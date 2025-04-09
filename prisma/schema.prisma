@@ -5,6 +5,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  output   = "src/lib/prisma"
 }
 
 model User {
@@ -17,6 +18,7 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  organizations UsersOnOrganizations[]
 
   @@unique([email])
   @@map("user")
@@ -65,4 +67,139 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// END OF USER PART
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+enum Day {
+  TUESDAY
+  MONDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum RoomType {
+  NOT_INCLUDED
+  INCLUDED
+  ON_SITE
+  MEMBER_HOME
+}
+
+enum MemberRole {
+  ADMIN
+  EDITOR
+  MEMBER
+}
+
+enum Language {
+  ALBANIAN
+  BASQUE
+  BELARUSIAN
+  BOSNIAN
+  BULGARIAN
+  CATALAN
+  CROATIAN
+  CZECH
+  DANISH
+  DUTCH
+  ENGLISH
+  ESTONIAN
+  FINNISH
+  FRENCH
+  GALICIAN
+  GERMAN
+  GREEK
+  HUNGARIAN
+  ICELANDIC
+  IRISH
+  ITALIAN
+  LATVIAN
+  LITHUANIAN
+  LUXEMBOURGISH
+  MALTESE
+  NORWEGIAN
+  POLISH
+  PORTUGUESE
+  ROMANIAN
+  RUSSIAN
+  SERBIAN
+  SLOVAK
+  SLOVENE
+  SPANISH
+  SWEDISH
+  TURKISH
+  UKRAINIAN
+  WELSH
+}
+
+model Organization {
+  id              String @id
+  name            String
+  description     String
+  email           String
+  phone           String
+  establishments  Establishment[]
+  members         UsersOnOrganizations[]
+  contactId       String // userId of one member
+
+  @@map("Organization")
+}
+
+model UsersOnOrganizations {
+  userId            String // relation scalar field (used in the `@relation` attribute above)
+  user              User     @relation(fields: [userId], references: [id])
+  organizationId    String
+  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignedAt        DateTime @default(now())
+  assignedBy        String // Id of the member
+  role              MemberRole
+
+  @@id([organizationId, userId])
+}
+
+model Establishment {
+  id                String @id
+  name              String
+  description       String
+  address           String
+  country           String
+  city              String
+  zipCode           String
+  languages         Language[]
+  openDays          Day[]
+  offers            Offer[]
+  collaborator      Int
+  organizationId    String
+  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("Establishment")
+}
+
+model Offer {
+  id                String  @id
+  reference         String  @unique
+  maxTime           Int
+  minTime           Int
+  timeUnit          String
+  description       String
+  room              RoomType
+  openDates         TimeSlot[]
+  traveler          Int
+  establishmentId   String
+  establishment     Establishment     @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  
+  @@map("Offer")
+}
+
+model TimeSlot {
+  id          String  @id
+  start_date  DateTime
+  end_date    DateTime?
+  offerId     String
+  offer       Offer      @relation(fields: [offerId], references: [id], onDelete: Cascade)
 }
