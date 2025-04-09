@@ -1,9 +1,14 @@
 import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
+import { cookies } from "next/headers"
+import { cache } from "react"
  
-export const getUser = async () => {
+// Use React's cache to avoid duplicate requests
+export const getUser = cache(async () => {
+  const cookieStore = cookies();
   const session = await auth.api.getSession({
-      headers: await headers()
+      headers: new Headers({
+        cookie: cookieStore.toString()
+      })
   })
   return session?.user;
-};
+});

@@ -8,19 +8,20 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const router = useRouter()
 
   return (
-    <Card className="max-w-md">
+    <>
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
         <CardDescription className="text-xs md:text-sm">
@@ -47,7 +48,7 @@ export default function SignIn() {
             <div className="flex items-center">
               <Label htmlFor="password">Password</Label>
               <Link
-                href="#"
+                href="forget-password"
                 className="ml-auto inline-block text-sm underline"
               >
                 Forgot your password?
@@ -89,7 +90,8 @@ export default function SignIn() {
               if (error) {
                 toast.error(error.message)
               } else {
-                redirect("/auth")
+                // Force a hard refresh to ensure all server components are revalidated
+                window.location.href = "/auth";
               }
             }}
           >
@@ -161,6 +163,6 @@ export default function SignIn() {
           </Link>
         </div>
       </CardContent>
-    </Card>
+    </>
   );
 }
