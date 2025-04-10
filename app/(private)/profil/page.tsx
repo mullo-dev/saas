@@ -1,6 +1,7 @@
+export default function PrivatePage() {
 
+  return (
+    <div>La page principale</div>
+  )
 
-export default async function ProfilPage() {
-
-  return <p>Salut</p>
 }

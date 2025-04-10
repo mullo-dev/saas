@@ -19,6 +19,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   organizations UsersOnOrganizations[]
+  subCatalogues SubCatalogue[]
 
   @@unique([email])
   @@map("user")
@@ -73,77 +74,19 @@ model Verification {
 // END OF USER PART
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-enum Day {
-  TUESDAY
-  MONDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
-}
-
-enum RoomType {
-  NOT_INCLUDED
-  INCLUDED
-  ON_SITE
-  MEMBER_HOME
-}
-
 enum MemberRole {
   ADMIN
   EDITOR
   MEMBER
 }
 
-enum Language {
-  ALBANIAN
-  BASQUE
-  BELARUSIAN
-  BOSNIAN
-  BULGARIAN
-  CATALAN
-  CROATIAN
-  CZECH
-  DANISH
-  DUTCH
-  ENGLISH
-  ESTONIAN
-  FINNISH
-  FRENCH
-  GALICIAN
-  GERMAN
-  GREEK
-  HUNGARIAN
-  ICELANDIC
-  IRISH
-  ITALIAN
-  LATVIAN
-  LITHUANIAN
-  LUXEMBOURGISH
-  MALTESE
-  NORWEGIAN
-  POLISH
-  PORTUGUESE
-  ROMANIAN
-  RUSSIAN
-  SERBIAN
-  SLOVAK
-  SLOVENE
-  SPANISH
-  SWEDISH
-  TURKISH
-  UKRAINIAN
-  WELSH
-}
-
 model Organization {
   id              String @id
   name            String
-  description     String
+  siret           String
   email           String
   phone           String
-  establishments  Establishment[]
+  catalogues      Catalogue[]
   members         UsersOnOrganizations[]
   contactId       String // userId of one member
 
@@ -162,44 +105,48 @@ model UsersOnOrganizations {
   @@id([organizationId, userId])
 }
 
-model Establishment {
+model Catalogue {
   id                String @id
   name              String
-  description       String
-  address           String
-  country           String
-  city              String
-  zipCode           String
-  languages         Language[]
-  openDays          Day[]
-  offers            Offer[]
-  collaborator      Int
+  products          Product[]
+  subCatalogues     SubCatalogue[]
   organizationId    String
   organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@map("Establishment")
+  @@map("Catalogue")
 }
 
-model Offer {
-  id                String  @id
-  reference         String  @unique
-  maxTime           Int
-  minTime           Int
-  timeUnit          String
-  description       String
-  room              RoomType
-  openDates         TimeSlot[]
-  traveler          Int
-  establishmentId   String
-  establishment     Establishment     @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
-  
-  @@map("Offer")
+model SubCatalogue {
+  id                String @id
+  products          ProductOnSubCatalogue[]
+  customerId        String
+  customer          User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  catalogueId       String
+  catalogue         Catalogue      @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
+
+  @@map("SubCatalogue")
 }
 
-model TimeSlot {
-  id          String  @id
-  start_date  DateTime
-  end_date    DateTime?
-  offerId     String
-  offer       Offer      @relation(fields: [offerId], references: [id], onDelete: Cascade)
+model ProductOnSubCatalogue {
+  productId         String // relation scalar field (used in the `@relation` attribute above)
+  product           Product         @relation(fields: [productId], references: [id])
+  subCatalogueId    String
+  subCatalogue      SubCatalogue    @relation(fields: [subCatalogueId], references: [id], onDelete: Cascade)
+  assignedAt        DateTime @default(now())
+  assignedBy        String // Id of the member
+  price             Int
+
+  @@id([subCatalogueId, productId])
+}
+
+model Product {
+  id                      String @id
+  name                    String
+  description             String
+  price                   Int
+  catalogueId             String
+  catalogue               Catalogue      @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
+  productOnSubCatalogues  ProductOnSubCatalogue[]
+
+  @@map("Product")
 }

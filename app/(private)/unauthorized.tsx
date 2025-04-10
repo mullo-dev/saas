@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export function unauthorized() {
+export default function unauthorized() {
 
   return (
     <div className="p-4">

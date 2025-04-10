@@ -1,7 +1,7 @@
 "use client"
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -90,8 +90,8 @@ export default function SignIn() {
               if (error) {
                 toast.error(error.message)
               } else {
-                // Force a hard refresh to ensure all server components are revalidated
-                window.location.href = "/auth";
+                router.refresh()
+                router.push("/profil")
               }
             }}
           >
@@ -116,7 +116,7 @@ export default function SignIn() {
               onClick={async () => {
                 await signIn.social({
                   provider: "google",
-                  callbackURL: "/auth"
+                  callbackURL: "/profil"
                 });
               }}
             >
@@ -136,7 +136,7 @@ export default function SignIn() {
               onClick={async () => {
                 await signIn.social({
                   provider: "github",
-                  callbackURL: "/auth"
+                  callbackURL: "/profil"
                 });
               }}
             >
@@ -155,13 +155,13 @@ export default function SignIn() {
             </Button>
           </div>
         </div>
-
-        <div>
-          <p>Don't have account yet ?</p>
-          <Link className={buttonVariants({ variant: "ghost" })} href="/auth/sign-up">
-            Sign Up
-          </Link>
-        </div>
+        <CardFooter>
+          <div className="flex justify-center w-full border-t py-4 mt-4">
+            <p className="text-center text-xs text-neutral-500">
+              Don't have account yet ? <Link href={"/auth/sign-up"} className="text-orange-400">sign up here</Link>
+            </p>
+          </div>
+        </CardFooter>
       </CardContent>
     </>
   );
