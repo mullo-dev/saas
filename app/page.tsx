@@ -1,14 +1,18 @@
 import { Header } from "@/components/global/header/header";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="">
       <Header />
       <div className="container mx-auto mt-5">
-        <h1 className="text-center text-2xl font-bold">
-          Work and travel for learn and discover the world !
+        <h1 className="text-center text-3xl font-bold mb-5">
+          Connectez vous à vos clients
         </h1>
+        <div className="flex justify-center">
+          <Link href="/auth/sign-up" className={buttonVariants()}>Commencer</Link>
+        </div>
       </div>
     </div>
   );

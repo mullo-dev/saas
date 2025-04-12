@@ -91,7 +91,7 @@ export default function SignIn() {
                 toast.error(error.message)
               } else {
                 router.refresh()
-                router.push("/profil")
+                router.push("/dashboard")
               }
             }}
           >
@@ -116,7 +116,7 @@ export default function SignIn() {
               onClick={async () => {
                 await signIn.social({
                   provider: "google",
-                  callbackURL: "/profil"
+                  callbackURL: "/dashboard"
                 });
               }}
             >
@@ -136,7 +136,7 @@ export default function SignIn() {
               onClick={async () => {
                 await signIn.social({
                   provider: "github",
-                  callbackURL: "/profil"
+                  callbackURL: "/dashboard"
                 });
               }}
             >

@@ -5,7 +5,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  output   = "src/lib/prisma"
+  // output   = "src/lib/prisma"
 }
 
 model User {
@@ -81,11 +81,12 @@ enum MemberRole {
 }
 
 model Organization {
-  id              String @id
+  id              String @id @default(uuid())
   name            String
   siret           String
   email           String
   phone           String
+  city            String
   catalogues      Catalogue[]
   members         UsersOnOrganizations[]
   contactId       String // userId of one member
@@ -106,7 +107,7 @@ model UsersOnOrganizations {
 }
 
 model Catalogue {
-  id                String @id
+  id                String @id @default(uuid())
   name              String
   products          Product[]
   subCatalogues     SubCatalogue[]
@@ -117,7 +118,7 @@ model Catalogue {
 }
 
 model SubCatalogue {
-  id                String @id
+  id                String @id @default(uuid())
   products          ProductOnSubCatalogue[]
   customerId        String
   customer          User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -140,7 +141,7 @@ model ProductOnSubCatalogue {
 }
 
 model Product {
-  id                      String @id
+  id                      String @id @default(uuid())
   name                    String
   description             String
   price                   Int
