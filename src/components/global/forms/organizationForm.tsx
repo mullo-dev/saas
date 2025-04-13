@@ -8,6 +8,7 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { organizationType } from "@/actions/organization/model";
+import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
 
 type InputNames = "name" | "siret" | "email" | "phone" | "contactId" | "city";
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; col: number }[] = [
@@ -58,20 +59,23 @@ const inputs: { label: string; defaultValue: string; name: InputNames; type: str
 export default function OrganizationForm(props: { organization?: Organization, setOpen: any }) {
   const {
     register,
-    control,
-    setValue,
     setError,
     clearErrors,
     handleSubmit,
     formState: { errors },
-  } = useForm<organizationType>({
-    defaultValues: {},
-  });
+  } = useForm<organizationType>();
 
   const onSubmit: SubmitHandler<organizationType> = async (data) => {
-    const result = await createOrganization(data);
+    let result
+    if (props.organization) {
+      result = await createOrganization(data);
+    } else {
+      result = await createOrganization(data);
+    }
     if (result?.data?.success) {
       props.setOpen(false)
+    } else {
+      handleFormErrors(result, setError);
     }
   };
 
@@ -84,9 +88,11 @@ export default function OrganizationForm(props: { organization?: Organization, s
             <div key={index} className={`col-span-${input.col}`}>
               <Label>
                 {input.label}
-                <Input {...register(input.name)} />
-                {/* defaultValue={props.organization ? (props.organization[input.name] as string) : input.defaultValue}  */}
-                {/* {errors[input.name] && <p className="text-red-500 mt-1 text-sm">{errors[input.name]?.message}</p>} */}
+                <Input 
+                  {...register(input.name)}
+                  defaultValue={props.organization && (props.organization[input.name] as string)} 
+                />
+                {errors[input.name] && <p className="text-red-500 mt-1 text-sm">{errors[input.name]?.message}</p>}
               </Label>
             </div>
           ))}

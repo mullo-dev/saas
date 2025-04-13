@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
- 
 import { useMediaQuery } from "@react-hook/media-query"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,8 +33,18 @@ interface DrawerDialogProps {
 
 export function DrawerDialog({ title, description, buttonTitle, children, buttonSize, onlyDrawer = false }: DrawerDialogProps) {
   const [open, setOpen] = React.useState(false)
+  const [mounted, setMounted] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
  
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Show nothing until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return null
+  }
+
   if (isDesktop && !onlyDrawer) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>

@@ -5,7 +5,6 @@ import { organizationModel } from './model';
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
 import { revalidatePath } from 'next/cache';
-import { MemberRole } from "@prisma/client"
 import { toast } from 'sonner';
 
 // const paramsSchema = z.object({
@@ -75,41 +74,6 @@ export const createOrganization = authActionClient
         }
       }
     })
-
-    revalidatePath("/dashboard")
-    toast.success("Organisation créée")
-    return { success: true };
-  } catch (error) {
-    console.log(error);
-    return { success: false, error };
-  }
-
-});
-
-
-export const addMemberToOrganization = authActionClient
-  .metadata({ actionName: "createAddress" }) 
-  .schema(z.object({
-    organizationId: z.string(),
-    userId: z.string(),
-    role: z.enum(Object.values(MemberRole) as [string, ...string[]])
-  }))
-  .action(async ({ parsedInput: { userId, organizationId, role }, ctx: { user } }) => {
-
-  try {
-    // New organization
-    const organization = await prisma.usersOnOrganizations.create({
-      data: {
-        assignedBy: user.name,
-        role: role as MemberRole,
-        user: {
-          connect: { id: userId },
-        },
-        organization: {
-          connect: { id: organizationId }, // <- passe l'ID de l'organisation ici
-        },
-      },
-    });
 
     revalidatePath("/dashboard")
     return { success: true };

@@ -10,11 +10,6 @@ export type organizationType = {
   members?: string[]
 }
 
-export type memberType = {
-  userId: string,
-  role: string,
-}
-
 export const organizationModel = {
   name: z.string().min(1, "Name is required"),
   phone: z.string(),
