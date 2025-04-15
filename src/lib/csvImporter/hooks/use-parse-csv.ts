@@ -219,7 +219,7 @@ export function useParseCsv({
     }))
   }
 
-  function getSanitizedData({ data, fields }: { data: Record<string, unknown>[], fields: any }) {
+  function getSanitizedData({ data }: { data: Record<string, unknown>[] }) {
     // Add prisma add products here 
     const parseData = data.map((row) =>
       Object.keys(row).reduce(
@@ -230,7 +230,6 @@ export function useParseCsv({
         {}
       )
     )
-    console.log(fields)
     return parseData
   }
 

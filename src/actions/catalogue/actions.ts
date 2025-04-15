@@ -39,13 +39,7 @@ export const getCatalogueById = authActionClient
       where: { id: catalogueId },
       include: {
         subCatalogues: true,
-        products: {
-          select: {
-            id: true,
-            name: true,
-            price: true
-          }
-        }
+        products: true
       }
     });
 

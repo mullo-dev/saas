@@ -44,32 +44,11 @@ import { FileUploader } from "./file-uploader"
 interface CsvImporterProps
   extends React.ComponentPropsWithoutRef<typeof DialogTrigger>,
     ButtonProps {
-  /**
-   * Array of field mappings defining the imported data structure.
-   * Each includes a label, value, and optional required flag.
-   * @example fields={[{ label: 'Name', value: 'name', required: true }, { label: 'Email', value: 'email' }]}
-   */
-  fields: {
-    /**
-     * Field display label shown to the user.
-     * @example "Name"
-     */
-    label: string
-
-    /**
-     * Key identifying the field in the imported data.
-     * @example "name"
-     */
-    value: string
-
-    /**
-     * Optional flag indicating if the field is required.
-     * Required fields cannot be unchecked during mapping.
-     * @default false
-     * @example true
-     */
-    required?: boolean
-  }[]
+      fields: {
+        label: string
+        value: string
+        required?: boolean
+      }[]
 
   /**
    * Callback function called on data import.
@@ -155,8 +134,6 @@ export function CsvImporter({
                       key={field.value}
                       field={field}
                       onFieldChange={(f) => {
-                        console.log(data)
-                        console.log(f)
                         onFieldChange({
                           oldValue: f.value,
                           newValue: field.value,
@@ -195,10 +172,10 @@ export function CsvImporter({
             <Button
               onClick={async () => {
                 await new Promise((resolve) => setTimeout(resolve, 100))
-                getSanitizedData({ data, fields })
-                // onImport(getSanitizedData({ data, fields }))
-                // setOpen(false)
-                // setStep("upload")
+                getSanitizedData({ data })
+                onImport(getSanitizedData({ data }))
+                setOpen(false)
+                setStep("upload")
               }}
             >
               Import

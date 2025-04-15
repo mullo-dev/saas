@@ -11,9 +11,38 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { CsvImporter } from "./csv-importer"
+import { useParams } from "next/navigation"
+import { createProducts } from "@/actions/produits/actions"
+import { toast } from "sonner"
 
 export function TricksTable(props: { propsData: any }) {
   const [data, setData] = React.useState(props.propsData)
+  const { catalogueId } = useParams()
+
+  console.log(props.propsData)
+
+  const toUploadData = async (parsedData:any) => {
+    const formattedData = parsedData.map((item:any) => ({
+        ref: String(item.chooseRef ?? ""),
+        name: String(item.chooseName ?? ""),
+        description: String(item.chooseDescription ?? ""),
+        price: Number.isNaN(Number(item.choosePrice))
+          ? 0
+          : Number(item.choosePrice),
+        catalogueId: String(catalogueId)
+      })
+    )
+    console.log(formattedData)
+    const result = await createProducts(formattedData)
+
+    if (result?.data?.success) {
+      toast.success("Produits importés !")
+      setData((prev:any) => [...prev, ...formattedData])
+    } else {
+      toast.success("Une erreur est survenue...")
+      console.log(result?.data)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -21,24 +50,12 @@ export function TricksTable(props: { propsData: any }) {
         <h4>Produits</h4>
         <CsvImporter
           fields={[
-            { label: "Référence", value: "ref", required: true },
-            { label: "Name", value: "name", required: true },
-            { label: "Description", value: "description" },
-            { label: "Prix", value: "price", required: true }
+            { label: "Référence", value: "chooseRef", required: true },
+            { label: "Name", value: "chooseName", required: true },
+            { label: "Description", value: "chooseDescription" },
+            { label: "Prix", value: "choosePrice", required: true }
           ]}
-          onImport={(parsedData) => {
-            const formattedData: any = parsedData.map(
-              (item) => ({
-                ref: String(item.ref ?? ""),
-                name: String(item.name ?? ""),
-                description: String(item.description ?? ""),
-                price: Number.isNaN(Number(item.price))
-                  ? 0
-                  : Number(item.points)
-              })
-            )
-            setData((prev:any) => [...prev, ...formattedData])
-          }}
+          onImport={(parsedData) => toUploadData(parsedData)}
           className="self-end"
         />
       </div>
@@ -54,8 +71,8 @@ export function TricksTable(props: { propsData: any }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item:any) => (
-              <TableRow key={item.id}>
+            {data.map((item:any, index:number) => (
+              <TableRow key={index}>
                 <TableCell className="font-medium w-40">
                   <span className="line-clamp-1">{item.ref}</span>
                 </TableCell>
@@ -66,7 +83,7 @@ export function TricksTable(props: { propsData: any }) {
                   <span className="line-clamp-3">{item.description}</span>
                 </TableCell>
                 <TableCell className="max-w-[100px]">
-                  <span className="line-clamp-1">{item.prix}</span>
+                  <span className="line-clamp-1">{item.price}</span>
                 </TableCell>
               </TableRow>
             ))}
