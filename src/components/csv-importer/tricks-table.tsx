@@ -14,12 +14,18 @@ import { CsvImporter } from "./csv-importer"
 import { useParams } from "next/navigation"
 import { createProducts } from "@/actions/produits/actions"
 import { toast } from "sonner"
+import { Checkbox } from "../ui/checkbox"
+import { Input } from "../ui/input"
 
-export function TricksTable(props: { propsData: any }) {
-  const [data, setData] = React.useState(props.propsData)
+
+export function TricksTable(
+  props: { 
+    propsData: any, 
+    formActive: boolean,
+    onToggleProduct: (productId: string, price: number, checked: boolean) => void 
+    selectProducts: any
+  }) {
   const { catalogueId } = useParams()
-
-  console.log(props.propsData)
 
   const toUploadData = async (parsedData:any) => {
     const formattedData = parsedData.map((item:any) => ({
@@ -32,12 +38,13 @@ export function TricksTable(props: { propsData: any }) {
         catalogueId: String(catalogueId)
       })
     )
-    console.log(formattedData)
+
     const result = await createProducts(formattedData)
 
     if (result?.data?.success) {
       toast.success("Produits importés !")
-      setData((prev:any) => [...prev, ...formattedData])
+      // we need to reload based composant to display products immediatly
+      // Reput useState but with return products (not possible with create many ?)
     } else {
       toast.success("Une erreur est survenue...")
       console.log(result?.data)
@@ -46,24 +53,29 @@ export function TricksTable(props: { propsData: any }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-between items-center mt-10 mb-2">
-        <h4>Produits</h4>
-        <CsvImporter
-          fields={[
-            { label: "Référence", value: "chooseRef", required: true },
-            { label: "Name", value: "chooseName", required: true },
-            { label: "Description", value: "chooseDescription" },
-            { label: "Prix", value: "choosePrice", required: true }
-          ]}
-          onImport={(parsedData) => toUploadData(parsedData)}
-          className="self-end"
-        />
+      <div className="flex justify-between items-center mt-5 mb-2">
+        <h4>{props.formActive ? "Produits à inclure :" : "Produits"}</h4>
+        {!props.formActive && 
+          <CsvImporter
+            fields={[
+              { label: "Référence", value: "chooseRef", required: true },
+              { label: "Name", value: "chooseName", required: true },
+              { label: "Description", value: "chooseDescription" },
+              { label: "Prix", value: "choosePrice", required: true }
+            ]}
+            onImport={(parsedData) => toUploadData(parsedData)}
+            className="self-end"
+          />
+        }
       </div>
 
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
+              {props.formActive && 
+                <TableHead>Inc</TableHead>
+              }
               <TableHead>Référence</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
@@ -71,8 +83,13 @@ export function TricksTable(props: { propsData: any }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item:any, index:number) => (
+            {props.propsData.map((item:any, index:number) => (
               <TableRow key={index}>
+                {props.formActive && 
+                  <TableCell className="font-medium w-15">
+                    <Checkbox onCheckedChange={(checked) => props.onToggleProduct(item.id, item.price, checked === true )} />
+                  </TableCell>
+                }
                 <TableCell className="font-medium w-40">
                   <span className="line-clamp-1">{item.ref}</span>
                 </TableCell>
@@ -83,7 +100,15 @@ export function TricksTable(props: { propsData: any }) {
                   <span className="line-clamp-3">{item.description}</span>
                 </TableCell>
                 <TableCell className="max-w-[100px]">
-                  <span className="line-clamp-1">{item.price}</span>
+                  {props.formActive && props.selectProducts.find((select:any) => select.productId === item.id) ?
+                    <Input 
+                      type="number" 
+                      defaultValue={item.price}
+                      onBlur={(e) => props.onToggleProduct(item.id, Number(e.target.value), true )}
+                    />
+                  : 
+                    <span className="line-clamp-1">{item.price}</span>
+                  }
                 </TableCell>
               </TableRow>
             ))}

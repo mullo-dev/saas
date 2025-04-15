@@ -16,3 +16,9 @@ export const productModel = {
   catalogueId: z.string(),
   description: z.string()
 }
+
+export const selectProductModel = z.object({
+  id: z.string().optional(),
+  price: z.number(),
+  productId: z.string().min(1, "Product is required")
+})

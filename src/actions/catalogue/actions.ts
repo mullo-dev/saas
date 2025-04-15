@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
 import { revalidatePath } from 'next/cache';
-import { catalogueModel } from './model';
+import { catalogueModel, selectProductModel, subCatalogueModel } from './model';
 
 export const createCatalogue = authActionClient
   .metadata({ actionName: "createCatalogue" })
@@ -45,6 +45,39 @@ export const getCatalogueById = authActionClient
 
     return { success: true, catalogue: catalogue };
   } catch (error) {
+    return { success: false, error };
+  }
+});
+
+
+export const createSubCatalogue = authActionClient
+  .metadata({ actionName: "createCatalogue" })
+  .schema(z.object({subCatalogue: z.object(subCatalogueModel), selectProducts: z.array(z.object(selectProductModel))}))
+  .action(async ({ parsedInput: { subCatalogue, selectProducts }, ctx: { user } }) => {
+
+  try {
+    // New organization
+    await prisma.subCatalogue.create({
+      data: {
+        ...subCatalogue,
+        products: {
+          create: selectProducts.map((prod) => ({
+            assignedBy: user.name,
+            price: prod.price,
+            product: {
+              connect: {
+                id: prod.productId
+              }
+            }
+          }))
+        }
+      }
+    })
+
+    revalidatePath("/dashboard")
+    return { success: true };
+  } catch (error) {
+    console.log(error);
     return { success: false, error };
   }
 });
