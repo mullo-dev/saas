@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { catalogueType } from "../catalogue/model";
 
 export type organizationType = {
   name: string,

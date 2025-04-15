@@ -5,7 +5,6 @@ import { organizationModel } from './model';
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
 import { revalidatePath } from 'next/cache';
-import { toast } from 'sonner';
 
 // const paramsSchema = z.object({
 //   id: z.string(),
@@ -46,7 +45,6 @@ export const getOrganizationById = authActionClient
   } catch (error) {
     return { success: false, error };
   }
-
 });
 
 export const createOrganization = authActionClient
@@ -81,5 +79,4 @@ export const createOrganization = authActionClient
     console.log(error);
     return { success: false, error };
   }
-
 });

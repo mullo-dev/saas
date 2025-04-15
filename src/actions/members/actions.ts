@@ -4,8 +4,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
 import { revalidatePath } from 'next/cache';
-import { MemberRole } from "@prisma/client"
-import { toast } from 'sonner';
+import { MemberRole } from "@prisma/client";
 
 export const addMemberToOrganization = authActionClient
   .metadata({ actionName: "addMember" }) 
@@ -26,7 +25,7 @@ export const addMemberToOrganization = authActionClient
           connect: { id: userId },
         },
         organization: {
-          connect: { id: organizationId }, // <- passe l'ID de l'organisation ici
+          connect: { id: organizationId }, // <- passe l'ID de connexion ici
         },
       },
     });

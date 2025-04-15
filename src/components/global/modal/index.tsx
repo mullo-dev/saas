@@ -31,6 +31,12 @@ interface DrawerDialogProps {
   buttonSize?: "default" | "sm" | "lg" | "icon" | null | undefined;
 }
 
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// This component work like layout for modal and drawer component.
+// To pass a component you must do : {(props) => <TheComponent setOpen={props.setOpen} otherProps={otherProps} />}
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 export function DrawerDialog({ title, description, buttonTitle, children, buttonSize, onlyDrawer = false }: DrawerDialogProps) {
   const [open, setOpen] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)

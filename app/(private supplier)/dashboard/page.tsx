@@ -1,7 +1,7 @@
-import { DrawerDialog } from "@/components/global/modal"
 import OrganizationCard from "./organizationCard"
 import { getUser } from "@/lib/auth-session"
 import { prisma } from "@/lib/prisma"
+import CatalogueSection from "./catalogues/catalogueSection"
 
 export default async function DashboardPage() {
   const user = await getUser()
@@ -13,6 +13,11 @@ export default async function DashboardPage() {
           organization: {
             select: {
               id: true,
+              catalogues: {
+                select: {
+                  id: true
+                }
+              }
             },
           }
         }
@@ -26,16 +31,7 @@ export default async function DashboardPage() {
         <OrganizationCard organizationId={theUser?.organizations[0]?.organizationId} />
       </div>
       <div className="flex-1">
-        <div className="flex justify-between items-center">
-          <h4 className="font-bold text-md">Vos catalogues</h4>
-          {/* <DrawerDialog 
-            title="Nouveau catalogue" 
-            buttonTitle="ajouter"
-            description="Ajoutez un catalogue"
-          >
-            <p>salut</p>
-          </DrawerDialog> */}
-        </div>
+        <CatalogueSection organization={theUser?.organizations[0]?.organization} />
       </div>
     </div>
   )

@@ -83,7 +83,7 @@ export default function OrganizationCard(props: { organizationId?: string }) {
                   <p className="text-sm text-gray-400">{member.role.toLowerCase()}</p>
                   <div className="toolBox absolute right-[-100px] bg-gray-100 transition-all delay-75">
                     <DrawerDialog 
-                      title="Ajouter un membre" 
+                      title={member.user.name}
                       buttonTitle={<Edit/>}
                       buttonSize="icon"
                       description="Mettre à jour le membre"

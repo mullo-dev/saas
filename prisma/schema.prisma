@@ -142,6 +142,7 @@ model ProductOnSubCatalogue {
 
 model Product {
   id                      String @id @default(uuid())
+  ref                     String
   name                    String
   description             String
   price                   Int
