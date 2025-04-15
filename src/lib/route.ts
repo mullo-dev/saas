@@ -3,7 +3,7 @@ import { createZodRoute } from "next-zod-route"
 import { NextResponse } from "next/server";
 import { getUser } from "./auth-session";
 import { z } from "zod"
-import { metadata } from "@app/layout";
+import { prisma } from "./prisma";
 
 export class SafeRouteError extends Error {
   status?: number;
@@ -15,56 +15,68 @@ export class SafeRouteError extends Error {
 
 export const route = createZodRoute({
   handleServerError: (e: Error) => {
-    logger.error(e);
+    logger.error(e.message);
+    
     if (e instanceof SafeRouteError) {
       return NextResponse.json(
         { message: e.message, status: e.status },
-        {
-          status: e.status,
-        }
-      )
+        { status: e.status }
+      );
     }
-  }
 
-  if (e instanceof AuthError) {
+    // Handle auth errors
+    if (e.message.includes("auth")) {
+      return NextResponse.json(
+        { message: e.message },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json(
-      { 
-        message: e.message,
-      }
-      {
-        status: 401,
-      }
-    )
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
-})
+});
 
 export const authRoute = route.use(async ({ next }) => {
   const user = await getUser();
   if (!user) {
-    throw new SafeRouteError("Session not found!")
+    throw new SafeRouteError("Session not found!");
   }
 
   return next({
     ctx: { user },
-  })
-})
+  });
+});
 
 // To use only on route orgaId
 export const orgRoute = authRoute
   .defineMetadata(
     z.object({
+      organizationId: z.string(),
       roles: z.string(),
       permissions: z.string()
     })
   )
   .use(async ({ next, metadata }) => {
+    if (!metadata) {
+      throw new SafeRouteError("Metadata is required");
+    }
+
     try {
-      const organization = await getOrganization(metadata);
+      const organization = await prisma.organization.findUnique({
+        where: { id: metadata.organizationId }
+      });
+
+      if (!organization) {
+        throw new SafeRouteError("Organization not found");
+      }
 
       return next({
         ctx: { organization },
       });
-    } catch {
-      throw new SafeRouteError("You need to be part of an organization")
+    } catch (e) {
+      throw new SafeRouteError("You need to be part of an organization");
     }
-})
+  });
