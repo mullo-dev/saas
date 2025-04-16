@@ -23,3 +23,24 @@ export const getUsers = authActionClient
   }
 
 });
+
+
+export const inviteNewUser = authActionClient
+  .metadata({ actionName: "inviteNewUser" }) 
+  .action(async ({ parsedInput, ctx: { user } }) => {
+
+  // try {
+  //   // New organization
+  //   const users = await prisma.user.create({
+  //     data: {
+  //       name: "true",
+  //       email: "true"
+  //     }
+  //   })
+
+  //   return { success: true, users: users };
+  // } catch (error) {
+  //   return { success: false, error };
+  // }
+
+});

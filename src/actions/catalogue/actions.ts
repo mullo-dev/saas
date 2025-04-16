@@ -56,10 +56,34 @@ export const createSubCatalogue = authActionClient
   .action(async ({ parsedInput: { subCatalogue, selectProducts }, ctx: { user } }) => {
 
   try {
+    // Exemple avec une action ou API route
+    // const existingUser = await prisma.user.findUnique({
+    //   where: { email: subCatalogue.customerEmail }
+    // });
+
+    // let userIdToLink;
+
+    // if (existingUser) {
+    //   userIdToLink = existingUser.id;
+    // } else {
+    //   const newUser = await prisma.user.create({
+    //     data: {
+    //       email: invitedEmail,
+    //       status: 'INVITED', // Optionnel, selon ton schéma
+    //     }
+    //   });
+
+    //   userIdToLink = newUser.id;
+
+    //   // Envoi d'un mail avec un lien pour compléter l'inscription
+    //   await sendInvitationEmail(invitedEmail, newUser.id);
+    // }
+
     // New organization
     await prisma.subCatalogue.create({
       data: {
-        ...subCatalogue,
+        customerId: "userIdToLink",
+        catalogueId: subCatalogue.catalogueId,
         products: {
           create: selectProducts.map((prod) => ({
             assignedBy: user.name,

@@ -10,7 +10,7 @@ export const catalogueModel = {
 }
 
 export const subCatalogueModel = {
-  customerId: z.string().min(1, "User is required"),
+  customerEmail: z.string().min(1, "User is required"),
   catalogueId: z.string().min(1, "Catalogue is required")
 }
 
