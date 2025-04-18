@@ -3,13 +3,23 @@
 import { DrawerDialog } from "@/components/global/modal";
 import CatalogueForm from "@/components/global/forms/catalogueForm";
 import CatalogueCard from "./catalogueCard";
+import { useEffect, useState } from "react";
+import { Catalogue } from "@prisma/client"
+import { getOrganizationCatalogue } from "@/actions/catalogue/actions";
 
-type OrganizationWithCatalogues = {
-  id: string,
-  catalogues: { id: string }[]
-}
+export default function CatalogueSection(props: { organizations: any }) {
+  const [catalogues, setCatalogues] = useState<Catalogue[]>()
 
-export default function CatalogueSection(props: { organization?: OrganizationWithCatalogues }) {
+  useEffect(() => {
+    const getCatalogues = async () => {
+      const response = await getOrganizationCatalogue({organizationId: props.organizations[0].id})
+      if (response?.data?.success) {
+        setCatalogues(response.data.catalogues)
+      }
+    }
+    getCatalogues()
+  }, [props.organizations])
+  
 
   return (
     <div>
@@ -21,12 +31,12 @@ export default function CatalogueSection(props: { organization?: OrganizationWit
           buttonSize="sm"
           description="Ajoutez un catalogue"
         >
-          {(p) => <CatalogueForm organizationId={props.organization?.id} setOpen={p.setOpen}/>}
+          {(p) => <CatalogueForm organizationId={props.organizations[0]?.id} setOpen={p.setOpen}/>}
         </DrawerDialog>
       </div>
       <hr />
 
-      {props.organization?.catalogues && props.organization.catalogues.map((cat, index) => (
+      {catalogues && catalogues.map((cat, index) => (
         <CatalogueCard key={index} catalogueId={cat.id} />
       ))}
     </div>

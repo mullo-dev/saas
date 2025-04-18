@@ -3,6 +3,7 @@ import { nextCookies } from 'better-auth/next-js';
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from './prisma';
+import { organization } from "better-auth/plugins"
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -11,12 +12,12 @@ export const auth = betterAuth({
   emailAndPassword: {
       enabled: true,
       async sendResetPassword(data, request) {
-          await resend.emails.send({
-            from: "noreply@mullo.fr",
-            to: data.user.email,
-            subject: "Reset Password",
-            text: `Reset password here : ${data.url}`,
-          })
+        await resend.emails.send({
+          from: "noreply@mullo.fr",
+          to: data.user.email,
+          subject: "Reset Password",
+          text: `Reset password here : ${data.url}`,
+        })
       },
   },
   // socialProviders: {
@@ -30,6 +31,17 @@ export const auth = betterAuth({
   //     }
   // },
   plugins: [
+    organization({
+      async sendInvitationEmail(data) {
+        const inviteLink = `http://localhost:3000/auth/accept-invitation/${data.id}?email=${data.email}`
+          await resend.emails.send({
+            from: "noreply@mullo.fr",
+            to: data.email,
+            subject: data.inviter.user.name + " invite you to join " + data.organization.name,
+            text: `Accept invite here : ${inviteLink}`,
+          })
+        },
+    }),
     nextCookies()
   ]
 });

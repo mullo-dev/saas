@@ -2,14 +2,14 @@
 
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Catalogue, Organization } from "@prisma/client";
-import { createOrganization } from "@/actions/organization/actions";
+import { Catalogue } from "@prisma/client";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { organizationType } from "@/actions/organization/model";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
 import { createCatalogue } from "@/actions/catalogue/actions";
+import { toast } from "sonner";
 
 type InputNames = "name";
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; col: number }[] = [
@@ -43,8 +43,10 @@ export default function CatalogueForm(props: { organizationId?: string, catalogu
       result = await createCatalogue({organizationId: props.organizationId, ...data});
     }
     if (result?.data?.success) {
+      toast.success("Catalogue créé !")
       props.setOpen(false)
     } else {
+      toast.error("Oups une erreur est survenue...")
       handleFormErrors(result, setError);
     }
   };

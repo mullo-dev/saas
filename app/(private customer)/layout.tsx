@@ -16,8 +16,8 @@ export default async function LayoutPrivate({
 
   const fullUser = await prisma.user.findUnique({where: {id:user.id}, select: {type: true}})
 
-  if (fullUser?.type === "CUSTOMER") {
-    redirect("/compte")
+  if (fullUser?.type === "SUPPLIER") {
+    redirect("/dashboard")
   }
 
   return (

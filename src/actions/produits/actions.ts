@@ -3,21 +3,22 @@
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
-import { revalidatePath } from 'next/cache';
 import { productModel } from "./model"
 
 export const createProducts = authActionClient
-  .metadata({ actionName: "createProduct" }) 
-  .schema(z.array(z.object(productModel)))
-  .action(async ({ parsedInput }) => {
-
+.metadata({ actionName: "createProduct" }) 
+.schema(z.object({
+  products: z.array(z.object(productModel)), // Tableau d'objets selon productModel
+  path: z.string(), // Un objet avec une propriété path de type string
+}))
+.action(async ({ parsedInput: { products, path } }) => {
+  
   try {
     // New products
     await prisma.product.createMany({
-      data: parsedInput,
+      data: products,
     });
 
-    revalidatePath("/dashboard")
     return { success: true };
   } catch (error) {
     return { success: false, error };

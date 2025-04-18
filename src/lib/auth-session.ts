@@ -13,6 +13,7 @@ export const getUser = cache(async () => {
         cookie: cookieStore.toString()
       })
   })
+  
   return session?.user;
 });
 

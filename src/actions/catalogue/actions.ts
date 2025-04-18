@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
 import { revalidatePath } from 'next/cache';
 import { catalogueModel, selectProductModel, subCatalogueModel } from './model';
+import { checkEmail, inviteMember } from '../members/actions';
+import { getOrganizationById } from '../organization/actions';
 
 export const createCatalogue = authActionClient
   .metadata({ actionName: "createCatalogue" })
@@ -28,6 +30,24 @@ export const createCatalogue = authActionClient
 });
 
 
+export const getOrganizationCatalogue = authActionClient
+  .metadata({ actionName: "getCatalogueOfOrganization" }) 
+  .schema(z.object({organizationId: z.string()}))
+  .action(async ({ parsedInput: { organizationId }}) => {
+
+  try {
+    // Get the catalogue
+    const catalogues = await prisma.catalogue.findMany({
+      where: { organizationId: organizationId },
+    });
+
+    return { success: true, catalogues: catalogues };
+  } catch (error) {
+    return { success: false, error };
+  }
+});
+
+
 export const getCatalogueById = authActionClient
   .metadata({ actionName: "getCatalogue" }) 
   .schema(z.object({catalogueId: z.string()}))
@@ -38,7 +58,18 @@ export const getCatalogueById = authActionClient
     const catalogue = await prisma.catalogue.findUnique({
       where: { id: catalogueId },
       include: {
-        subCatalogues: true,
+        subCatalogues: {
+          // select: {}
+          include: {
+            customer: true,
+            products: {
+              select: {
+                productId: true,
+                price: true
+              }
+            }
+          }
+        },
         products: true
       }
     });
@@ -52,38 +83,53 @@ export const getCatalogueById = authActionClient
 
 export const createSubCatalogue = authActionClient
   .metadata({ actionName: "createCatalogue" })
-  .schema(z.object({subCatalogue: z.object(subCatalogueModel), selectProducts: z.array(z.object(selectProductModel))}))
-  .action(async ({ parsedInput: { subCatalogue, selectProducts }, ctx: { user } }) => {
+  .schema(z.object({
+    subCatalogue: z.object(subCatalogueModel), 
+    selectProducts: z.array(z.object(selectProductModel)),
+    organization: z.any()
+  }))
+  .action(async ({ parsedInput: { subCatalogue, selectProducts, organization }, ctx: { user } }) => {
 
   try {
-    // Exemple avec une action ou API route
-    // const existingUser = await prisma.user.findUnique({
-    //   where: { email: subCatalogue.customerEmail }
-    // });
+    const fullOrganization = await getOrganizationById(organization.slug)
+    // Check if user exist and invited it is not
+    let status, userId, invitation
+    if (fullOrganization?.data?.organization?.members.find((user:any) => user.user.email === subCatalogue.customerEmail)){
+      userId = fullOrganization?.data?.organization?.members.find((user:any) => user.user.email === subCatalogue.customerEmail)?.userId
+      status = "memberInvited"
+    } else {
+      const check = await checkEmail(subCatalogue.customerEmail)
+      if (check) {
+        const result = await prisma.user.findUnique({
+          where: { email: subCatalogue.customerEmail }
+        })
+        userId = result ? result.id : ""
+      } else {
+        userId = null
+      }
 
-    // let userIdToLink;
-
-    // if (existingUser) {
-    //   userIdToLink = existingUser.id;
-    // } else {
-    //   const newUser = await prisma.user.create({
-    //     data: {
-    //       email: invitedEmail,
-    //       status: 'INVITED', // Optionnel, selon ton schéma
-    //     }
-    //   });
-
-    //   userIdToLink = newUser.id;
-
-    //   // Envoi d'un mail avec un lien pour compléter l'inscription
-    //   await sendInvitationEmail(invitedEmail, newUser.id);
-    // }
+      try {
+        invitation = await inviteMember({
+          email: subCatalogue.customerEmail,
+          organizationId: organization.id,
+          role: "member"
+        })
+        console.log(invitation)
+      } catch(error) {
+        console.error(error)
+        return { success: false, error }
+      }
+      
+      status = "pendingInvit"
+    }
 
     // New organization
     await prisma.subCatalogue.create({
       data: {
-        customerId: "userIdToLink",
+        customerId: userId,
+        status: status,
         catalogueId: subCatalogue.catalogueId,
+        invitationId: invitation?.data?.invitation?.id,
         products: {
           create: selectProducts.map((prod) => ({
             assignedBy: user.name,
@@ -95,6 +141,29 @@ export const createSubCatalogue = authActionClient
             }
           }))
         }
+      }
+    })
+
+    revalidatePath("/dashboard")
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error };
+  }
+});
+
+
+export const updateSubCatalogueFromInivtation = authActionClient
+  .metadata({ actionName: "updateSubCatalogueFromInivtation" })
+  .schema(z.object({subCatalogueId: z.string()}))
+  .action(async ({ parsedInput: { subCatalogueId }, ctx: { user } }) => {
+
+  try {
+    
+    await prisma.subCatalogue.update({
+      where: { id: subCatalogueId },
+      data: {
+        customerId: user.id,
       }
     })
 

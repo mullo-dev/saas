@@ -16,6 +16,8 @@ import { createProducts } from "@/actions/produits/actions"
 import { toast } from "sonner"
 import { Checkbox } from "../ui/checkbox"
 import { Input } from "../ui/input"
+import { Button } from "../ui/button"
+import { Trash } from "lucide-react"
 
 
 export function TricksTable(
@@ -23,7 +25,9 @@ export function TricksTable(
     propsData: any, 
     formActive: boolean,
     onToggleProduct: (productId: string, price: number, checked: boolean) => void 
-    selectProducts: any
+    selectProducts: any,
+    selectCustomer: any,
+    reload: () => void
   }) {
   const { catalogueId } = useParams()
 
@@ -39,15 +43,13 @@ export function TricksTable(
       })
     )
 
-    const result = await createProducts(formattedData)
-
+    const result = await createProducts({products: formattedData, path: window.location.href})
     if (result?.data?.success) {
       toast.success("Produits importés !")
-      // we need to reload based composant to display products immediatly
-      // Reput useState but with return products (not possible with create many ?)
+      props.reload()
     } else {
       toast.success("Une erreur est survenue...")
-      console.log(result?.data)
+      console.log(result?.data?.error)
     }
   }
 
@@ -83,35 +85,71 @@ export function TricksTable(
             </TableRow>
           </TableHeader>
           <TableBody>
-            {props.propsData.map((item:any, index:number) => (
-              <TableRow key={index}>
-                {props.formActive && 
-                  <TableCell className="font-medium w-15">
-                    <Checkbox onCheckedChange={(checked) => props.onToggleProduct(item.id, item.price, checked === true )} />
-                  </TableCell>
-                }
-                <TableCell className="font-medium w-40">
-                  <span className="line-clamp-1">{item.ref}</span>
-                </TableCell>
-                <TableCell className="max-w-[100px]">
-                  <span className="line-clamp-1">{item.name}</span>
-                </TableCell>
-                <TableCell className="max-w-[100px]">
-                  <span className="line-clamp-3">{item.description}</span>
-                </TableCell>
-                <TableCell className="max-w-[100px]">
-                  {props.formActive && props.selectProducts.find((select:any) => select.productId === item.id) ?
-                    <Input 
-                      type="number" 
-                      defaultValue={item.price}
-                      onBlur={(e) => props.onToggleProduct(item.id, Number(e.target.value), true )}
-                    />
-                  : 
-                    <span className="line-clamp-1">{item.price}</span>
+            {props.propsData.map((item:any, index:number) => {
+              const isInSubCatalogue = props.selectCustomer?.products?.find((id:any) => id.productId === item.id)
+              return (
+                <TableRow key={index} className={isInSubCatalogue && "bg-green-50"}>
+                  {props.formActive && 
+                    <TableCell className="font-medium w-15">
+                      <Checkbox onCheckedChange={(checked) => props.onToggleProduct(item.id, item.price, checked === true )} />
+                    </TableCell>
                   }
-                </TableCell>
-              </TableRow>
-            ))}
+                  <TableCell className="font-medium w-40">
+                    <span className="line-clamp-1">{item.ref}</span>
+                  </TableCell>
+                  <TableCell className="max-w-[100px]">
+                    <span className="line-clamp-1">{item.name}</span>
+                  </TableCell>
+                  <TableCell className="max-w-[100px]">
+                    <span className="line-clamp-3">{item.description}</span>
+                  </TableCell>
+                  <TableCell className="max-w-[100px]">
+                    {props.formActive && props.selectProducts.find((select:any) => select.productId === item.id) ?
+                      <Input 
+                        type="number" 
+                        defaultValue={item.price}
+                        onBlur={(e) => props.onToggleProduct(item.id, Number(e.target.value), true )}
+                      />
+                    : isInSubCatalogue ?
+                      <div className="flex gap-2">
+                        <div className="relative flex items-center rounded-md border focus-within:ring-1 focus-within:ring-ring px-2">        
+                          <Input 
+                            type="number"
+                            className="border-0 focus-visible:ring-0 shadow-none" 
+                            defaultValue={isInSubCatalogue.price}
+                            onBlur={(e) => props.onToggleProduct(item.id, Number(e.target.value), true )}
+                          />        
+                          <span className="text-gray-500 font-bold text-xs">  
+                            Prix public : {item.price}        
+                          </span>      
+                        </div>
+                        <Button
+                          variant="destructive"
+                        >
+                          <Trash />
+                        </Button>
+                      </div>
+                    : props.selectCustomer?.products?.length > 0 ?
+                      <div className="flex justify-between">
+                        <span className="line-clamp-1">
+                          {item.price}
+                        </span>
+                        <Button 
+                          size="sm"
+                          variant="secondary"
+                        >
+                          ajouter
+                        </Button>
+                      </div>
+                    :
+                      <span className="line-clamp-1">
+                        {item.price}
+                      </span>
+                    }
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </div>
