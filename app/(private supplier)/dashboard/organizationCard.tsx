@@ -74,7 +74,7 @@ export default function OrganizationCard(props: { organizations?: any }) {
             </div>
             <ul>
               {/* HERE NEED TO CHANGE THE ROLE WHEN BUG BETTER-AUTH WILL BE FIXED */}
-              {organization.members.filter((r:any) => r.role !== "member").map((member: memberTypeFull, index: number) => (
+              {organization.members.filter((r:any) => r.role !== "customer").map((member: memberTypeFull, index: number) => (
                 <li 
                   key={index} 
                   className="relative left-0 after::lest-0 flex justify-between border-b overflow-hidden hover:bg-gray-100 hover:[&>.toolBox]:right-0"

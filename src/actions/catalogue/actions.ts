@@ -112,7 +112,7 @@ export const createSubCatalogue = authActionClient
         invitation = await inviteMember({
           email: subCatalogue.customerEmail,
           organizationId: organization.id,
-          role: "member"
+          role: "customer"
         })
         console.log(invitation)
       } catch(error) {

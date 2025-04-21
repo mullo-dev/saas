@@ -37,7 +37,7 @@ export const returnOnlySuppliers = authActionClient
     const memberships = await prisma.member.findMany({
       where: {
         userId: user.id,
-        role: "member",
+        role: "customer",
       },
       select: {
         organizationId: true,

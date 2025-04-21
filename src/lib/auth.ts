@@ -4,6 +4,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from './prisma';
 import { organization } from "better-auth/plugins"
+import { ac, admin, customer, member, owner } from './permissions';
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -32,6 +33,13 @@ export const auth = betterAuth({
   // },
   plugins: [
     organization({
+      ac,
+      roles: {
+        owner,
+        admin,
+        member,
+        customer
+      },
       async sendInvitationEmail(data) {
         const inviteLink = `http://localhost:3000/auth/accept-invitation/${data.id}?email=${data.email}`
           await resend.emails.send({

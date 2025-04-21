@@ -17,7 +17,6 @@ export default function SupplierCard(props: { organization: any }) {
       if (result?.data?.success) {
         setOrganization(result.data.organization)
       }
-      console.log(result)
     }
     getOrga()
   }, [])

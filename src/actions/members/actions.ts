@@ -13,7 +13,7 @@ export const inviteMember = authActionClient
   .schema(z.object({
     organizationId: z.string(),
     email: z.string(),
-    role: z.enum(["member", "admin", "owner"])
+    role: z.enum(["member", "admin", "owner", "customer"])
   }))
   .action(async ({ parsedInput: { organizationId, email, role } }) => {
 
