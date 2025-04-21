@@ -1,6 +1,7 @@
 import { Header } from "@/components/global/header/header";
 import { getUser } from "@/lib/auth-session";
-import { unauthorized } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { redirect, unauthorized } from "next/navigation";
 
 export default async function LayoutPrivate({
   children,
@@ -11,6 +12,12 @@ export default async function LayoutPrivate({
 
   if (!user) {
     unauthorized()
+  }
+
+  const fullUser = await prisma.user.findUnique({where: {id:user.id}, select: {type: true}})
+
+  if (fullUser?.type === "CUSTOMER") {
+    redirect("/compte")
   }
 
   return (

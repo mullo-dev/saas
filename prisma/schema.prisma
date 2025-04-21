@@ -8,18 +8,25 @@ generator client {
   // output   = "src/lib/prisma"
 }
 
+enum UserType {
+  SUPPLIER
+  CUSTOMER
+}
+
 model User {
-  id            String    @id
+  id            String         @id
   name          String
   email         String
   emailVerified Boolean
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
+  type          UserType       @default(SUPPLIER)
   sessions      Session[]
   accounts      Account[]
-  organizations UsersOnOrganizations[]
   subCatalogues SubCatalogue[]
+  members       Member[]
+  invitations   Invitation[]
 
   @@unique([email])
   @@map("user")
@@ -35,6 +42,8 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  activeOrganizationId String?
 
   @@unique([token])
   @@map("session")
@@ -70,85 +79,104 @@ model Verification {
   @@map("verification")
 }
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// END OF USER PART
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 enum MemberRole {
   ADMIN
   EDITOR
   MEMBER
+  OWNER
 }
 
 model Organization {
-  id              String @id @default(uuid())
-  name            String
-  siret           String
-  email           String
-  phone           String
-  city            String
-  catalogues      Catalogue[]
-  members         UsersOnOrganizations[]
-  contactId       String // userId of one member
+  id          String      @id @default(uuid())
+  name        String
+  catalogues  Catalogue[]
+  members     Member[]
+  slug        String?
+  logo        String?
+  createdAt   DateTime
+  metadata    String?
+  invitations Invitation[]
 
   @@map("Organization")
+  @@unique([slug])
 }
 
-model UsersOnOrganizations {
-  userId            String // relation scalar field (used in the `@relation` attribute above)
-  user              User     @relation(fields: [userId], references: [id])
-  organizationId    String
-  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  assignedAt        DateTime @default(now())
-  assignedBy        String // Id of the member
-  role              MemberRole
+model Member {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String
+  createdAt      DateTime
 
-  @@id([organizationId, userId])
+  @@map("member")
 }
+
+model Invitation {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String?
+  status         String
+  expiresAt      DateTime
+  inviterId      String
+  subCatalogueId String?
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@map("invitation")
+}
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// END OF USER AND ORGANIZATION PART
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 model Catalogue {
-  id                String @id @default(uuid())
-  name              String
-  products          Product[]
-  subCatalogues     SubCatalogue[]
-  organizationId    String
-  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id             String         @id @default(uuid())
+  name           String
+  products       Product[]
+  subCatalogues  SubCatalogue[]
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("Catalogue")
 }
 
 model SubCatalogue {
-  id                String @id @default(uuid())
-  products          ProductOnSubCatalogue[]
-  customerId        String
-  customer          User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  catalogueId       String
-  catalogue         Catalogue      @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
+  id            String                  @id @default(uuid())
+  products      ProductOnSubCatalogue[]
+  customerId    String?
+  customer      User?                   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  catalogueId   String
+  catalogue     Catalogue               @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
+  status        String?
+  invitationId  String?
 
   @@map("SubCatalogue")
 }
 
 model ProductOnSubCatalogue {
-  productId         String // relation scalar field (used in the `@relation` attribute above)
-  product           Product         @relation(fields: [productId], references: [id])
-  subCatalogueId    String
-  subCatalogue      SubCatalogue    @relation(fields: [subCatalogueId], references: [id], onDelete: Cascade)
-  assignedAt        DateTime @default(now())
-  assignedBy        String // Id of the member
-  price             Int
+  productId      String // relation scalar field (used in the `@relation` attribute above)
+  product        Product      @relation(fields: [productId], references: [id])
+  subCatalogueId String
+  subCatalogue   SubCatalogue @relation(fields: [subCatalogueId], references: [id], onDelete: Cascade)
+  assignedAt     DateTime     @default(now())
+  assignedBy     String // Id of the member
+  price          Int
 
   @@id([subCatalogueId, productId])
 }
 
 model Product {
-  id                      String @id @default(uuid())
-  ref                     String
-  name                    String
-  description             String
-  price                   Int
-  catalogueId             String
-  catalogue               Catalogue      @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
-  productOnSubCatalogues  ProductOnSubCatalogue[]
+  id                     String                  @id @default(uuid())
+  ref                    String
+  name                   String
+  description            String
+  price                  Int
+  catalogueId            String
+  catalogue              Catalogue               @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
+  productOnSubCatalogues ProductOnSubCatalogue[]
 
   @@map("Product")
 }

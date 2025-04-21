@@ -9,31 +9,33 @@ import { Edit, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { memberTypeFull } from "@/actions/members/model";
 import { Button } from "@/components/ui/button";
-import { deleteMemberToOrganization } from "@/actions/members/actions";
 import { toast } from "sonner";
+import { removeMember } from "@/actions/members/actions";
 
-export default function OrganizationCard(props: { organizationId?: string }) {
+export default function OrganizationCard(props: { organizations?: any }) {
   const [organization, setOrganization] = useState<any>(null);
   
-  const deleteMember = async (member: memberTypeFull) => {
-    const result = await deleteMemberToOrganization({
-      userId: member.userId,
-      organizationId: props.organizationId as string,
+  const deleteMember = async (memberId: string) => {
+    const result = await removeMember({
+      memberId: memberId,
+      organizationId: organization.id,
     })
     if (result?.data?.success) {
-      toast.success("Membre supprimé")
+      toast.success("Membre supprimé.")
+    } else {
+      toast.error("Le membre n'a pas pu être supprimé.")
     }
   }
 
   useEffect(() => {
     const fetchOrganization = async () => {
-      if (props.organizationId) {
-        const org = await getOrganizationById({organizationId: props.organizationId})
+      if (props.organizations.length > 0) {
+        const org = await getOrganizationById({organizationSlug: props.organizations[0].slug})
         setOrganization(org?.data?.organization);
       }
     };
     fetchOrganization();
-  }, [props.organizationId, toast]);
+  }, [props.organizations, toast]);
 
 
   return (
@@ -71,7 +73,8 @@ export default function OrganizationCard(props: { organizationId?: string }) {
               </DrawerDialog>
             </div>
             <ul>
-              {organization.members.map((member: memberTypeFull, index: number) => (
+              {/* HERE NEED TO CHANGE THE ROLE WHEN BUG BETTER-AUTH WILL BE FIXED */}
+              {organization.members.filter((r:any) => r.role !== "customer").map((member: memberTypeFull, index: number) => (
                 <li 
                   key={index} 
                   className="relative left-0 after::lest-0 flex justify-between border-b overflow-hidden hover:bg-gray-100 hover:[&>.toolBox]:right-0"
@@ -90,7 +93,7 @@ export default function OrganizationCard(props: { organizationId?: string }) {
                     >
                       {(props) => <MemberForm organizationId={organization.id} setOpen={props.setOpen} member={member} />}
                     </DrawerDialog>
-                    <Button variant="destructive" size="icon" className="ml-2" onClick={() => deleteMember(member)}>
+                    <Button variant="destructive" size="icon" className="ml-2" onClick={() => deleteMember(member.id)}>
                       <Trash2 />
                     </Button>
                   </div>

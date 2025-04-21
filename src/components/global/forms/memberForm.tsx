@@ -1,12 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { addMemberToOrganization, editMemberToOrganization } from "@/actions/members/actions";
+import { inviteMember } from "@/actions/members/actions";
 import { Button } from "@/components/ui/button";
 import { memberType } from "@/actions/members/model";
-import { MemberRole } from "@prisma/client"
-import { getUsers } from "@/actions/user/action";
 import {
   Select,
   SelectContent,
@@ -14,19 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { usersType } from "@/actions/user/model";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-const roleLabels: Record<MemberRole, string> = {
-  ADMIN: "Administrateur",
-  MEMBER: "Membre",
-  EDITOR: "Editeur",
-};
-const rolesWithLabels = Object.values(MemberRole).map((role) => ({
+const rolesWithLabels = Object.values(["member", "admin", "owner"]).map((role) => ({
   value: role,
-  label: roleLabels[role],
+  label: role,
 }));
 
 export default function MemberForm(props: { organizationId: string, setOpen: any, member?: memberType }) {
@@ -41,38 +34,23 @@ export default function MemberForm(props: { organizationId: string, setOpen: any
   } = useForm<memberType>({
     defaultValues: {
       role: props.member && props.member.role,
-      userId: props.member && props.member.userId,
+      email: props.member && props.member.email,
     },
   });
-  const [users, setUsers] = useState<usersType[]>()
-
-  useEffect(() => {
-    const returnUsers = async () => {
-      const response = await getUsers()
-      if (response?.data?.success) {
-        setUsers(response.data.users)
-      }
-    }
-    returnUsers()
-  }, [])
   
   const onSubmit: SubmitHandler<memberType> = async (data) => {
     let result
     if (props.member) {
-      result = await editMemberToOrganization({
-        organizationId: props.organizationId,
-        userId: props.member.userId,
-        role: data.role
-      });
+      // Edit here
     } else {
-      result = await addMemberToOrganization({
+      result = await inviteMember({
         organizationId: props.organizationId,
-        userId: data.userId,
+        email: data.email,
         role: data.role
       });
     }
     if (result?.data?.success) {
-      toast.success(props.member ? "Membre mis à jour" : "Membre créé")
+      toast.success(props.member ? "Membre mis à jour" : "Invitation envoyé")
       props.setOpen(false)
     } else {
       handleFormErrors(result, setError);
@@ -86,25 +64,11 @@ export default function MemberForm(props: { organizationId: string, setOpen: any
         {errors.root && <p className="text-red-500 text-sm">{errors.root.message}</p>}
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <Controller
-              name="userId"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Sélectionner un utilisateur" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {users?.map((user, i) => (
-                        <SelectItem key={i} value={user.id}>{user.name + ' - ' + user.email}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.userId && <p className="text-red-500 mt-1 text-sm">{errors.userId.message}</p>}
-                </>
-              )}
-            />
+            <Label>
+              Email
+              <Input {...register("email")} />
+              {errors["email"] && <p className="text-red-500 mt-1 text-sm">{errors["email"]?.message}</p>}
+            </Label>
           </div>
           <div className="col-span-2">
             <Controller
@@ -130,7 +94,7 @@ export default function MemberForm(props: { organizationId: string, setOpen: any
 
           <div className="cols-span-2">
             <Button type="submit" onClick={() => clearErrors()}>
-              {props.member ? "Mettre à jour" : "Ajouter"}
+              {props.member ? "Mettre à jour" : "Envoyer l'invitation"}
             </Button>
           </div>
         </div>

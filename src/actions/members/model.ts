@@ -1,13 +1,18 @@
+export type Role = "member" | "admin" | "owner"
+
 export type memberType = {
-  userId: string,
-  role: string,
+  email: string,
+  role: Role,
 }
 
 export type memberTypeFull = {
+  id: string,
   userId: string,
-  role: string,
+  email: string,
+  role: Role,
   user: {
     name: string,
     email: string,
+    image: string
   }
 }

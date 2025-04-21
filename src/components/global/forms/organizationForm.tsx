@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Organization } from "@prisma/client";
 import { createOrganization } from "@/actions/organization/actions";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { organizationType } from "@/actions/organization/model";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
 
-type InputNames = "name" | "siret" | "email" | "phone" | "contactId" | "city";
+type InputNames = "name" | "slug" ;
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; col: number }[] = [
   {
     label: "Name",
@@ -20,43 +19,15 @@ const inputs: { label: string; defaultValue: string; name: InputNames; type: str
     col: 2,
   },
   {
-    label: "Siret",
+    label: "Url",
     defaultValue: "",
-    name: "siret",
-    type: "text",
-    col: 2,
-  },
-  {
-    label: "Email",
-    defaultValue: "",
-    name: "email",
-    type: "text",
-    col: 2,
-  },
-  {
-    label: "Phone",
-    defaultValue: "",
-    name: "phone",
-    type: "text",
-    col: 2,
-  },
-  {
-    label: "Ville",
-    defaultValue: "",
-    name: "city",
-    type: "text",
-    col: 2,
-  },
-  {
-    label: "Contact ID",
-    defaultValue: "",
-    name: "contactId",
+    name: "slug",
     type: "text",
     col: 2,
   },
 ];
 
-export default function OrganizationForm(props: { organization?: Organization, setOpen: any }) {
+export default function OrganizationForm(props: { organization?: organizationType, setOpen: any }) {
   const {
     register,
     setError,
@@ -67,7 +38,9 @@ export default function OrganizationForm(props: { organization?: Organization, s
 
   const onSubmit: SubmitHandler<organizationType> = async (data) => {
     let result
+
     if (props.organization) {
+      // Update to put here
       result = await createOrganization(data);
     } else {
       result = await createOrganization(data);

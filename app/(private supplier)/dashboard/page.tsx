@@ -1,37 +1,28 @@
-import OrganizationCard from "./organizationCard"
-import { getUser } from "@/lib/auth-session"
-import { prisma } from "@/lib/prisma"
-import CatalogueSection from "./catalogues/catalogueSection"
+"use client"
 
-export default async function DashboardPage() {
-  const user = await getUser()
-  const theUser = await prisma.user.findUnique({
-    where: {id: user?.id},
-    include: { 
-      organizations: {
-        include: {
-          organization: {
-            select: {
-              id: true,
-              catalogues: {
-                select: {
-                  id: true
-                }
-              }
-            },
-          }
-        }
-      } 
-    },
-  })
+import OrganizationCard from "./organizationCard"
+import CatalogueSection from "./catalogues/catalogueSection"
+import { authClient } from "@/lib/auth-client"
+import { Suspense } from "react"
+
+export default function DashboardPage() {
+  const { data: organizations, isPending } = authClient.useListOrganizations()
+
+  if (isPending) {
+    return <div>Chargement...</div>
+  }
 
   return (
     <div className="flex gap-6">
       <div className="w-sm">
-        <OrganizationCard organizationId={theUser?.organizations[0]?.organizationId} />
+        <Suspense fallback={<p>Chargement...</p>}>
+          <OrganizationCard organizations={organizations} />
+        </Suspense>
       </div>
       <div className="flex-1">
-        <CatalogueSection organization={theUser?.organizations[0]?.organization} />
+        <Suspense fallback={<p>Chargement...</p>}>
+          <CatalogueSection organizations={organizations} />
+        </Suspense>
       </div>
     </div>
   )
