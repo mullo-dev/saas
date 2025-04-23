@@ -56,22 +56,40 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
           </SheetDescription>
         </SheetHeader>
         <div className="relative h-full overflow-scroll pb-4 px-4">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
             {!conversation?.message ? conversation?.conversation?.messages?.map((message:any, index:number) => {
               const theSender = message.senderEmail === receipt.email
+              const formatted = `${message.createdAt.toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+              })} à ${message.createdAt.toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}`;
+
               return (
-                <div key={index} className={`flex ${!theSender && "justify-end"}`}>
-                  <div className={`${!theSender ? "bg-gray-600 rounded-bl-2xl" : "bg-black rounded-br-2xl"} rounded-t-2xl max-w-[80%] py-2 px-4`}>
-                    <span className="text-white font-bold text-sm">
-                      {message.body}
-                    </span>
+                <div key={index}>
+                  <div className={`flex ${!theSender && "justify-end"}`}>
+                    <div className={`${!theSender ? "bg-gray-600 rounded-bl-2xl" : "bg-black rounded-br-2xl"} rounded-t-2xl max-w-[80%] py-2 px-4`}>
+                      <span className="text-white font-bold text-sm">
+                        {message.body}
+                      </span>
+                    </div>
                   </div>
+                  <p className={`text-xs font-bold text-gray-500 ${!theSender && "text-end"}`}>{formatted}</p>
                 </div>
               )
             })
             : <p>{conversation?.message}</p>}
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="fixed py-2 bg-white w-[367px] bottom-0 grid gap-2">
+            {!conversation?.conversation?.messages.at(-1).readBy.includes(receipt.email) &&
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <p>Non lu</p>
+              </div>
+            }
             <Textarea required {...register("message")} placeholder="Type your message here." />
             {errors.message && <p className="text-red-500 mt-1 text-sm">{errors.message?.message}</p>}
             {errors.root && <p className="text-red-500 text-sm">{errors.root.message}</p>}
