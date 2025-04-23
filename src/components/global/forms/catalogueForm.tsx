@@ -10,6 +10,7 @@ import { organizationType } from "@/actions/organization/model";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
 import { createCatalogue } from "@/actions/catalogue/actions";
 import { toast } from "sonner";
+import { DrawerDialog } from "../modal";
 
 type InputNames = "name";
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; col: number }[] = [
@@ -22,7 +23,7 @@ const inputs: { label: string; defaultValue: string; name: InputNames; type: str
   },
 ];
 
-export default function CatalogueForm(props: { organizationId?: string, catalogue?: Catalogue, setOpen: any }) {
+function CatalogueForm(props: { organizationId?: string, catalogue?: Catalogue, setOpen: any }) {
   const {
     register,
     setError,
@@ -82,4 +83,20 @@ export default function CatalogueForm(props: { organizationId?: string, catalogu
       </form>
     </div>
   );
+}
+
+
+// EXPORT WITH DRAWER
+export default function DrawerCatalogue(props: { organizationId?: string }) {
+
+  return (
+    <DrawerDialog 
+      title="Nouveau catalogue" 
+      buttonTitle="ajouter"
+      buttonSize="sm"
+      description="Ajoutez un catalogue"
+    >
+      {(p) => <CatalogueForm organizationId={props.organizationId} setOpen={p.setOpen}/>}
+    </DrawerDialog>
+  )
 }

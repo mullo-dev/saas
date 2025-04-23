@@ -11,19 +11,18 @@ import { prisma } from '@/lib/prisma';
 
 export const getOrganizationById = authActionClient
   .metadata({ actionName: "getOrganizationById" }) 
-  .schema(z.object({organizationSlug: z.string()}))
-  .action(async ({ parsedInput: { organizationSlug } }) => {
+  .schema(z.object({organizationId: z.string()}))
+  .action(async ({ parsedInput: { organizationId } }) => {
 
   try {
     const cookieStore = await cookies();
     // Get the organization
     const organization = await auth.api.getFullOrganization({
-      // organizationId: "mKo1x197K4C6OxfeY5RG7G8vmHiLTtRu",
       headers: new Headers({
         cookie: cookieStore.toString()
       }),
       query: {
-        organizationSlug: organizationSlug
+        organizationId: organizationId
     }
     })
     return { success: true, organization: organization };
@@ -35,12 +34,12 @@ export const getOrganizationById = authActionClient
 
 export const getOrganizationInvited = authActionClient
   .metadata({ actionName: "getOrganizationInvited" }) 
-  .schema(z.object({organizationSlug: z.string()}))
-  .action(async ({ parsedInput: { organizationSlug } }) => {
+  .schema(z.object({organizationId: z.string()}))
+  .action(async ({ parsedInput: { organizationId } }) => {
 
   try {
     const organization = await prisma.organization.findUnique({
-      where: { slug: organizationSlug }
+      where: { id: organizationId }
     })
     return { success: true, organization: organization };
   } catch (error) {
@@ -76,9 +75,37 @@ export const createOrganization = authActionClient
     });
 
     // Set the new organization active
+    if (org?.id) {
+      await auth.api.setActiveOrganization({
+        body: {
+          organizationId: org.id,
+        },
+        headers: new Headers({
+          cookie: cookieStore.toString()
+        })
+      })
+    }
+
+    revalidatePath("/dashboard")
+    return { success: true };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error };
+  }
+});
+
+
+export const activeOrganization = authActionClient
+  .metadata({ actionName: "activeOrganization" }) 
+  .schema(z.object({organizationId: z.string()}))
+  .action(async ({ parsedInput }) => {
+
+  try {
+    const cookieStore = await cookies();
+
     await auth.api.setActiveOrganization({
       body: {
-        organizationId: org?.id,
+        organizationId: parsedInput.organizationId,
       },
       headers: new Headers({
         cookie: cookieStore.toString()

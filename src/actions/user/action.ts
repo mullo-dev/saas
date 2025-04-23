@@ -36,7 +36,7 @@ export const returnOnlySuppliers = authActionClient
     // On récupère les memberships de ce user
     const memberships = await prisma.member.findMany({
       where: {
-        userId: user.id,
+        userId: user?.user?.id,
         role: "customer",
       },
       select: {
@@ -54,7 +54,7 @@ export const returnOnlySuppliers = authActionClient
     // We will check if inviations are pending for this user
     let invitedOrganizationsWithFlag = <any>[]
     const invitations = await prisma.invitation.findMany({ 
-      where: { email: user.email, status: "pending" }
+      where: { email: user?.user?.email, status: "pending" }
     })
     if (invitations.length > 0) {
       const invitedOrgIds = invitations.map((inv:any) => inv.organizationId);
@@ -65,7 +65,7 @@ export const returnOnlySuppliers = authActionClient
           id: true, 
           slug: true,
           invitations: { 
-            where: { email: user.email },
+            where: { email: user?.user?.email },
             select: { id: true } 
           }
         },

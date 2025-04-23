@@ -180,3 +180,35 @@ model Product {
 
   @@map("Product")
 }
+
+// MESSENGER
+model Conversation {
+  id        String     @id @default(uuid())
+  fromEmail String
+  toEmail   String
+
+  messages  Message[]
+  updatedAt DateTime   @updatedAt
+  createdAt DateTime   @default(now())
+
+  @@unique([fromEmail, toEmail]) // Une conversation par duo
+}
+
+model Message {
+  id             String     @id @default(uuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+
+  senderEmail    String
+  body           String
+  via            ChannelType  @default(EMAIL) // le nouveau champ
+  readBy         String[]    // tableau d'IDs qui ont lu le message
+  createdAt      DateTime    @default(now())
+}
+
+enum ChannelType {
+  EMAIL
+  SMS
+  WHATSAPP
+  APP // message interne
+}
