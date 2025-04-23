@@ -1,4 +1,4 @@
-import { CustomerCard } from "./customerCard";
+import { ConversationDrawer } from "./conversationDrawer";
 
 export function CustomerSection({ organization }: { organization?: any }) {
 
@@ -10,7 +10,10 @@ export function CustomerSection({ organization }: { organization?: any }) {
       <hr />
       <ul className="mt-2">
         {organization.members.filter((m:any) => m.role === "customer").map((member:any, index:number) => (
-          <CustomerCard key={index} customer={member.user} />
+          <li key={index} className="flex justify-between items-center">
+            <p>{member.user.name} - {member.user.email}</p>
+            <ConversationDrawer receipt={member.user} />
+          </li>
         ))}
       </ul>
     </div>

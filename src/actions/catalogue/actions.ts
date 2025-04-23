@@ -114,7 +114,6 @@ export const createSubCatalogue = authActionClient
           organizationId: organization.id,
           role: "customer"
         })
-        console.log(invitation)
       } catch(error) {
         console.error(error)
         return { success: false, error }

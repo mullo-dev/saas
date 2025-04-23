@@ -17,7 +17,7 @@ export default function profilPage() {
         setFilteredOrganizations(result?.data?.filteredOrganizations)
       }
     }
-    !isPending && filtered()
+    filtered()
   }, [isPending])
   
 

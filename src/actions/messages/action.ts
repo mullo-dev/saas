@@ -6,6 +6,7 @@ import { authActionClient } from '@/lib/auth-action';
 import { revalidatePath } from 'next/cache';
 import { messageModel } from './model';
 import { resend } from '@/lib/resend';
+import ReviewEmail from '@/components/emails/reviewEmail'
 
 export const createMessage = authActionClient
   .metadata({ actionName: "createMessage" })
@@ -18,16 +19,18 @@ export const createMessage = authActionClient
       throw new Error("Email non trouvé")
     }
 
+    const userType = await prisma.user.findUnique({where: {id: user.user.id}})
+
     const conversation = await prisma.conversation.upsert({
       where: {
-        fromEmail_toEmail: {
-          toEmail: parsedInput.toEmail,
-          fromEmail: user.user.email
+        customerId_supplierId: {
+          customerId: userType?.type === "CUSTOMER" ? userType.id : parsedInput.receiptId,
+          supplierId: userType?.type === "SUPPLIER" ? userType.id : parsedInput.receiptId
         }
       },
       create: {
-        toEmail: parsedInput.toEmail,
-        fromEmail: user.user.email,
+        customerId: userType?.type === "CUSTOMER" ? userType.id : parsedInput.receiptId,
+        supplierId: userType?.type === "SUPPLIER" ? userType.id : parsedInput.receiptId,
         messages: {
           create: {
             body: parsedInput.message,
@@ -48,12 +51,18 @@ export const createMessage = authActionClient
     });
 
     // SEND EMAIL HERE
-    // await resend.emails.send({
-    //   from: user.user.email,
-    //   to: conversation.toEmail,
-    //   subject: "Reset Password",
-    //   text: `Reset password here : ${data.url}`,
-    // })
+    await resend.emails.send({
+      from: 'reply@mullo.fr',
+      to: parsedInput.toEmail,
+      subject: "Vous avez reçu un nouveau message sur Mullo",
+      replyTo: `reply+${conversation.id}@mullo.fr`,
+      react: ReviewEmail({
+        authorName: user.user.name,
+        authorEmail: user.user.email,
+        reviewText: parsedInput.message,
+        href: "http://localhost:3000/compte"
+      })
+    })
 
     revalidatePath("/dashboard")
     return { success: true, conversation: conversation };
@@ -71,7 +80,7 @@ export const getConversations = authActionClient
   try {
     const conversations = await prisma.conversation.findMany({
       where: {
-        OR: [{ toEmail: user?.user?.email }, { fromEmail: user?.user?.email }],
+        OR: [{ customerId: user?.user?.id }, { supplierId: user?.user?.id }],
       },
       include: {
         messages: {
@@ -90,15 +99,17 @@ export const getConversations = authActionClient
 
 export const getConversationById = authActionClient
   .metadata({ actionName: "getConversationById" }) 
-  .schema(z.object({email: z.string()}))
+  .schema(z.object({receiptId: z.string()}))
   .action(async ({ parsedInput, ctx: { user } }) => {
 
   try {
+    const userType = await prisma.user.findUnique({where: {id: user?.user?.id}})
+
     const conversation = await prisma.conversation.findUnique({
       where: {
-        fromEmail_toEmail: { 
-          toEmail: parsedInput.email, 
-          fromEmail: user?.user?.email as string
+        customerId_supplierId: {
+          customerId: userType?.type === "CUSTOMER" ? userType.id : parsedInput.receiptId,
+          supplierId: userType?.type === "SUPPLIER" ? userType.id : parsedInput.receiptId
         },
       },
       include: {
@@ -111,7 +122,7 @@ export const getConversationById = authActionClient
     if (!conversation) return { success: true, conversation: { message: "Aucune conversation à afficher" } }
 
     const toUser = await prisma.user.findUnique({
-      where: { email: conversation.toEmail },
+      where: { id: parsedInput.receiptId },
       select: {
         name: true,
         email: true

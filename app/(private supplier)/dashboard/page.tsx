@@ -3,12 +3,13 @@ import CatalogueSection from "./catalogues/catalogueSection"
 import { Suspense } from "react"
 import { CustomerSection } from "./customers/customerSection"
 import { getUser } from "@/lib/auth-session"
-import { getOrganizationById } from "@/actions/organization/actions"
+import { getOrganizationById, passActiveOrganization } from "@/actions/organization/actions"
 
 export default async function DashboardPage() {
   const { activeOrganizationId } = await getUser()
   
   if (!activeOrganizationId) {
+    await passActiveOrganization({})
     return <p>Chargement...</p>
   }
   

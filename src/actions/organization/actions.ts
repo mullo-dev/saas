@@ -39,7 +39,23 @@ export const getOrganizationInvited = authActionClient
 
   try {
     const organization = await prisma.organization.findUnique({
-      where: { id: organizationId }
+      where: { slug: organizationId },
+      include: {
+        members: {
+          where: {
+            role: 'owner' // ou 'owner' selon ta définition de l'enum
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true
+              }
+            }
+          }
+        }
+      }
     })
     return { success: true, organization: organization };
   } catch (error) {
@@ -95,17 +111,29 @@ export const createOrganization = authActionClient
 });
 
 
-export const activeOrganization = authActionClient
+export const passActiveOrganization = authActionClient
   .metadata({ actionName: "activeOrganization" }) 
-  .schema(z.object({organizationId: z.string()}))
-  .action(async ({ parsedInput }) => {
+  .schema(z.object({organizationId: z.string().optional()}))
+  .action(async ({ parsedInput, ctx: { user } }) => {
 
   try {
     const cookieStore = await cookies();
+    let orgaId
 
-    await auth.api.setActiveOrganization({
+    if (!parsedInput.organizationId && user?.user) {
+      const ownOrg = await auth.api.listOrganizations({
+        headers: new Headers({
+          cookie: cookieStore.toString()
+        })
+      })
+      orgaId = ownOrg[0].id
+    } else {
+      orgaId = parsedInput.organizationId
+    }
+
+    const organization = await auth.api.setActiveOrganization({
       body: {
-        organizationId: parsedInput.organizationId,
+        organizationId: orgaId,
       },
       headers: new Headers({
         cookie: cookieStore.toString()
@@ -113,7 +141,7 @@ export const activeOrganization = authActionClient
     })
 
     revalidatePath("/dashboard")
-    return { success: true };
+    return { success: true, organization: organization };
   } catch (error) {
     console.log(error);
     return { success: false, error };

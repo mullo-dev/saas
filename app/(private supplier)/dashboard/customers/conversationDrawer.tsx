@@ -1,0 +1,88 @@
+"use client"
+
+import { createMessage, getConversationById } from "@/actions/messages/action";
+import { Button } from "@/components/ui/button";
+import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
+import { LoaderCircle, Send } from "lucide-react";
+import { useState, useTransition } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+export function ConversationDrawer({ receipt }: { receipt: any }) {
+  const {
+    register,
+    setValue,
+    setError,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{message: string}>();
+  const [conversation, setConversation] = useState<any>()
+  const [isPending, startTransition] = useTransition();
+
+  const getConv = async () => {
+    const result = await getConversationById({receiptId: receipt.id })
+    setConversation(result?.data?.conversation)
+  }
+
+  const onSubmit: SubmitHandler<{message: string}> = async (data) => {
+    startTransition(async () => {
+      if (!receipt.email) {
+        return setError("root", { type: "manual", message: "Le client n'a pas été trouvé." })
+      }
+      const result = await createMessage({receiptId: receipt.id, toEmail: receipt.email, message: data.message})
+      
+      if (result?.data?.success) {
+        setValue("message", "")
+        getConv()
+      } else {
+        handleFormErrors(result, setError);
+      }
+    })
+  }
+
+  return (
+    <Sheet>
+      <SheetTrigger>
+        <Button variant="outline" onClick={() => getConv()}>
+          <Send />
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="w-[400px]">
+        <SheetHeader>
+          <SheetTitle>Conversation</SheetTitle>
+          <SheetDescription>
+            <span>{receipt.name} - {receipt.email}</span>
+          </SheetDescription>
+        </SheetHeader>
+        <div className="relative h-full overflow-scroll pb-4 px-4">
+          <div className="flex flex-col gap-2">
+            {!conversation?.message ? conversation?.conversation?.messages?.map((message:any, index:number) => {
+              const theSender = message.senderEmail === receipt.email
+              return (
+                <div key={index} className={`flex ${!theSender && "justify-end"}`}>
+                  <div className={`${!theSender ? "bg-gray-600 rounded-bl-2xl" : "bg-black rounded-br-2xl"} rounded-t-2xl max-w-[80%] py-2 px-4`}>
+                    <span className="text-white font-bold text-sm">
+                      {message.body}
+                    </span>
+                  </div>
+                </div>
+              )
+            })
+            : <p>{conversation?.message}</p>}
+          </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="fixed py-2 bg-white w-[367px] bottom-0 grid gap-2">
+            <Textarea required {...register("message")} placeholder="Type your message here." />
+            {errors.message && <p className="text-red-500 mt-1 text-sm">{errors.message?.message}</p>}
+            {errors.root && <p className="text-red-500 text-sm">{errors.root.message}</p>}
+            <Button type="submit" disabled={isPending}>
+              {isPending ?
+                <LoaderCircle className="animate-spin" />
+              : "Send message"}
+            </Button>
+          </form>
+        </div>
+      </SheetContent>
+    </Sheet>
+  )
+}
