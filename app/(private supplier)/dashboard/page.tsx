@@ -4,13 +4,18 @@ import { Suspense } from "react"
 import { CustomerSection } from "./customers/customerSection"
 import { getUser } from "@/lib/auth-session"
 import { getOrganizationById, passActiveOrganization } from "@/actions/organization/actions"
+import { redirect } from "next/navigation"
 
 export default async function DashboardPage() {
   const { activeOrganizationId } = await getUser()
-  
-  if (!activeOrganizationId) {
+
+  const activeNotHere = async () => {
     await passActiveOrganization({})
-    return <p>Chargement...</p>
+    redirect("/dashboard")
+  }
+
+  if (!activeOrganizationId) {
+    return activeNotHere()
   }
   
   const org = await getOrganizationById({organizationId: activeOrganizationId})

@@ -24,3 +24,53 @@ export const createProducts = authActionClient
     return { success: false, error };
   }
 });
+
+
+export const getAllProducts = authActionClient
+.metadata({ actionName: "createProduct" })
+.action(async ({ ctx: { user } }) => {
+  
+  try {
+    // New products
+    const subCatalogues = await prisma.subCatalogue.findMany({
+      where: {
+        customerId: user?.user?.id
+      },
+      include: {
+        catalogue: {
+          select: {
+            organization: {
+              select: {
+                name: true
+              }
+            }
+          }
+        },
+        products: {
+          select: {
+            product: {
+              select: {
+                name: true,
+                description: true,
+                ref: true,
+                id: true
+              }
+            },
+            price: true
+          }
+        }
+      }
+    });
+
+    const allProducts =  subCatalogues.flatMap(sub =>
+      sub.products.map(product => ({
+        ...product,
+        supplierName: sub.catalogue.organization.name
+      }))
+    );
+
+    return { success: true, products: allProducts, subCatalogues: subCatalogues };
+  } catch (error) {
+    return { success: false, error };
+  }
+});

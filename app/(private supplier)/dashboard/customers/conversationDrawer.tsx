@@ -84,10 +84,15 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
             : <p>{conversation?.message}</p>}
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="fixed py-2 bg-white w-[367px] bottom-0 grid gap-2">
-            {!conversation?.conversation?.messages.at(-1).readBy.includes(receipt.email) &&
+            {!conversation?.conversation?.messages.at(-1).readBy.includes(receipt.email) ?
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                <p>Non lu</p>
+                <p>non lu</p>
+              </div>
+            : 
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <p>lu</p>
               </div>
             }
             <Textarea required {...register("message")} placeholder="Type your message here." />

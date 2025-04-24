@@ -3,10 +3,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from "react"
 import { getOrganizationInvited } from "@/actions/organization/actions"
-import Link from "next/link"
 import { acceptInvitation } from "@/actions/members/actions"
 import { toast } from "sonner"
 import { ConversationDrawer } from "@app/(private supplier)/dashboard/customers/conversationDrawer"
+import { Button } from "@/components/ui/button"
 
 export default function SupplierCard(props: { organization: any }) {
   const [organization, setOrganization] = useState<any>()
@@ -34,7 +34,6 @@ export default function SupplierCard(props: { organization: any }) {
       toast.success("Une erreur est survenu lors de la validation de l'invitaion")
     )
   }
-  
 
   if (!organization) {
     return <p>Chargement...</p>
@@ -57,7 +56,9 @@ export default function SupplierCard(props: { organization: any }) {
       </CardHeader>
       <CardContent>
         {props.organization.invit ? 
-          <p>Invité : <Link href="" className="font-italic text-orange-400">Accepter l'invitation</Link></p>
+          <p>Invité : 
+            <Button onClick={() => props.organization.invit && invitationValidation()} className="font-italic text-orange-400">Accepter l'invitation</Button>
+          </p>
         : 
           <div>
             <ConversationDrawer receipt={organization.members[0].user} />

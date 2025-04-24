@@ -121,6 +121,10 @@ export const getConversationById = authActionClient
 
     if (!conversation) return { success: true, conversation: { message: "Aucune conversation à afficher" } }
 
+    if (user?.user?.email && !conversation.messages.at(-1)?.readBy.includes(user.user.email)) {
+      await readMessage({conversationId: conversation.id})
+    }
+
     const toUser = await prisma.user.findUnique({
       where: { id: parsedInput.receiptId },
       select: {

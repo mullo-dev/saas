@@ -152,8 +152,8 @@ export const createSubCatalogue = authActionClient
 });
 
 
-export const updateSubCatalogueFromInivtation = authActionClient
-  .metadata({ actionName: "updateSubCatalogueFromInivtation" })
+export const updateSubCatalogueFromInvitation = authActionClient
+  .metadata({ actionName: "updateSubCatalogueFromInvitation" })
   .schema(z.object({subCatalogueId: z.string()}))
   .action(async ({ parsedInput: { subCatalogueId }, ctx: { user } }) => {
 
