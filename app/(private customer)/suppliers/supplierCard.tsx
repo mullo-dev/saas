@@ -1,26 +1,12 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useEffect, useState } from "react"
-import { getOrganizationInvited } from "@/actions/organization/actions"
 import { acceptInvitation } from "@/actions/members/actions"
 import { toast } from "sonner"
 import { ConversationDrawer } from "@app/(private supplier)/dashboard/customers/conversationDrawer"
 import { Button } from "@/components/ui/button"
 
-export default function SupplierCard(props: { organization: any }) {
-  const [organization, setOrganization] = useState<any>()
-
-  useEffect(() => {
-    const getOrga = async () => {
-      const result = await getOrganizationInvited({organizationId: props.organization.slug})
-      if (result?.data?.success) {
-        setOrganization(result.data.organization)
-      }
-    }
-    getOrga()
-  }, [])
-
+export default function SupplierCard(props: { organization: any, selectSupplierId: (id:string) => void, isSelected: boolean }) {
 
   const invitationValidation = async () => {
     const confirmed = window.confirm("Es-tu sûr de vouloir accepter cette invitation ?");
@@ -35,23 +21,23 @@ export default function SupplierCard(props: { organization: any }) {
     )
   }
 
-  if (!organization) {
+  if (!props.organization) {
     return <p>Chargement...</p>
   }
 
-  return (
+  return ( 
     <Card 
-      className={`flex w-80 cursor-pointer ${props.organization.invit ? "opacity-50 hover:opacity-80 transition-all" : "hover:bg-gray-100"}`}
-      // onClick={() => props.organization.invit ? invitationValidation() : console.log("nop")}
+      className={`flex w-80 cursor-pointer ${props.organization.invit ? "opacity-50 hover:opacity-80 transition-all" : "hover:bg-gray-200"} ${props.isSelected && "bg-gray-100"}`}
+      onClick={() => props.selectSupplierId(props.organization.id)}
     >
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <h3>
-            {organization.name}
+            {props.organization.name}
           </h3>
         </CardTitle>
         <CardDescription>
-          {organization.slug}
+          {props.organization.slug}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -61,7 +47,7 @@ export default function SupplierCard(props: { organization: any }) {
           </p>
         : 
           <div>
-            <ConversationDrawer receipt={organization.members[0].user} />
+            <ConversationDrawer receipt={props.organization.members[0].user} />
           </div>
         }
       </CardContent>

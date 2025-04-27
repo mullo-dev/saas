@@ -44,7 +44,10 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
   return (
     <Sheet>
       <SheetTrigger>
-        <Button variant="outline" onClick={() => getConv()}>
+        <Button 
+          variant="outline" 
+          onClick={() => getConv()}
+        >
           <Send />
         </Button>
       </SheetTrigger>

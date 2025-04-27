@@ -32,29 +32,16 @@ export const getOrganizationById = authActionClient
 });
 
 
-export const getOrganizationInvited = authActionClient
+export const getSupplier = authActionClient
   .metadata({ actionName: "getOrganizationInvited" }) 
   .schema(z.object({organizationId: z.string()}))
   .action(async ({ parsedInput: { organizationId } }) => {
 
   try {
     const organization = await prisma.organization.findUnique({
-      where: { slug: organizationId },
-      include: {
-        members: {
-          where: {
-            role: 'owner' // ou 'owner' selon ta définition de l'enum
-          },
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true
-              }
-            }
-          }
-        }
+      where: { id: organizationId },
+      select: {
+        name: true
       }
     })
     return { success: true, organization: organization };

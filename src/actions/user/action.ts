@@ -2,8 +2,6 @@
 
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
-import { organizationsSchema } from '../organization/model';
-
 
 export const getUsers = authActionClient
   .metadata({ actionName: "createAddress" }) 
@@ -29,27 +27,38 @@ export const getUsers = authActionClient
 
 export const returnOnlySuppliers = authActionClient
   .metadata({ actionName: "inviteNewUser" }) 
-  .schema(organizationsSchema)
   .action(async ({ parsedInput, ctx: { user } }) => {
 
   try {
-    // On récupère les memberships de ce user
-    const memberships = await prisma.member.findMany({
+    if (!user?.user) throw new Error("Invalid user")
+      
+    // We get organization customers
+    const filteredOrganizations = await prisma.organization.findMany({
       where: {
-        userId: user?.user?.id,
-        role: "customer",
+        members: {
+          some: {
+            userId: user.user.id,  // à remplacer par l'ID du user connecté
+            role: 'customer'
+          }
+        }
       },
-      select: {
-        organizationId: true,
-      },
+      include: {
+        members: {
+          where: {
+            role: 'customer' // ou 'owner' selon ta définition de l'enum
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true
+              }
+            }
+          }
+        }
+      }
     });
-
-    const memberOrgIds = memberships.map((m) => m.organizationId);
-
-    // On filtre les organizations qui matchent ces IDs
-    const filteredOrganizations = parsedInput.filter((org) =>
-      memberOrgIds.includes(org.id)
-    );
 
     // We will check if inviations are pending for this user
     let invitedOrganizationsWithFlag = <any>[]
