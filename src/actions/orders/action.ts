@@ -5,6 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { GroupedAupplierAndGetPrice } from "../products/actions";
 import { clearCart } from "@/lib/cart";
+import { resend } from "@/lib/resend";
+import ReviewEmail from "@/components/emails/reviewEmail";
+import NewOrderEmail from "@/components/emails/newOrder";
 
 export const createOrder = authActionClient
   .metadata({ actionName: "createOrder" }) 
@@ -13,7 +16,8 @@ export const createOrder = authActionClient
   try {
     const grouped = await GroupedAupplierAndGetPrice()
 
-    if (!grouped?.data) throw new Error("Cart not finded")
+    if (!grouped?.data) throw new Error("Cart not found")
+    if (!user?.user) throw new Error("User not found")
 
     const groupedSuppliers = new Map<string, {
       supplierId: string;
@@ -71,6 +75,34 @@ export const createOrder = authActionClient
         }
       }
     });
+
+    order.suppliers.map(async (supplier:any) => {
+      const organization = grouped?.data?.groupedArray.find((sup) => sup.supplierId === supplier.supplierId)
+      await resend.emails.send({
+        from: 'noreply@mullo.fr',
+        to: organization?.supplier.members[0].user.email,
+        subject: "Vous avez une nouvelle commande à traîter",
+        // replyTo: `reply+${conversation.id}@mullo.fr`,
+        react: NewOrderEmail({
+          products: organization?.fullProducts,
+          client: user?.user?.name,
+          href: `http://localhost:3000/orders/${order.id}`
+        })
+      })
+    })
+
+    // await resend.emails.send({
+    //   from: 'noreply@mullo.fr',
+    //   to: user.user.email,
+    //   subject: "Commande validée",
+    //   // replyTo: `reply+${conversation.id}@mullo.fr`,
+    //   react: ReviewEmail({ // change template here
+    //     authorName: user?.user?.name,
+    //     authorEmail: user?.user?.email,
+    //     reviewText: "Vos fournisseurs ont reçu les instructions. Votre commande sera traîtée par leur soint dans les meilleurs délais.",
+    //     href: "http://localhost:3000/orders/id_de_la_commande" // put id here
+    //   })
+    // })
 
     revalidatePath("/dashboard")
     await clearCart()

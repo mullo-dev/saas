@@ -41,8 +41,19 @@ export const getSupplier = authActionClient
     const organization = await prisma.organization.findUnique({
       where: { id: organizationId },
       select: {
-        name: true
-      }
+        name: true,
+        members: {
+          where: { role: "owner" },
+          select: {
+            user: {
+              select: {
+                name: true,
+                email: true
+              }
+            }
+          }
+        }
+      },
     })
     return { success: true, organization: organization };
   } catch (error) {
