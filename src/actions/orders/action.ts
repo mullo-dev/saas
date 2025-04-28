@@ -3,10 +3,9 @@
 import { authActionClient } from "@/lib/auth-action";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { GroupedAupplierAndGetPrice } from "../products/actions";
+import { GroupedSupplierAndGetPrice } from "../products/actions";
 import { clearCart } from "@/lib/cart";
 import { resend } from "@/lib/resend";
-import ReviewEmail from "@/components/emails/reviewEmail";
 import NewOrderEmail from "@/components/emails/newOrder";
 
 export const createOrder = authActionClient
@@ -14,7 +13,7 @@ export const createOrder = authActionClient
   .action(async ({ ctx: { user } }) => {
 
   try {
-    const grouped = await GroupedAupplierAndGetPrice()
+    const grouped = await GroupedSupplierAndGetPrice()
 
     if (!grouped?.data) throw new Error("Cart not found")
     if (!user?.user) throw new Error("User not found")
@@ -40,7 +39,6 @@ export const createOrder = authActionClient
 
       const currentSupplier = groupedSuppliers.get(supplierId)!;
 
-      // Tu dois boucler ici sur les fullProducts probablement ?
       for (const product of fullProducts ?? []) {
         currentSupplier.products.push({
           productId: product.id,
@@ -80,7 +78,7 @@ export const createOrder = authActionClient
       const organization = grouped?.data?.groupedArray.find((sup) => sup.supplierId === supplier.supplierId)
       await resend.emails.send({
         from: 'noreply@mullo.fr',
-        to: organization?.supplier.members[0].user.email,
+        to: organization?.supplier.metadata.email ? organization?.supplier.metadata.email : organization?.supplier.members[0].user.email,
         subject: "Vous avez une nouvelle commande à traîter",
         // replyTo: `reply+${conversation.id}@mullo.fr`,
         react: NewOrderEmail({

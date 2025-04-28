@@ -43,7 +43,7 @@ export function TricksTable(
       })
     )
 
-    const result = await createProducts({products: formattedData, path: window.location.href})
+    const result = await createProducts({products: formattedData})
     if (result?.data?.success) {
       toast.success("Produits importés !")
       props.reload()

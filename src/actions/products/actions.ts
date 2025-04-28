@@ -11,15 +11,43 @@ import { getSupplier } from '../organization/actions';
 export const createProducts = authActionClient
 .metadata({ actionName: "createProduct" }) 
 .schema(z.object({
-  products: z.array(z.object(productModel))
+  products: z.array(z.object(productModel)),
+  createByCustomer: z.boolean().default(false).optional()
 }))
-.action(async ({ parsedInput: { products } }) => {
+.action(async ({ parsedInput: { products, createByCustomer }, ctx: { user } }) => {
   
   try {
     // New products
     await prisma.product.createMany({
       data: products,
     });
+
+    if (createByCustomer) {
+      const allProducts = await prisma.product.findMany({
+        where: {
+          catalogueId: products[0].catalogueId
+        }
+      })
+      // Create the subCatalogue
+      await prisma.subCatalogue.create({
+        data: {
+          customerId: user?.user?.id,
+          status: "memberInvited",
+          catalogueId: products[0].catalogueId,
+          products: {
+            create: allProducts.map((prod) => ({
+              assignedBy: user.user ? user.user.name : "Inconnu",
+              price: prod.price,
+              product: {
+                connect: {
+                  id: prod.id
+                }
+              }
+            }))
+          }
+        }
+      })
+    }
 
     return { success: true };
   } catch (error) {
@@ -142,8 +170,8 @@ export const getInCartProducts = authActionClient
 });
 
 
-export const GroupedAupplierAndGetPrice = authActionClient
-.metadata({ actionName: "groupedAupplierAndGetPrice" })
+export const GroupedSupplierAndGetPrice = authActionClient
+.metadata({ actionName: "GroupedSupplierAndGetPrice" })
 .action(async () => {
     const response = await getCart()
 

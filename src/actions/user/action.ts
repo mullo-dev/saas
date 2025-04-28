@@ -38,7 +38,7 @@ export const returnOnlySuppliers = authActionClient
         members: {
           some: {
             userId: user.user.id,  // à remplacer par l'ID du user connecté
-            role: 'customer'
+            role: { in: ["customer", "customerOfInternSupplier"] }
           }
         }
       },

@@ -6,7 +6,9 @@ import { returnOnlySuppliers } from "@/actions/user/action"
 import { ProductsTable } from "@/components/global/table/table"
 import { getAllProducts } from "@/actions/products/actions"
 import Link from "next/link"
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { DrawerDialog } from "@/components/global/modal"
+import SupplierForm from "@/components/global/forms/supplierForm"
 
 export default function profilPage() {
   const [filteredOrganizations, setFilteredOrganizations] = useState<any>()
@@ -37,7 +39,16 @@ export default function profilPage() {
 
   return (
     <div>
-      <h2 className="font-bold text-xl">Vos fournisseurs</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="font-bold text-xl">Vos fournisseurs</h2>
+        <DrawerDialog
+          title="Ajouter un nouveau fournisseur" 
+          buttonTitle={"Ajouter un fournisseur"}
+          description="Sélectionnez ou créez un fournisseur"
+        >
+          {(props) => <SupplierForm setOpen={props.setOpen} />}
+        </DrawerDialog>
+      </div>
       <div className="flex gap-2 mt-5">
         {filteredOrganizations?.map((orga:any, index:number) => (
           <SupplierCard key={index} organization={orga} selectSupplierId={selectSupplierId} isSelected={selectSupplier === orga.id} />

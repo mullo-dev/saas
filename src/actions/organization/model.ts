@@ -14,7 +14,13 @@ export type organizationType = {
 
 export const organizationModel = {
   name: z.string().min(1, "Name is required"),
-  slug: z.string()
+  slug: z.string(),
+  createByCustomer: z.boolean().default(false),
+  metadata: z.object({
+    email: z.string(),
+    supplierName: z.string(),
+    phone: z.string()
+  }).optional()
 }
 
 export const organizationsSchema = z.array(
@@ -24,3 +30,12 @@ export const organizationsSchema = z.array(
     invit: z.boolean().optional().default(false)
   })
 )
+
+export type supplierType = {
+  name: string,
+  slug: string,
+  logo?: string,
+  email: string,
+  supplierName: string,
+  phone: string
+}
