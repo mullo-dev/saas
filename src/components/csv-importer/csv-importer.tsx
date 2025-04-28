@@ -77,8 +77,6 @@ export function CsvImporter({
   } = useParseCsv({ fields })
   const { onUpload, isUploading } = useUploadFile("csvUploader")
 
-  console.log(fields)
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -150,7 +148,7 @@ export function CsvImporter({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.map((row, i) => (
+                {data.filter(r => Object.values(r).some((value) => value !== null)).map((row, i) => (
                   <TableRow key={i} className="h-10">
                     {fields.map((field) => (
                       <TableCell
@@ -210,7 +208,6 @@ function PreviewTableHead({
   const id = React.useId()
   const [open, setOpen] = React.useState(false)
 
-  console.log(open)
   return (
     <TableHead className={cn("whitespace-nowrap py-2", className)} {...props}>
       <div className="flex items-center gap-4 pr-1.5">
