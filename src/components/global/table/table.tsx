@@ -16,7 +16,7 @@ import { Minus, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 
 
-export function ProductsTable(props: { propsData: any, supplierId?: string }) {
+export function ProductsTable(props: { propsData: any, supplierId?: string[] }) {
   const [cart, setCart] = useState<Cart>()
   
   const getProductsInCart = async () => {
@@ -47,7 +47,7 @@ export function ProductsTable(props: { propsData: any, supplierId?: string }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {props.propsData?.filter((data:any) => props.supplierId ? data.organizationId === props.supplierId : data).map((item:any, index:number) => {
+          {props.propsData?.filter((data:any) => props.supplierId && props.supplierId?.length > 0 ? props.supplierId.includes(data.organizationId) : data).map((item:any, index:number) => {
             const inTheCart = cart?.find((c) => c.productId === item.product.id)
             return (
               <TableRow key={index}>

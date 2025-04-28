@@ -33,9 +33,9 @@ export function TricksTable(
 
   const toUploadData = async (parsedData:any) => {
     const formattedData = parsedData.filter((r:any) => Object.values(r).some((value) => value !== "")).map((item:any) => ({
-        ref: String(item.chooseRef ?? ""),
-        name: String(item.chooseName ?? ""),
-        description: String(item.chooseDescription ?? ""),
+        ref: String(item.chooseRef),
+        name: String(item.chooseName),
+        description: String(item.chooseDescription),
         price: Number.isNaN(Number(item.choosePrice))
           ? 0
           : Number(item.choosePrice),

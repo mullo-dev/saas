@@ -43,6 +43,18 @@ export const returnOnlySuppliers = authActionClient
         }
       },
       include: {
+        catalogues: {
+          where: {
+            subCatalogues: {
+              some: {            // <- IMPORTANT : `some` pour dire "au moins un subCatalogue"
+                customerId: user.user.id,
+              },
+            },
+          },
+          select: {
+            id: true
+          }
+        },
         members: {
           where: {
             role: 'customer' // ou 'owner' selon ta définition de l'enum
