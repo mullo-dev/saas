@@ -179,7 +179,6 @@ export default function SignIn() {
                       setLoading(false);
                     },
                     onSuccess: async () => {
-                      // console.log(data)
                       const result = await acceptInvitation({ invitationId: invitationId as string })
                       if (result?.data?.success) {
                         toast.success("Invitation validée !")

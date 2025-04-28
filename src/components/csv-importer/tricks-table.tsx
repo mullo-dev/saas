@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table"
 import { CsvImporter } from "./csv-importer"
 import { useParams } from "next/navigation"
-import { createProducts } from "@/actions/produits/actions"
+import { createProducts } from "@/actions/products/actions"
 import { toast } from "sonner"
 import { Checkbox } from "../ui/checkbox"
 import { Input } from "../ui/input"
@@ -43,7 +43,7 @@ export function TricksTable(
       })
     )
 
-    const result = await createProducts({products: formattedData, path: window.location.href})
+    const result = await createProducts({products: formattedData})
     if (result?.data?.success) {
       toast.success("Produits importés !")
       props.reload()

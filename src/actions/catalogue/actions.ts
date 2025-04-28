@@ -114,7 +114,6 @@ export const createSubCatalogue = authActionClient
           organizationId: organization.id,
           role: "customer"
         })
-        console.log(invitation)
       } catch(error) {
         console.error(error)
         return { success: false, error }
@@ -123,7 +122,7 @@ export const createSubCatalogue = authActionClient
       status = "pendingInvit"
     }
 
-    // New organization
+    // New subCatalogue
     await prisma.subCatalogue.create({
       data: {
         customerId: userId,
@@ -132,7 +131,7 @@ export const createSubCatalogue = authActionClient
         invitationId: invitation?.data?.invitation?.id,
         products: {
           create: selectProducts.map((prod) => ({
-            assignedBy: user.name,
+            assignedBy: user.user ? user.user.name : "Inconnu",
             price: prod.price,
             product: {
               connect: {
@@ -153,8 +152,8 @@ export const createSubCatalogue = authActionClient
 });
 
 
-export const updateSubCatalogueFromInivtation = authActionClient
-  .metadata({ actionName: "updateSubCatalogueFromInivtation" })
+export const updateSubCatalogueFromInvitation = authActionClient
+  .metadata({ actionName: "updateSubCatalogueFromInvitation" })
   .schema(z.object({subCatalogueId: z.string()}))
   .action(async ({ parsedInput: { subCatalogueId }, ctx: { user } }) => {
 
@@ -163,7 +162,7 @@ export const updateSubCatalogueFromInivtation = authActionClient
     await prisma.subCatalogue.update({
       where: { id: subCatalogueId },
       data: {
-        customerId: user.id,
+        customerId: user?.user?.id,
       }
     })
 

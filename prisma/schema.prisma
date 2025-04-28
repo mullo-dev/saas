@@ -27,6 +27,7 @@ model User {
   subCatalogues SubCatalogue[]
   members       Member[]
   invitations   Invitation[]
+  orders        Order[]
 
   @@unique([email])
   @@map("user")
@@ -96,6 +97,7 @@ model Organization {
   createdAt   DateTime
   metadata    String?
   invitations Invitation[]
+  orders      SupplierOnOrder[]
 
   @@map("Organization")
   @@unique([slug])
@@ -133,13 +135,13 @@ model Invitation {
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 model Catalogue {
-  id             String         @id @default(uuid())
-  name           String
-  products       Product[]
-  subCatalogues  SubCatalogue[]
-  organizationId String
-  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
+  id              String         @id @default(uuid())
+  name            String
+  products        Product[]
+  subCatalogues   SubCatalogue[]
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
   @@map("Catalogue")
 }
 
@@ -158,7 +160,7 @@ model SubCatalogue {
 
 model ProductOnSubCatalogue {
   productId      String // relation scalar field (used in the `@relation` attribute above)
-  product        Product      @relation(fields: [productId], references: [id])
+  product        Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
   subCatalogueId String
   subCatalogue   SubCatalogue @relation(fields: [subCatalogueId], references: [id], onDelete: Cascade)
   assignedAt     DateTime     @default(now())
@@ -169,14 +171,83 @@ model ProductOnSubCatalogue {
 }
 
 model Product {
-  id                     String                  @id @default(uuid())
-  ref                    String
-  name                   String
-  description            String
-  price                  Int
-  catalogueId            String
-  catalogue              Catalogue               @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
-  productOnSubCatalogues ProductOnSubCatalogue[]
+  id                      String                  @id @default(uuid())
+  ref                     String
+  name                    String
+  description             String
+  price                   Int
+  catalogueId             String
+  catalogue               Catalogue               @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
+  productOnSubCatalogues  ProductOnSubCatalogue[]
+  orders                  SupplierProductOnOrder[]
 
   @@map("Product")
+}
+
+
+// ORDERS
+model Order {
+  id              String    @id @default(uuid())
+  ref             String    @unique
+  customerId      String
+  customer        User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  suppliers       SupplierOnOrder[]
+
+  updatedAt       DateTime   @updatedAt
+  createdAt       DateTime   @default(now())
+}
+
+model SupplierOnOrder {
+  id              String     @id @default(uuid())
+  supplierId      String
+  supplier        Organization @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  orderId         String
+  order           Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  products        SupplierProductOnOrder[]
+  deliveryNote    String?
+  totalHt         Int
+  totalTtc        Int
+}
+
+model SupplierProductOnOrder {
+  id              String                  @id @default(uuid())
+  quantity        Int
+  productId       String // relation scalar field (used in the `@relation` attribute above)
+  price           Int
+  product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplierOrderId String
+  supplierOrder   SupplierOnOrder @relation(fields: [supplierOrderId], references: [id], onDelete: Cascade)
+}
+
+
+// MESSENGER
+model Conversation {
+  id         String     @id @default(uuid())
+  customerId String
+  supplierId String
+
+  messages   Message[]
+  updatedAt  DateTime   @updatedAt
+  createdAt  DateTime   @default(now())
+
+  @@unique([customerId, supplierId]) // Une conversation par duo
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId String
+
+  senderEmail    String
+  body           String
+  via            ChannelType  @default(EMAIL) // le nouveau champ
+  readBy         String[]    // tableau d'IDs qui ont lu le message
+  createdAt      DateTime    @default(now())
+}
+
+enum ChannelType {
+  EMAIL
+  SMS
+  WHATSAPP
+  APP // message interne
 }

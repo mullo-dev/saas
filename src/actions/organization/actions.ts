@@ -8,22 +8,22 @@ import { authClient } from '@/lib/auth-client';
 import { auth } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { createCatalogue } from '../catalogue/actions';
 
 export const getOrganizationById = authActionClient
   .metadata({ actionName: "getOrganizationById" }) 
-  .schema(z.object({organizationSlug: z.string()}))
-  .action(async ({ parsedInput: { organizationSlug } }) => {
+  .schema(z.object({organizationId: z.string()}))
+  .action(async ({ parsedInput: { organizationId } }) => {
 
   try {
     const cookieStore = await cookies();
     // Get the organization
     const organization = await auth.api.getFullOrganization({
-      // organizationId: "mKo1x197K4C6OxfeY5RG7G8vmHiLTtRu",
       headers: new Headers({
         cookie: cookieStore.toString()
       }),
       query: {
-        organizationSlug: organizationSlug
+        organizationId: organizationId
     }
     })
     return { success: true, organization: organization };
@@ -33,14 +33,29 @@ export const getOrganizationById = authActionClient
 });
 
 
-export const getOrganizationInvited = authActionClient
+export const getSupplier = authActionClient
   .metadata({ actionName: "getOrganizationInvited" }) 
-  .schema(z.object({organizationSlug: z.string()}))
-  .action(async ({ parsedInput: { organizationSlug } }) => {
+  .schema(z.object({organizationId: z.string()}))
+  .action(async ({ parsedInput: { organizationId } }) => {
 
   try {
     const organization = await prisma.organization.findUnique({
-      where: { slug: organizationSlug }
+      where: { id: organizationId },
+      select: {
+        name: true,
+        metadata: true,
+        members: {
+          where: { role: "owner" },
+          select: {
+            user: {
+              select: {
+                name: true,
+                email: true
+              }
+            }
+          }
+        }
+      },
     })
     return { success: true, organization: organization };
   } catch (error) {
@@ -69,16 +84,70 @@ export const createOrganization = authActionClient
         name: parsedInput.name,
         slug: parsedInput.slug,
         logo: "",
+        metadata: parsedInput.createByCustomer ? parsedInput.metadata : {}
       },
       headers: new Headers({
         cookie: cookieStore.toString()
       })
     });
 
-    // Set the new organization active
-    await auth.api.setActiveOrganization({
+    if (org && parsedInput.createByCustomer) {
+      await prisma.member.update({
+        where: {
+          id: org.members[0].id
+        },
+        data: {
+          role: "customerOfInternSupplier"
+        }
+      })
+      await createCatalogue({organizationId: org.id, name: org.name + " - catalogue"})
+    } else {
+      // Set the new organization active to the create user
+      if (org?.id) {
+        await auth.api.setActiveOrganization({
+          body: {
+            organizationId: org.id,
+          },
+          headers: new Headers({
+            cookie: cookieStore.toString()
+          })
+        })
+      }
+    }
+
+
+    revalidatePath(parsedInput.createByCustomer ? "/suppliers" : "/dashboard")
+    return { success: true };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error };
+  }
+});
+
+
+export const passActiveOrganization = authActionClient
+  .metadata({ actionName: "activeOrganization" }) 
+  .schema(z.object({organizationId: z.string().optional()}))
+  .action(async ({ parsedInput, ctx: { user } }) => {
+
+  try {
+    const cookieStore = await cookies();
+    let orgaId
+
+    if (!parsedInput.organizationId && user?.user) {
+      const ownOrg = await auth.api.listOrganizations({
+        headers: new Headers({
+          cookie: cookieStore.toString()
+        })
+      })
+      orgaId = ownOrg[0].id
+    } else {
+      orgaId = parsedInput.organizationId
+    }
+
+    const organization = await auth.api.setActiveOrganization({
       body: {
-        organizationId: org?.id,
+        organizationId: orgaId,
       },
       headers: new Headers({
         cookie: cookieStore.toString()
@@ -86,7 +155,7 @@ export const createOrganization = authActionClient
     })
 
     revalidatePath("/dashboard")
-    return { success: true };
+    return { success: true, organization: organization };
   } catch (error) {
     console.log(error);
     return { success: false, error };

@@ -1,19 +1,16 @@
 "use client"
 
-import { getOrganizationById } from "@/actions/organization/actions";
 import MemberForm from "@/components/global/forms/memberForm";
 import OrganizationForm from "@/components/global/forms/organizationForm";
 import { DrawerDialog } from "@/components/global/modal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Edit, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { memberTypeFull } from "@/actions/members/model";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { removeMember } from "@/actions/members/actions";
 
-export default function OrganizationCard(props: { organizations?: any }) {
-  const [organization, setOrganization] = useState<any>(null);
+export default function OrganizationCard({ organization }: { organization?: any }) {
   
   const deleteMember = async (memberId: string) => {
     const result = await removeMember({
@@ -26,17 +23,6 @@ export default function OrganizationCard(props: { organizations?: any }) {
       toast.error("Le membre n'a pas pu être supprimé.")
     }
   }
-
-  useEffect(() => {
-    const fetchOrganization = async () => {
-      if (props.organizations.length > 0) {
-        const org = await getOrganizationById({organizationSlug: props.organizations[0].slug})
-        setOrganization(org?.data?.organization);
-      }
-    };
-    fetchOrganization();
-  }, [props.organizations, toast]);
-
 
   return (
     <Card>

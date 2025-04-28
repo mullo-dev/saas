@@ -14,7 +14,7 @@ export const getUser = cache(async () => {
       })
   })
   
-  return session?.user;
+  return {user: session?.user, activeOrganizationId: session?.session.activeOrganizationId};
 });
 
 export const getRequiredSession = cache(async () => {
