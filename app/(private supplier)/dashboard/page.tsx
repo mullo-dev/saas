@@ -1,27 +1,38 @@
-"use client"
-
 import OrganizationCard from "./organizationCard"
 import CatalogueSection from "./catalogues/catalogueSection"
-import { authClient } from "@/lib/auth-client"
 import { Suspense } from "react"
+import { CustomerSection } from "./customers/customerSection"
+import { getUser } from "@/lib/auth-session"
+import { getOrganizationById, passActiveOrganization } from "@/actions/organization/actions"
+import { redirect } from "next/navigation"
 
-export default function DashboardPage() {
-  const { data: organizations, isPending } = authClient.useListOrganizations()
+export default async function DashboardPage() {
+  const { activeOrganizationId } = await getUser()
 
-  if (isPending) {
-    return <div>Chargement...</div>
+  const activeNotHere = async () => {
+    await passActiveOrganization({})
+    redirect("/dashboard")
   }
+
+  if (!activeOrganizationId) {
+    return activeNotHere()
+  }
+  
+  const org = await getOrganizationById({organizationId: activeOrganizationId})
 
   return (
     <div className="flex gap-6">
       <div className="w-sm">
         <Suspense fallback={<p>Chargement...</p>}>
-          <OrganizationCard organizations={organizations} />
+          <OrganizationCard organization={org?.data?.organization} />
         </Suspense>
       </div>
       <div className="flex-1">
         <Suspense fallback={<p>Chargement...</p>}>
-          <CatalogueSection organizations={organizations} />
+          <CatalogueSection organizationId={activeOrganizationId} />
+        </Suspense>
+        <Suspense fallback={<p>Chargement...</p>}>
+          <CustomerSection organization={org?.data?.organization} />
         </Suspense>
       </div>
     </div>

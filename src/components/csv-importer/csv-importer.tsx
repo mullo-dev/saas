@@ -100,7 +100,7 @@ export function CsvImporter({
             onValueChange={(files) => {
               const file = files[0]
               if (!file) return
-
+              
               onParse({ file, limit: 1001 })
 
               setStep("map")

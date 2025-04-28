@@ -23,7 +23,12 @@ const owner = ac.newRole({
 const customer = ac.newRole({ 
   project: ["create", "update", "delete"], 
   organization: [], 
-}); 
+});
 
-export { ac, member, admin, owner, customer }
+const customerOfInternSupplier = ac.newRole({
+  project: ["create", "update", "delete"], 
+  organization: ["update", "delete"], 
+})
+
+export { ac, member, admin, owner, customer, customerOfInternSupplier }
  

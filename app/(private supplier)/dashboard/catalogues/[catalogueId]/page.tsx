@@ -9,7 +9,7 @@ import { TricksTable } from "@/components/csv-importer/tricks-table";
 import { Shell } from "@/components/csv-importer/shell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { selectProductModel } from "@/actions/produits/model"
+import { selectProductModel } from "@/actions/products/model"
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";

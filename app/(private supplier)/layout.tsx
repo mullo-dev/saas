@@ -14,10 +14,10 @@ export default async function LayoutPrivate({
     unauthorized()
   }
 
-  const fullUser = await prisma.user.findUnique({where: {id:user.id}, select: {type: true}})
+  const fullUser = await prisma.user.findUnique({where: {id:user?.user?.id}, select: {type: true}})
 
   if (fullUser?.type === "CUSTOMER") {
-    redirect("/compte")
+    redirect("/suppliers")
   }
 
   return (

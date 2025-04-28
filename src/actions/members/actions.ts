@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { updateSubCatalogueFromInivtation } from '../catalogue/actions';
+import { updateSubCatalogueFromInvitation } from '../catalogue/actions';
 
 export const inviteMember = authActionClient
   .metadata({ actionName: "inviteMember" }) 
@@ -65,7 +65,7 @@ export const acceptInvitation = authActionClient
       if (checkSubCatalogue.length > 0) {
         // Here update SubCatalogue for add userId
         checkSubCatalogue.map(async (cat) => (
-          await updateSubCatalogueFromInivtation({subCatalogueId: cat.id})
+          await updateSubCatalogueFromInvitation({subCatalogueId: cat.id})
         ))
       }
   
