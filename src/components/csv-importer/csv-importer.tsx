@@ -77,6 +77,8 @@ export function CsvImporter({
   } = useParseCsv({ fields })
   const { onUpload, isUploading } = useUploadFile("csvUploader")
 
+  console.log(fields)
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -208,6 +210,7 @@ function PreviewTableHead({
   const id = React.useId()
   const [open, setOpen] = React.useState(false)
 
+  console.log(open)
   return (
     <TableHead className={cn("whitespace-nowrap py-2", className)} {...props}>
       <div className="flex items-center gap-4 pr-1.5">
@@ -228,7 +231,7 @@ function PreviewTableHead({
           </Label>
         </div>
         <ArrowLeft className="size-4" aria-hidden="true" />
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"

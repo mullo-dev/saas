@@ -7,7 +7,7 @@ import { createSubCatalogue, getCatalogueById } from "@/actions/catalogue/action
 import { useParams } from "next/navigation";
 import { TricksTable } from "@/components/csv-importer/tricks-table";
 import { Shell } from "@/components/csv-importer/shell";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { selectProductModel } from "@/actions/produits/model"
 import { z } from "zod";
