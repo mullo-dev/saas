@@ -30,16 +30,17 @@ export default function SupplierCard(props: { organization: any, selectSupplierI
     if (!props.organization.catalogues[0]) throw new Error("Catalogue not found")
 
     const theCatalogue = props.organization.catalogues[0].id
-    const formattedData = parsedData.filter((r:any) => Object.values(r).some((value) => value !== "")).map((item:any) => ({
-      ref: String(item.chooseRef ?? ""),
-      name: String(item.chooseName ?? ""),
-      description: String(item.chooseDescription ?? ""),
-      price: Number.isNaN(Number(item.choosePrice))
+    const formattedData = parsedData.map((item:any) => {
+      return {
+      ref: String(item.chooseRef),
+      name: String(item.chooseName),
+      description: String(item.chooseDescription),
+      price: Number.isNaN(Number(item.choosePrice.replace(',', '.')))
         ? 0
-        : Number(item.choosePrice),
+        : Number(item.choosePrice.replace(',', '.')),
       catalogueId: String(theCatalogue)
+      }
     })
-    )
 
     const result = await createProducts({products: formattedData, createByCustomer: true})
     if (result?.data?.success) {
@@ -58,7 +59,7 @@ export default function SupplierCard(props: { organization: any, selectSupplierI
   return ( 
     <Card 
       className={`
-        flex w-80 cursor-pointer 
+        flex w-80 
         ${props.organization.invit && "opacity-50 hover:opacity-80 transition-all"} 
         ${props.isSelected && "bg-gray-100"}
       `}
@@ -68,7 +69,7 @@ export default function SupplierCard(props: { organization: any, selectSupplierI
           <h3>
             {props.organization.name}
           </h3>
-          <Checkbox onCheckedChange={e => props.selectSupplierId(props.organization.id, e as boolean)} />
+          <Checkbox className="cursor-pointer" onCheckedChange={e => props.selectSupplierId(props.organization.id, e as boolean)} />
         </CardTitle>
         <CardDescription>
           {props.organization.slug}

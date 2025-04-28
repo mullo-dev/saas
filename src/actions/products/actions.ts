@@ -28,6 +28,8 @@ export const createProducts = authActionClient
           catalogueId: products[0].catalogueId
         }
       })
+
+      console.log(allProducts)
       // Create the subCatalogue
       await prisma.subCatalogue.create({
         data: {

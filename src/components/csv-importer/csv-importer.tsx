@@ -81,7 +81,7 @@ export function CsvImporter({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className={cn("w-fit", className)} {...props}>
-          Import CSV
+          Importer produits
         </Button>
       </DialogTrigger>
       {step === "upload" ? (
