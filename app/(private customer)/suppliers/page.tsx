@@ -1,9 +1,9 @@
 "use client"
 
 import SupplierCard from "./supplierCard"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { returnOnlySuppliers } from "@/actions/user/action"
-import { ProductsTable } from "@/components/global/table/table"
+import { ProductsTable } from "@/components/global/table/productsTable"
 import { getAllProducts } from "@/actions/products/actions"
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
@@ -54,16 +54,20 @@ export default function profilPage() {
         </DrawerDialog>
       </div>
       <div className="flex gap-2 mt-5">
-        {filteredOrganizations?.map((orga:any, index:number) => (
-          <SupplierCard key={index} organization={orga} selectSupplierId={selectSupplierId} isSelected={selectSupplier.includes(orga.id)} />
-        ))}
+        <Suspense fallback={<p>Chargement...</p>}>
+          {filteredOrganizations?.map((orga:any, index:number) => (
+            <SupplierCard key={index} organization={orga} selectSupplierId={selectSupplierId} isSelected={selectSupplier.includes(orga.id)} />
+          ))}
+        </Suspense>
       </div>
       <div className="mt-10">
         <Link href="/suppliers/tunnel" className={buttonVariants()}>
           Passer commande
         </Link>
         <div className="mt-5">
-          <ProductsTable supplierId={selectSupplier} propsData={allProducts} />
+          <Suspense fallback={<p>Chargement...</p>}>
+            <ProductsTable supplierId={selectSupplier} propsData={allProducts} />
+          </Suspense>
         </div>
       </div>
     </div>

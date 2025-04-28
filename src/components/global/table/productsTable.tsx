@@ -16,8 +16,10 @@ import { Minus, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 
 
-export function ProductsTable(props: { propsData: any, supplierId?: string[] }) {
+export function ProductsTable(props: { propsData: any, supplierId?: string[], viewOnly?: boolean }) {
   const [cart, setCart] = useState<Cart>()
+
+  console.log(props.propsData)
   
   const getProductsInCart = async () => {
     const result = await getCart()
@@ -39,11 +41,17 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[] }) 
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">
-            <TableHead>Fournisseur</TableHead>
+            {!props.viewOnly &&<TableHead>Fournisseur</TableHead>}
             <TableHead>Référence</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Prix</TableHead>
+            {props.viewOnly &&
+              <>
+                <TableHead>Quantité</TableHead>
+                <TableHead>Total</TableHead>
+              </>
+            }
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -51,9 +59,9 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[] }) 
             const inTheCart = cart?.find((c) => c.productId === item.product.id)
             return (
               <TableRow key={index}>
-                <TableCell className="font-medium w-40">
+                {!props.viewOnly && <TableCell className="font-medium w-40">
                   <span className="line-clamp-1">{item.supplierName}</span>
-                </TableCell>
+                </TableCell>}
                 <TableCell className="font-medium w-40">
                   <span className="line-clamp-1">{item.product.ref}</span>
                 </TableCell>
@@ -63,29 +71,41 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[] }) 
                 <TableCell className="max-w-[100px]">
                   <span className="line-clamp-3">{item.product.description}</span>
                 </TableCell>
+                {props.viewOnly &&
+                  <>
+                    <TableCell className="max-w-[100px]">
+                      <span className="line-clamp-1">{(item.price/item.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</span>
+                    </TableCell>
+                    <TableCell className="max-w-[100px]">
+                      <span className="line-clamp-3">{item.quantity}</span>
+                    </TableCell>
+                  </>
+                }
                 <TableCell className="max-w-[100px]">
                   <span className="line-clamp-1">{item.price.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}€</span>
                 </TableCell>
                 <TableCell className="w-[50px]">
                   {inTheCart && (item.price*inTheCart.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€'}
                 </TableCell>
-                <TableCell className="text-right w-[150px]">
-                  {inTheCart ? 
-                    <div className="flex gap-2 items-center justify-end">
-                      <Button size="icon" variant="outline" onClick={() => addOrRemoveProduct(item, -1)}>
-                        <Minus />
+                {!props.viewOnly &&
+                  <TableCell className="text-right w-[150px]">
+                    {inTheCart ? 
+                      <div className="flex gap-2 items-center justify-end">
+                        <Button size="icon" variant="outline" onClick={() => addOrRemoveProduct(item, -1)}>
+                          <Minus />
+                        </Button>
+                        <span>{inTheCart.quantity}</span>
+                        <Button size="icon" variant="outline" onClick={() => addOrRemoveProduct(item, 1)}>
+                          <Plus />
+                        </Button>
+                      </div>
+                    :
+                      <Button onClick={() => addOrRemoveProduct(item)}>
+                        Ajouter
                       </Button>
-                      <span>{inTheCart.quantity}</span>
-                      <Button size="icon" variant="outline" onClick={() => addOrRemoveProduct(item, 1)}>
-                        <Plus />
-                      </Button>
-                    </div>
-                  :
-                    <Button onClick={() => addOrRemoveProduct(item)}>
-                      Ajouter
-                    </Button>
-                  }
-                </TableCell>
+                    }
+                  </TableCell>
+                }
               </TableRow>
             )
           })}

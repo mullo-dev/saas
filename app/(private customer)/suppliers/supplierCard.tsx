@@ -76,7 +76,7 @@ export default function SupplierCard(props: { organization: any, selectSupplierI
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {props.organization.invit ? 
+        {props.organization.invit ? // if the invitation isn't accepted yet
           <p>Invité : 
             <Button 
               onClick={() => props.organization.invit && invitationValidation()} 
@@ -86,15 +86,16 @@ export default function SupplierCard(props: { organization: any, selectSupplierI
             </Button>
           </p>
         : 
-          props.organization.members[0] ? 
+          props.organization.members[0] ? // the supplier is real
             <div>
               <ConversationDrawer receipt={props.organization.members[0].user} />
             </div>
-          : props.organization.catalogues[0] ?
+          // the supplier was created by the customer...
+          : props.organization.catalogues[0] ? // ...and have a catalogue
             <Button size="icon" variant="outline">
               <Edit />
             </Button>
-          :
+          : // ...don't have catagloue yet
             <CsvImporter
               fields={[
                 { label: "Référence", value: "chooseRef", required: true },
