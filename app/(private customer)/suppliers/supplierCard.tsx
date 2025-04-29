@@ -6,12 +6,18 @@ import { toast } from "sonner"
 import { ConversationDrawer } from "@app/(private supplier)/dashboard/customers/conversationDrawer"
 import { Button } from "@/components/ui/button"
 import { CsvImporter } from "@/components/csv-importer/csv-importer"
-import { getOrganizationCatalogue } from "@/actions/catalogue/actions"
 import { createProducts } from "@/actions/products/actions"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Edit } from "lucide-react"
+import { useState } from "react"
 
-export default function SupplierCard(props: { organization: any, selectSupplierId: (id:string,status:boolean) => void, isSelected: boolean }) {
+export default function SupplierCard(props: { 
+  organization: any, 
+  selectSupplierId: (id:string,status:boolean) => void, 
+  isSelected: boolean 
+  reload: () => void
+}) {
+  const [returnResult, setReturnResult] = useState<any>()
 
   const invitationValidation = async () => {
     const confirmed = window.confirm("Es-tu sûr de vouloir accepter cette invitation ?");
@@ -42,10 +48,10 @@ export default function SupplierCard(props: { organization: any, selectSupplierI
       }
     })
 
-    const result = await createProducts({products: formattedData, createByCustomer: true})
+    const result = await createProducts({products: formattedData, createByCustomer: true, catalogueId: theCatalogue})
     if (result?.data?.success) {
       toast.success("Produits importés !")
-      // props.reload()
+      setReturnResult(result.data)
     } else {
       toast.success("Une erreur est survenue...")
       console.log(result?.data?.error)
@@ -104,8 +110,17 @@ export default function SupplierCard(props: { organization: any, selectSupplierI
                 { label: "Prix", value: "choosePrice", required: true }
               ]}
               onImport={(parsedData) => toUploadData(parsedData)}
+              reload={props.reload}
               className="self-end"
-            />
+            >
+              <ul>
+                <li className="text-sm font-bold">{returnResult?.updated} produits ont été mis à jour.</li>
+                <li className="text-sm font-bold">{returnResult?.created} produits ont été créés.</li>
+                {returnResult?.failed > 0 && <li className="text-sm font-bold text-red-800">
+                  {returnResult?.failed} produits n'ont pas pu être importé.
+                </li>}
+              </ul>
+            </CsvImporter>
         }
       </CardContent>
     </Card>

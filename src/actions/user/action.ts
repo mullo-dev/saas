@@ -2,18 +2,38 @@
 
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
+import { UserType } from '@prisma/client'
+import { z } from 'zod';
+import { userModel } from './model';
 
 export const getUsers = authActionClient
-  .metadata({ actionName: "createAddress" }) 
+  .metadata({ actionName: "getUsers" })
+  .schema(z.object({searchType: z.nativeEnum(UserType).optional()}))
   .action(async ({ parsedInput, ctx: { user } }) => {
 
   try {
     // New organization
     const users = await prisma.user.findMany({
+      where: {
+        type: parsedInput.searchType ?? undefined,
+      },
       select: {
         id: true,
         name: true,
-        email: true
+        email: true,
+        members: {
+          where: {
+            role: 'owner'
+          },
+          select: {
+            organizationId: true,
+            organization: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
       }
     })
 
@@ -21,7 +41,54 @@ export const getUsers = authActionClient
   } catch (error) {
     return { success: false, error };
   }
+});
 
+
+export const getUserById = authActionClient
+  .metadata({ actionName: "getUserById" })
+  .schema(z.object({userId: z.string()}))
+  .action(async ({ parsedInput, ctx: { user } }) => {
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parsedInput.userId,
+      },
+      select: {
+        name: true,
+        email: true,
+      }
+    })
+
+    return { success: true, user: user };
+  } catch (error) {
+    return { success: false, error };
+  }
+});
+
+
+export const updateUser = authActionClient
+  .metadata({ actionName: "updateUser" })
+  .schema(z.object(userModel))
+  .action(async ({ parsedInput, ctx: { user } }) => {
+    const { type, name, email } = parsedInput
+
+  try {
+    await prisma.user.update({
+      where: {
+        id: user?.user?.id,
+      },
+      data: {
+        ...(type !== undefined && { type }),
+        ...(name !== undefined && { name }),
+        ...(email !== undefined && { email }),
+      }
+    })
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error };
+  }
 });
 
 

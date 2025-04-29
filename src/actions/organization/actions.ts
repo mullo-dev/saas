@@ -140,9 +140,13 @@ export const passActiveOrganization = authActionClient
           cookie: cookieStore.toString()
         })
       })
-      orgaId = ownOrg[0].id
+      orgaId = ownOrg[0]?.id
     } else {
       orgaId = parsedInput.organizationId
+    }
+
+    if (!orgaId) {
+      throw new Error("Organization not found")
     }
 
     const organization = await auth.api.setActiveOrganization({
@@ -153,8 +157,7 @@ export const passActiveOrganization = authActionClient
         cookie: cookieStore.toString()
       })
     })
-
-    revalidatePath("/dashboard")
+    
     return { success: true, organization: organization };
   } catch (error) {
     console.log(error);

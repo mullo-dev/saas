@@ -12,24 +12,54 @@ export const createProducts = authActionClient
 .metadata({ actionName: "createProduct" }) 
 .schema(z.object({
   products: z.array(z.object(productModel)),
-  createByCustomer: z.boolean().default(false).optional()
+  createByCustomer: z.boolean().default(false).optional(),
+  catalogueId: z.string()
 }))
-.action(async ({ parsedInput: { products, createByCustomer }, ctx: { user } }) => {
+.action(async ({ parsedInput: { products, createByCustomer, catalogueId }, ctx: { user } }) => {
   
   try {
-    // New products
-    await prisma.product.createMany({
-      data: products,
-    });
+    // Chek if products are validated
+    const results = products.map((product) => {
+      const result = z.object(productModel).safeParse(product)
+      return {
+        success: result.success,
+        data: result.success ? result.data : product,
+        error: result.success ? null : result.error.format(),
+      }
+    })
+    
+    const validProducts = results.filter(r => r.success).map(r => r.data)
+    const invalidProducts = results.filter(r => !r.success)
+    const created: any[] = []
+    const updated: any[] = []
 
+    for (const product of validProducts) {
+      const existing = await prisma.product.findFirst({
+        where: { 
+          name: product.name,
+          catalogueId: catalogueId
+        },
+      });
+    
+      if (existing) {
+        await prisma.product.update({
+          where: { id: existing.id },
+          data: product,
+        });
+        updated.push(existing)
+      } else {
+        const newProduct = await prisma.product.create({ data: product });
+        created.push(newProduct)
+      }
+    }
+
+    // TO DO : ADD HERE UPDATE AND ADD PRODUCTS (add also the produt is already in)
     if (createByCustomer) {
       const allProducts = await prisma.product.findMany({
         where: {
           catalogueId: products[0].catalogueId
         }
       })
-
-      console.log(allProducts)
       // Create the subCatalogue
       await prisma.subCatalogue.create({
         data: {
@@ -51,7 +81,17 @@ export const createProducts = authActionClient
       })
     }
 
-    return { success: true };
+    return {
+      success: true,
+      created: created.length,
+      updated: updated.length,
+      failed: invalidProducts.length,
+      errors: invalidProducts.map((r, index) => ({
+        index,
+        product: r.data,
+        error: r.error,
+      })),
+    }
   } catch (error) {
     return { success: false, error };
   }

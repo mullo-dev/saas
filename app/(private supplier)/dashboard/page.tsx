@@ -5,35 +5,49 @@ import { CustomerSection } from "./customers/customerSection"
 import { getUser } from "@/lib/auth-session"
 import { getOrganizationById, passActiveOrganization } from "@/actions/organization/actions"
 import { redirect } from "next/navigation"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 export default async function DashboardPage() {
   const { activeOrganizationId } = await getUser()
-
-  const activeNotHere = async () => {
-    await passActiveOrganization({})
-    redirect("/dashboard")
-  }
-
+  let org
+  
   if (!activeOrganizationId) {
-    return activeNotHere()
+    const result = await passActiveOrganization({})
+    if (result?.data?.success) {
+      redirect("/dashboard")
+    }
+  } else {
+    org = await getOrganizationById({organizationId: activeOrganizationId})
   }
   
-  const org = await getOrganizationById({organizationId: activeOrganizationId})
 
   return (
     <div className="flex gap-6">
       <div className="w-sm">
         <Suspense fallback={<p>Chargement...</p>}>
-          <OrganizationCard organization={org?.data?.organization} />
+          <OrganizationCard organization={activeOrganizationId ? org?.data?.organization : ""} />
         </Suspense>
       </div>
       <div className="flex-1">
-        <Suspense fallback={<p>Chargement...</p>}>
-          <CatalogueSection organizationId={activeOrganizationId} />
-        </Suspense>
-        <Suspense fallback={<p>Chargement...</p>}>
-          <CustomerSection organization={org?.data?.organization} />
-        </Suspense>
+        {activeOrganizationId ? 
+          <>
+            <Suspense fallback={<p>Chargement...</p>}>
+              <CatalogueSection organizationId={activeOrganizationId} />
+            </Suspense>
+            <Suspense fallback={<p>Chargement...</p>}>
+              <CustomerSection organization={org?.data?.organization} />
+            </Suspense>
+          </>
+        :
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Vous n'avez pas d'entreprise enregistrée</AlertTitle>
+            <AlertDescription>
+              Vous devez enregistrer votre organisation avant de pouvoir gérer vos données.
+            </AlertDescription>
+          </Alert>
+        }
       </div>
     </div>
   )

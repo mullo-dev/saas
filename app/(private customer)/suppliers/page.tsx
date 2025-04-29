@@ -56,7 +56,13 @@ export default function profilPage() {
       <div className="flex gap-2 mt-5">
         <Suspense fallback={<p>Chargement...</p>}>
           {filteredOrganizations?.map((orga:any, index:number) => (
-            <SupplierCard key={index} organization={orga} selectSupplierId={selectSupplierId} isSelected={selectSupplier.includes(orga.id)} />
+            <SupplierCard 
+              key={index} 
+              organization={orga} 
+              selectSupplierId={selectSupplierId} 
+              isSelected={selectSupplier.includes(orga.id)} 
+              reload={getProducts}
+            />
           ))}
         </Suspense>
       </div>

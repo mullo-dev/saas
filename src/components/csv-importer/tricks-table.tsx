@@ -30,6 +30,7 @@ export function TricksTable(
     reload: () => void
   }) {
   const { catalogueId } = useParams()
+  const [returnResult, setReturnResult] = React.useState<any>()
 
   const toUploadData = async (parsedData:any) => {
     const formattedData = parsedData.map((item:any) => ({
@@ -43,13 +44,12 @@ export function TricksTable(
       })
     )
 
-    const result = await createProducts({products: formattedData})
+    const result = await createProducts({products: formattedData, catalogueId: catalogueId as string})
     if (result?.data?.success) {
       toast.success("Produits importés !")
-      props.reload()
+      setReturnResult(result.data)
     } else {
       toast.success("Une erreur est survenue...")
-      console.log(result?.data?.error)
     }
   }
 
@@ -66,8 +66,17 @@ export function TricksTable(
               { label: "Prix", value: "choosePrice", required: true }
             ]}
             onImport={(parsedData) => toUploadData(parsedData)}
+            reload={props.reload}
             className="self-end"
-          />
+          >
+            <ul>
+              <li className="text-sm font-bold">{returnResult?.updated} produits ont été mis à jour.</li>
+              <li className="text-sm font-bold">{returnResult?.created} produits ont été créés.</li>
+              {returnResult?.failed > 0 && <li className="text-sm font-bold text-red-800">
+                {returnResult?.failed} produits n'ont pas pu être importé.
+              </li>}
+            </ul>
+          </CsvImporter>
         }
       </div>
 
@@ -143,7 +152,7 @@ export function TricksTable(
                       </div>
                     :
                       <span className="line-clamp-1">
-                        {item.price}
+                        {item.price.toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€'}
                       </span>
                     }
                   </TableCell>

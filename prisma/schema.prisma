@@ -165,7 +165,7 @@ model ProductOnSubCatalogue {
   subCatalogue   SubCatalogue @relation(fields: [subCatalogueId], references: [id], onDelete: Cascade)
   assignedAt     DateTime     @default(now())
   assignedBy     String // Id of the member
-  price          Int
+  price          Float
 
   @@id([subCatalogueId, productId])
 }
@@ -175,7 +175,7 @@ model Product {
   ref                     String
   name                    String
   description             String
-  price                   Int
+  price                   Float
   catalogueId             String
   catalogue               Catalogue               @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
   productOnSubCatalogues  ProductOnSubCatalogue[]
@@ -205,15 +205,15 @@ model SupplierOnOrder {
   order           Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   products        SupplierProductOnOrder[]
   deliveryNote    String?
-  totalHt         Int
-  totalTtc        Int
+  totalHt         Float
+  totalTtc        Float
 }
 
 model SupplierProductOnOrder {
   id              String                  @id @default(uuid())
-  quantity        Int
+  quantity        Float
   productId       String // relation scalar field (used in the `@relation` attribute above)
-  price           Int
+  price           Float
   product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   supplierOrderId String
   supplierOrder   SupplierOnOrder @relation(fields: [supplierOrderId], references: [id], onDelete: Cascade)

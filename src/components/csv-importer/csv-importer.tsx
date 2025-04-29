@@ -56,16 +56,19 @@ interface CsvImporterProps
    * @example onImport={(data) => console.log(data)}
    */
   onImport: (data: Record<string, unknown>[]) => void
+  reload: () => void
 }
 
 export function CsvImporter({
   fields,
   onImport,
   className,
+  reload,
+  children,
   ...props
 }: CsvImporterProps) {
   const [open, setOpen] = React.useState(false)
-  const [step, setStep] = React.useState<"upload" | "map">("upload")
+  const [step, setStep] = React.useState<"upload" | "map" | "done">("upload")
   const {
     data,
     fieldMappings,
@@ -87,9 +90,9 @@ export function CsvImporter({
       {step === "upload" ? (
         <DialogContent className="p-8 sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>Upload CSV</DialogTitle>
+            <DialogTitle>Importer CSV</DialogTitle>
             <DialogDescription>
-              Drag and drop your files here or click to browse.
+              Glisser déposer le fichier ici ou cliquer pour choisir sur l'ordinateur.
             </DialogDescription>
           </DialogHeader>
           <FileUploader
@@ -108,13 +111,13 @@ export function CsvImporter({
             disabled={isUploading}
           />
         </DialogContent>
-      ) : (
+      ) : step === "map" ? (
         <DialogContent className="overflow-hidden p-8 sm:max-w-6xl">
           <div className="flex flex-col items-center gap-2 sm:flex-row">
             <DialogHeader className="flex-1">
-              <DialogTitle>Map fields</DialogTitle>
+              <DialogTitle>Correspondance des champs</DialogTitle>
               <DialogDescription>
-                Map the CSV fields to the corresponding table fields.
+                Faire correspondre les colonnes avec les en tête du CSV.
               </DialogDescription>
             </DialogHeader>
             <Button
@@ -167,18 +170,37 @@ export function CsvImporter({
           </div>
           <DialogFooter className="gap-2 sm:space-x-0">
             <Button variant="outline" onClick={() => setStep("upload")}>
-              Back
+              Retour
             </Button>
             <Button
               onClick={async () => {
                 await new Promise((resolve) => setTimeout(resolve, 100))
                 getSanitizedData({ data })
                 onImport(getSanitizedData({ data }))
-                setOpen(false)
-                setStep("upload")
+                setStep("done")
               }}
             >
-              Import
+              Importer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      ) : (
+        <DialogContent className="overflow-hidden p-8 sm:max-w-6xl">
+          <DialogHeader className="flex-1">
+            <DialogTitle>Import validé !</DialogTitle>
+            <DialogDescription>
+              {children}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:space-x-0">
+            <Button 
+              onClick={() => {
+                setOpen(false)
+                setStep("upload")
+                reload()
+              }}
+            >
+              Fermer
             </Button>
           </DialogFooter>
         </DialogContent>

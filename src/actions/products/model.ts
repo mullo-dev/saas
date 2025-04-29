@@ -11,9 +11,9 @@ export type productType = {
 
 export const productModel = {
   ref: z.string(),
-  name: z.string(),
+  name: z.string().min(1),
   price: z.number(),
-  catalogueId: z.string(),
+  catalogueId: z.string().min(1),
   description: z.string()
 }
 

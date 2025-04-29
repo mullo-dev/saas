@@ -18,8 +18,6 @@ import { useEffect, useState } from "react"
 
 export function ProductsTable(props: { propsData: any, supplierId?: string[], viewOnly?: boolean }) {
   const [cart, setCart] = useState<Cart>()
-
-  console.log(props.propsData)
   
   const getProductsInCart = async () => {
     const result = await getCart()

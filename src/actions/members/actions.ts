@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { updateSubCatalogueFromInvitation } from '../catalogue/actions';
+import { resend } from '@/lib/resend';
 
 export const inviteMember = authActionClient
   .metadata({ actionName: "inviteMember" }) 
@@ -35,6 +36,65 @@ export const inviteMember = authActionClient
 
     revalidatePath("/dashboard")
     return { success: true, invitation: invitation };
+  } catch (error) {
+    return { success: false, error };
+  }
+});
+
+
+// For owner of organization to accept a customer request to join
+export const acceptRequestMember = authActionClient
+  .metadata({ actionName: "inviteMember" }) 
+  .schema(z.object({
+    organizationId: z.string(),
+    customerId: z.string()
+  }))
+  .action(async ({ parsedInput: { organizationId, customerId } }) => {
+
+  try {
+    const cookieStore = await cookies();
+
+    const acceptRequest = await auth.api.addMember({
+      body: {
+          userId: customerId,
+          organizationId: organizationId,
+          role: "customer", // We pass the customer role as default
+      },
+      headers: new Headers({
+        cookie: cookieStore.toString()
+      })
+    })
+
+    revalidatePath("/dashboard")
+    return { success: true, invitation: acceptRequest };
+  } catch (error) {
+    return { success: false, error };
+  }
+});
+
+
+// When a customer ask to a supplier to join
+export const sendRequestMember = authActionClient
+  .metadata({ actionName: "inviteMember" }) 
+  .schema(z.object({
+    organizationId: z.string(),
+    supplierEmail: z.string(),
+    supplierId: z.string()
+  }))
+  .action(async ({ parsedInput: { organizationId, supplierId, supplierEmail }, ctx: { user } }) => {
+
+  try {
+
+    const path = `http://localhost:3000/auth/accept-request?organization=${organizationId}&customer=${user?.user?.id}&owner=${supplierId}`
+
+    await resend.emails.send({
+      from: 'noreply@mullo.fr',
+      to: supplierEmail,
+      subject: "Vous avez reçu une demande de nouveau client",
+      text: `Accept invite here : ${path}`,
+    })
+
+    return { success: true };
   } catch (error) {
     return { success: false, error };
   }
