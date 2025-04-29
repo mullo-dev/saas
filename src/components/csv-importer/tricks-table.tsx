@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table"
 import { CsvImporter } from "./csv-importer"
 import { useParams } from "next/navigation"
-import { createProducts } from "@/actions/products/actions"
+import { createProducts } from "@/actions/products/actions/create"
 import { toast } from "sonner"
 import { Checkbox } from "../ui/checkbox"
 import { Input } from "../ui/input"

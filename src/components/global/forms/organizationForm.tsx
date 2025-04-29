@@ -2,12 +2,13 @@
 
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createOrganization } from "@/actions/organization/actions";
+import { createOrganization } from "@/actions/organization/actions/create";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { organizationType } from "@/actions/organization/model";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
+import { updateOrganization } from "@/actions/organization/actions/update";
 
 type InputNames = "name" | "slug" ;
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; col: number }[] = [
@@ -41,7 +42,7 @@ export default function OrganizationForm(props: { organization?: organizationTyp
 
     if (props.organization) {
       // Update to put here
-      result = await createOrganization(data);
+      result = await updateOrganization(data);
     } else {
       result = await createOrganization(data);
     }

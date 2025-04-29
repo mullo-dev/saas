@@ -8,7 +8,7 @@ import { Edit, Plus, Trash2 } from "lucide-react";
 import { memberTypeFull } from "@/actions/members/model";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { removeMember } from "@/actions/members/actions";
+import { removeMember } from "@/actions/members/actions/delete";
 
 export default function OrganizationCard({ organization }: { organization?: any }) {
   

@@ -1,6 +1,6 @@
 "use client"
 
-import { createMessage, getConversationById } from "@/actions/messages/action";
+import { createMessage } from "@/actions/messages/actions/create";
 import { Button } from "@/components/ui/button";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { LoaderCircle, Send } from "lucide-react";
 import { useState, useTransition } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { getConversationById } from "@/actions/messages/actions/get";
 
 export function ConversationDrawer({ receipt }: { receipt: any }) {
   const {

@@ -16,7 +16,7 @@ import { signUp } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { updateUser } from "@/actions/user/action";
+import { updateUser } from "@/actions/user/actions/update";
 import { UserType } from '@prisma/client'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 

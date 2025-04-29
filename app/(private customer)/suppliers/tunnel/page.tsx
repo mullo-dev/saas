@@ -3,7 +3,7 @@
 import SummaryCard from "./summaryCard";
 import TotalCard from "./totalCard";
 import { useEffect, useState } from "react";
-import { GroupedAupplierAndGetPrice } from "@/actions/products/actions";
+import { GroupedAupplierAndGetPrice } from "@/actions/products/actions/get";
 
 export default function tunnelPage() {
   const [groupedSupplier, setGroupedSupplier] = useState<any[]>([])

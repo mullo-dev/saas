@@ -1,9 +1,9 @@
+import { getOrganizationCatalogues } from "@/actions/catalogue/actions/get";
 import CatalogueCard from "./catalogueCard";
-import { getOrganizationCatalogue } from "@/actions/catalogue/actions";
 import DrawerCatalogue from "@/components/global/forms/catalogueForm";
 
 export default async function CatalogueSection(props: {organizationId: string}) {
-  const result = await getOrganizationCatalogue({ organizationId: props.organizationId });
+  const result = await getOrganizationCatalogues({ organizationId: props.organizationId });
 
   if (!result?.data?.success || !result.data.catalogues) {
     return <p>Erreur lors du chargement des catalogues</p>;

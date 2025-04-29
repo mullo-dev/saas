@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { organizationType } from "@/actions/organization/model";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
-import { createCatalogue } from "@/actions/catalogue/actions";
+import { createCatalogue } from "@/actions/catalogue/actions/create";
 import { toast } from "sonner";
 import { DrawerDialog } from "../modal";
 

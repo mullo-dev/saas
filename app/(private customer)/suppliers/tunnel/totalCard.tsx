@@ -1,6 +1,6 @@
 "use client"
 
-import { createOrder } from "@/actions/orders/action"
+import { createOrder } from "@/actions/orders/actions/create"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoaderCircle } from "lucide-react";

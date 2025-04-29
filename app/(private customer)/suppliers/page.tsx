@@ -2,9 +2,9 @@
 
 import SupplierCard from "./supplierCard"
 import { Suspense, useEffect, useState } from "react"
-import { returnOnlySuppliers } from "@/actions/user/action"
+import { returnOnlySuppliers } from "@/actions/user/actions/get"
 import { ProductsTable } from "@/components/global/table/productsTable"
-import { getAllProducts } from "@/actions/products/actions"
+import { getAllProducts } from "@/actions/products/actions/get"
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { DrawerDialog } from "@/components/global/modal"

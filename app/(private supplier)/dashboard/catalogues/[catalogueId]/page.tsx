@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { createSubCatalogue, getCatalogueById } from "@/actions/catalogue/actions";
+import { createSubCatalogue } from "@/actions/catalogue/actions/create";
 import { useParams } from "next/navigation";
 import { TricksTable } from "@/components/csv-importer/tricks-table";
 import { Shell } from "@/components/csv-importer/shell";
@@ -14,6 +14,7 @@ import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import CustomerCard from "./customerCard";
+import { getCatalogueById } from "@/actions/catalogue/actions/get";
 
 type SelectProduct = z.infer<typeof selectProductModel>;
 
@@ -85,7 +86,6 @@ export default function CataloguePage() {
 
 
   // const updateSubCatalogue
-
   if (!catalogue) {
     return <p>Loading...</p>
   }

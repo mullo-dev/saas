@@ -1,7 +1,6 @@
 "use client";
 
 import { useForm, SubmitHandler } from "react-hook-form";
-import { inviteMember } from "@/actions/members/actions";
 import { Button } from "@/components/ui/button";
 import { memberType } from "@/actions/members/model";
 import {
@@ -16,6 +15,7 @@ import { toast } from "sonner";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { inviteMember } from "@/actions/invitations/actions/create";
 
 const rolesWithLabels = Object.values(["member", "admin", "owner"]).map((role) => ({
   value: role,

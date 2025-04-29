@@ -1,6 +1,6 @@
 "use client"
 
-import { getOrderById } from "@/actions/orders/action"
+import { getOrderById } from "@/actions/orders/actions/create"
 import { ProductsTable } from "@/components/global/table/productsTable"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"

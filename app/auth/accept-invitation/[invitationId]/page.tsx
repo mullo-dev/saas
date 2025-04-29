@@ -10,7 +10,8 @@ import { signIn, signUp } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { acceptInvitation, checkEmail } from "@/actions/members/actions";
+import { checkEmail } from "@/actions/members/actions/get";
+import { acceptInvitation } from "@/actions/invitations/actions/accept";
 
 export default function SignIn() {
   const { invitationId } = useParams()

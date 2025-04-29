@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { catalogueType } from "../catalogue/model";
-import { memberTypeFull } from "../members/model";
+import { catalogueType } from "@/actions/catalogue/model";
+import { memberTypeFull } from "@/actions/members/model";
 
 export type organizationType = {
   id: string,

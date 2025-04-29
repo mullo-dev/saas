@@ -4,9 +4,10 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
 import { revalidatePath } from 'next/cache';
-import { catalogueModel, selectProductModel, subCatalogueModel } from './model';
-import { checkEmail, inviteMember } from '../members/actions';
-import { getOrganizationById } from '../organization/actions';
+import { catalogueModel, selectProductModel, subCatalogueModel } from '../model';
+import { getOrganizationById } from '../../organization/actions/get';
+import { checkEmail } from '../../members/actions/get';
+import { inviteMember } from '../../invitations/actions/create';
 
 export const createCatalogue = authActionClient
   .metadata({ actionName: "createCatalogue" })
@@ -25,57 +26,6 @@ export const createCatalogue = authActionClient
     return { success: true };
   } catch (error) {
     console.log(error);
-    return { success: false, error };
-  }
-});
-
-
-export const getOrganizationCatalogue = authActionClient
-  .metadata({ actionName: "getCatalogueOfOrganization" }) 
-  .schema(z.object({organizationId: z.string()}))
-  .action(async ({ parsedInput: { organizationId }}) => {
-
-  try {
-    // Get the catalogue
-    const catalogues = await prisma.catalogue.findMany({
-      where: { organizationId: organizationId },
-    });
-
-    return { success: true, catalogues: catalogues };
-  } catch (error) {
-    return { success: false, error };
-  }
-});
-
-
-export const getCatalogueById = authActionClient
-  .metadata({ actionName: "getCatalogue" }) 
-  .schema(z.object({catalogueId: z.string()}))
-  .action(async ({ parsedInput: { catalogueId }}) => {
-
-  try {
-    // Get the catalogue
-    const catalogue = await prisma.catalogue.findUnique({
-      where: { id: catalogueId },
-      include: {
-        subCatalogues: {
-          // select: {}
-          include: {
-            customer: true,
-            products: {
-              select: {
-                productId: true,
-                price: true
-              }
-            }
-          }
-        },
-        products: true
-      }
-    });
-
-    return { success: true, catalogue: catalogue };
-  } catch (error) {
     return { success: false, error };
   }
 });
@@ -147,29 +97,6 @@ export const createSubCatalogue = authActionClient
     return { success: true };
   } catch (error) {
     console.error(error);
-    return { success: false, error };
-  }
-});
-
-
-export const updateSubCatalogueFromInvitation = authActionClient
-  .metadata({ actionName: "updateSubCatalogueFromInvitation" })
-  .schema(z.object({subCatalogueId: z.string()}))
-  .action(async ({ parsedInput: { subCatalogueId }, ctx: { user } }) => {
-
-  try {
-    
-    await prisma.subCatalogue.update({
-      where: { id: subCatalogueId },
-      data: {
-        customerId: user?.user?.id,
-      }
-    })
-
-    revalidatePath("/dashboard")
-    return { success: true };
-  } catch (error) {
-    console.log(error);
     return { success: false, error };
   }
 });

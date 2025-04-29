@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 import { signOut } from "@/lib/auth-client";
 import { useUser } from "@/lib/auth-session-client";
 import { Button } from "@/components/ui/button";
-import { acceptRequestMember } from "@/actions/members/actions";
-import { getUserById } from "@/actions/user/action";
+import { acceptRequestMember } from "@/actions/invitations/actions/accept";
+import { getUserById } from "@/actions/user/actions/get";
 import { toast } from "sonner";
 
 export default function SignIn() {

@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createOrganization } from "@/actions/organization/actions";
+import { createOrganization } from "@/actions/organization/actions/create";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supplierType } from "@/actions/organization/model";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
-import { getUsers } from "@/actions/user/action";
+import { getUsers } from "@/actions/user/actions/get";
 import {
   Tabs,
   TabsContent,
@@ -15,8 +15,8 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label";
-import { sendRequestMember } from "@/actions/members/actions";
 import { toast } from "sonner";
+import { sendRequestMember } from "@/actions/invitations/actions/create";
 
 type InputNames = "name" | "supplierName" | "email" | "phone" ;
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; col: number }[] = [

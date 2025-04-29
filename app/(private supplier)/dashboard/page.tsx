@@ -3,10 +3,11 @@ import CatalogueSection from "./catalogues/catalogueSection"
 import { Suspense } from "react"
 import { CustomerSection } from "./customers/customerSection"
 import { getUser } from "@/lib/auth-session"
-import { getOrganizationById, passActiveOrganization } from "@/actions/organization/actions"
+import { getOrganizationById } from "@/actions/organization/actions/get"
 import { redirect } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { passActiveOrganization } from "@/actions/organization/actions/active"
 
 export default async function DashboardPage() {
   const { activeOrganizationId } = await getUser()

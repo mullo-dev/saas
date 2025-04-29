@@ -3,11 +3,10 @@
 import { authActionClient } from "@/lib/auth-action";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { GroupedSupplierAndGetPrice } from "../products/actions";
 import { clearCart } from "@/lib/cart";
 import { resend } from "@/lib/resend";
 import NewOrderEmail from "@/components/emails/newOrder";
-import { z } from "zod";
+import { GroupedSupplierAndGetPrice } from "../../organization/actions/get";
 
 export const createOrder = authActionClient
   .metadata({ actionName: "createOrder" }) 
@@ -105,42 +104,6 @@ export const createOrder = authActionClient
 
     revalidatePath("/dashboard")
     await clearCart()
-    return { success: true, order: order };
-  } catch (error) {
-    return { success: false, error };
-  }
-});
-
-
-export const getOrderById = authActionClient
-  .metadata({ actionName: "getOrderById" }) 
-  .schema(z.object({orderId: z.string()}))
-  .action(async ({ parsedInput: { orderId }}) => {
-
-  try {
-    // Get the catalogue
-    const order = await prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        suppliers: {
-          include: {
-            supplier: {
-              select: {
-                name: true,
-              }
-            },
-            products: {
-              select: {
-                price: true,
-                quantity: true,
-                product: true
-              }
-            }
-          }
-        }
-      }
-    });
-
     return { success: true, order: order };
   } catch (error) {
     return { success: false, error };
