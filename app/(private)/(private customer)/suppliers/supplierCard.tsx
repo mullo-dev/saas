@@ -1,9 +1,9 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { acceptInvitation } from "@/actions/invitations/actions/accept"
 import { toast } from "sonner"
-import { ConversationDrawer } from "@app/(private supplier)/dashboard/customers/conversationDrawer"
+import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"
 import { Button } from "@/components/ui/button"
 import { CsvImporter } from "@/components/csv-importer/csv-importer"
 import { createProducts } from "@/actions/products/actions/create"
@@ -12,7 +12,7 @@ import { Edit } from "lucide-react"
 import { useState } from "react"
 
 export default function SupplierCard(props: { 
-  organization: any, 
+  organization: any,
   selectSupplierId: (id:string,status:boolean) => void, 
   isSelected: boolean 
   reload: () => void
@@ -65,7 +65,7 @@ export default function SupplierCard(props: {
   return ( 
     <Card 
       className={`
-        flex w-80 
+        flex h-full
         ${props.organization.invit && "opacity-50 hover:opacity-80 transition-all"} 
         ${props.isSelected && "bg-gray-100"}
       `}
@@ -81,7 +81,7 @@ export default function SupplierCard(props: {
           {props.organization.slug}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardFooter className="flex-1 items-end">
         {props.organization.invit ? // if the invitation isn't accepted yet
           <p>Invité : 
             <Button 
@@ -122,7 +122,7 @@ export default function SupplierCard(props: {
               </ul>
             </CsvImporter>
         }
-      </CardContent>
+      </CardFooter>
     </Card>
   )
 

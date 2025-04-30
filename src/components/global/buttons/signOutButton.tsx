@@ -7,7 +7,10 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-export default function SignOutButton() {
+export default function SignOutButton(props: {
+  className?:string,
+  variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined
+}) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -26,9 +29,10 @@ export default function SignOutButton() {
 
   return (
     <Button
-      variant="outline"
+      variant={props.variant}
       onClick={handleSignOut}
       disabled={loading}
+      className={props.className}
     >
       {loading ? (
         <Loader2 size={16} className="animate-spin" />

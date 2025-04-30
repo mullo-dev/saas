@@ -8,15 +8,13 @@ export default async function LayoutPrivate({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getUser()
+  const { user } = await getUser()
 
   if (!user) {
     unauthorized()
   }
 
-  const fullUser = await prisma.user.findUnique({where: {id:user?.user?.id}, select: {type: true}})
-
-  if (fullUser?.type === "SUPPLIER") {
+  if (user?.type === "SUPPLIER") {
     redirect("/dashboard")
   }
 

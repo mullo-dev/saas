@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react"
-import { organizationClient } from "better-auth/client/plugins"
+import { inferAdditionalFields, organizationClient } from "better-auth/client/plugins"
 import { ac, member, owner, admin, customer, customerOfInternSupplier } from "./permissions";
 
 export const authClient = createAuthClient({
@@ -15,7 +15,15 @@ export const authClient = createAuthClient({
           customer,
           customerOfInternSupplier
         },
-      }) 
+      }),
+      inferAdditionalFields({
+        user: {
+          type: {
+            type: 'string',
+            required: true
+          }
+        }
+      })
   ]
 })
 

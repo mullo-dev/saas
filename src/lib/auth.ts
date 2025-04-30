@@ -7,6 +7,16 @@ import { organization } from "better-auth/plugins"
 import { ac, admin, customer, member, owner, customerOfInternSupplier } from './permissions';
 
 export const auth = betterAuth({
+  user: {
+    additionalFields: {
+      type: {
+        type: "string",
+        required: true,
+        defaultValue: "CUSTOMER",
+        input: true, // don't allow user to set role
+      },
+    },
+  },
   database: prismaAdapter(prisma, {
       provider: "postgresql", // or "mysql", "postgresql", ...etc
   }),

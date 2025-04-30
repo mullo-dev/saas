@@ -14,18 +14,20 @@ import { useState } from "react";
 import { Loader2, X } from "lucide-react";
 import { signUp } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { updateUser } from "@/actions/user/actions/update";
 import { UserType } from '@prisma/client'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function SignUp() {
+	const searchParams = useSearchParams()
+	const userType = searchParams.get("type")
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [type, setType] = useState<UserType>("CUSTOMER");
+	const [type, setType] = useState<UserType>(userType ? userType as UserType : "CUSTOMER");
 	const [passwordConfirmation, setPasswordConfirmation] = useState("");
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
@@ -40,7 +42,11 @@ export default function SignUp() {
 			</CardHeader>
 			<CardContent>
 				<div className="grid gap-4">
-					<RadioGroup className="mb-2" defaultValue="CUSTOMER" onValueChange={(e) => setType(e as UserType)}>
+					<RadioGroup 
+						className="mb-2" 
+						defaultValue={userType ? userType : "CUSTOMER"} 
+						onValueChange={(e) => setType(e as UserType)}
+					>
 						<div className="flex items-center space-x-2">
 							<RadioGroupItem value="CUSTOMER" id="customer" />
 							<Label className="font-bold" htmlFor="customer">Je suis un acheteur pro</Label>

@@ -4,6 +4,7 @@ export type CartItem = {
   productId: string
   quantity: number
   supplierId: string
+  productPrice: number
 }
 
 export type Cart = CartItem[]

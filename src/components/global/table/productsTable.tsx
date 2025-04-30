@@ -2,7 +2,8 @@
 
 import { addToCart } from "@/actions/cart/action"
 import { Cart } from "@/actions/cart/model"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -11,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getCart } from "@/lib/cart"
-import { Minus, Plus } from "lucide-react"
+import { clearCart, getCart } from "@/lib/cart"
+import { Eye, Minus, Plus } from "lucide-react"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
 
@@ -28,87 +30,109 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
     getProductsInCart()
   }, [])
   
-
   const addOrRemoveProduct = async (data:any, quantity?: number) => {
-    await addToCart(data.product.id, data.organizationId, quantity ? quantity : 1)
+    await addToCart(data.product.id, data.organizationId, quantity ? quantity : 1, data.price)
     getProductsInCart()
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/50">
-            {!props.viewOnly &&<TableHead>Fournisseur</TableHead>}
-            <TableHead>Référence</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Prix</TableHead>
-            {props.viewOnly &&
-              <>
-                <TableHead>Quantité</TableHead>
-                <TableHead>Total</TableHead>
-              </>
-            }
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {props.propsData?.filter((data:any) => props.supplierId && props.supplierId?.length > 0 ? props.supplierId.includes(data.organizationId) : data).map((item:any, index:number) => {
-            const inTheCart = cart?.find((c) => c.productId === item.product.id)
-            return (
-              <TableRow key={index}>
-                {!props.viewOnly && <TableCell className="font-medium w-40">
-                  <span className="line-clamp-1">{item.supplierName}</span>
-                </TableCell>}
-                <TableCell className="font-medium w-40">
-                  <span className="line-clamp-1">{item.product.ref}</span>
-                </TableCell>
-                <TableCell className="max-w-[100px]">
-                  <span className="line-clamp-1">{item.product.name}</span>
-                </TableCell>
-                <TableCell className="max-w-[100px]">
-                  <span className="line-clamp-3">{item.product.description}</span>
-                </TableCell>
-                {props.viewOnly &&
-                  <>
-                    <TableCell className="max-w-[100px]">
-                      <span className="line-clamp-1">{(item.price/item.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</span>
-                    </TableCell>
-                    <TableCell className="max-w-[100px]">
-                      <span className="line-clamp-3">{item.quantity}</span>
-                    </TableCell>
-                  </>
-                }
-                <TableCell className="max-w-[100px]">
-                  <span className="line-clamp-1">{item.price.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}€</span>
-                </TableCell>
-                <TableCell className="w-[50px]">
-                  {inTheCart && (item.price*inTheCart.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€'}
-                </TableCell>
-                {!props.viewOnly &&
-                  <TableCell className="text-right w-[150px]">
-                    {inTheCart ? 
-                      <div className="flex gap-2 items-center justify-end">
-                        <Button size="icon" variant="outline" onClick={() => addOrRemoveProduct(item, -1)}>
-                          <Minus />
-                        </Button>
-                        <span>{inTheCart.quantity}</span>
-                        <Button size="icon" variant="outline" onClick={() => addOrRemoveProduct(item, 1)}>
-                          <Plus />
-                        </Button>
-                      </div>
-                    :
-                      <Button onClick={() => addOrRemoveProduct(item)}>
-                        Ajouter
-                      </Button>
-                    }
+    // TO DO : mobile view
+    <div className="flex flex-row-reverse gap-4">
+      <div className="w-70">
+        <Card className="sticky top-5">
+          <CardHeader>
+            <CardTitle>Panier</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <hr />
+            <div className="flex justify-between my-3">
+              <p className="text-sm font-bold text-gray-500">Total</p>
+              <p className="text-sm font-bold">
+                {cart?.reduce((acc: number, p: any) => acc + (p.productPrice*p.quantity), 0).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + "€ HT"}
+              </p>
+            </div>
+            <Link href="/suppliers/tunnel" className={`w-full ${buttonVariants()}`}>
+              Passer commande
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="rounded-md border flex-1">
+        <Table>
+          <TableHeader className="top-0 sticky">
+            <TableRow className="bg-muted/50">
+              {!props.viewOnly &&<TableHead>Fournisseur</TableHead>}
+              <TableHead>Référence</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Prix</TableHead>
+              <TableHead className="text-right">Quantité</TableHead>
+              <TableHead className="text-right">Panier</TableHead>
+              {props.viewOnly &&
+                <>
+                  <TableHead>Quantité</TableHead>
+                  <TableHead>Total</TableHead>
+                </>
+              }
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {props.propsData?.filter((data:any) => props.supplierId && props.supplierId?.length > 0 ? props.supplierId.includes(data.organizationId) : data).map((item:any, index:number) => {
+              const inTheCart = cart?.find((c) => c.productId === item.product.id)
+
+              return (
+                <TableRow key={index}>
+                  {!props.viewOnly && <TableCell className="max-w-30 truncate text-sm">{item.supplierName}</TableCell>}
+                  <TableCell className="text-sm max-w-20 truncate">
+                    {item.product.ref}
                   </TableCell>
-                }
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+                  <TableCell className="cursor-pointer hover:text-primary text-sm truncate flex items-center gap-2 group">
+                    <div>
+                      <p className="font-bold">{item.product.name}</p>
+                      <p className="text-xs hidden md:block">{item.product.description}</p>
+                    </div>
+                    <Eye size={18} className="onHover text-white group-has-hover:text-white-400" />
+                  </TableCell>
+                  {props.viewOnly &&
+                    <>
+                      <TableCell className="text-sm">
+                        {(item.price/item.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {item.quantity}
+                      </TableCell>
+                    </>
+                  }
+                  <TableCell className="text-sm">
+                    {item.price.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}€
+                  </TableCell>
+                  {!props.viewOnly &&
+                    <TableCell className="text-right">
+                      {inTheCart ? 
+                        <div className="flex gap-2 items-center justify-end">
+                          <Button size="icon" variant="outline" onClick={() => addOrRemoveProduct(item, -1)}>
+                            <Minus />
+                          </Button>
+                          <span>{inTheCart.quantity}</span>
+                          <Button size="icon" variant="outline" onClick={() => addOrRemoveProduct(item, 1)}>
+                            <Plus />
+                          </Button>
+                        </div>
+                      :
+                        <Button onClick={() => addOrRemoveProduct(item)}>
+                          Ajouter
+                        </Button>
+                      }
+                    </TableCell>
+                  }
+                  <TableCell className="text-sm text-right font-bold">
+                    {inTheCart && (item.price*inTheCart.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€'}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }

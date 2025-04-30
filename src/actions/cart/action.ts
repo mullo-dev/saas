@@ -1,7 +1,7 @@
 import { getCart, setCart } from '@/lib/cart'
 import { prisma } from '@/lib/prisma'
 
-export async function addToCart(productId: string, supplierId: string, quantity: number = 1) {
+export async function addToCart(productId: string, supplierId: string, quantity: number = 1, productPrice: number) {
   let cart = await getCart()
 
   const existing = cart.find((item) => item.productId === productId)
@@ -12,7 +12,7 @@ export async function addToCart(productId: string, supplierId: string, quantity:
       cart = cart.filter((c) => c.productId !== productId)
     }
   } else {
-    cart.push({ productId, quantity, supplierId })
+    cart.push({ productId, quantity, supplierId, productPrice })
   }
 
   await setCart(cart)

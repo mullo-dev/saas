@@ -19,6 +19,12 @@ export const getOrderById = authActionClient
             supplier: {
               select: {
                 name: true,
+                members: {
+                  where: { role: 'owner' },
+                  select: {
+                    user: true
+                  }
+                }
               }
             },
             products: {
