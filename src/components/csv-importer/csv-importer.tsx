@@ -174,10 +174,14 @@ export function CsvImporter({
             </Button>
             <Button
               onClick={async () => {
-                await new Promise((resolve) => setTimeout(resolve, 100))
-                getSanitizedData({ data })
-                onImport(getSanitizedData({ data }))
-                setStep("done")
+                try {
+                  await new Promise((resolve) => setTimeout(resolve, 100))
+                  getSanitizedData({ data })
+                  onImport(getSanitizedData({ data }))
+                  setStep("done")
+                } catch (error) {
+                  console.log(error)
+                }
               }}
             >
               Importer

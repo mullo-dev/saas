@@ -3,7 +3,7 @@
 import { createMessage } from "@/actions/messages/actions/create";
 import { Button } from "@/components/ui/button";
 import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { LoaderCircle, Send } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -52,15 +52,15 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
           <Send />
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-[400px]">
+      <SheetContent className="">
         <SheetHeader>
           <SheetTitle>Conversation</SheetTitle>
           <SheetDescription>
             <span>{receipt.name} - {receipt.email}</span>
           </SheetDescription>
         </SheetHeader>
-        <div className="relative h-full overflow-scroll pb-4 px-4">
-          <div className="flex flex-col gap-4">
+        <div className="px-4 overflow-scroll">
+          <div className="flex flex-col gap-4 h-[2000px]">
             {!conversation?.message ? conversation?.conversation?.messages?.map((message:any, index:number) => {
               const theSender = message.senderEmail === receipt.email
               const formatted = `${message.createdAt.toLocaleDateString('fr-FR', {
@@ -87,7 +87,9 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
             })
             : <p>{conversation?.message}</p>}
           </div>
-          <form onSubmit={handleSubmit(onSubmit)} className="fixed py-2 bg-white w-[367px] bottom-0 grid gap-2">
+        </div>
+        <SheetFooter>
+          <form onSubmit={handleSubmit(onSubmit)} className="py-2 max-w-[91%] bg-white grid gap-2">
             {!conversation?.conversation?.messages.at(-1).readBy.includes(receipt.email) ?
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-red-500 rounded-full"></div>
@@ -99,7 +101,11 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
                 <p>lu</p>
               </div>
             }
-            <Textarea required {...register("message")} placeholder="Type your message here." />
+            <Textarea 
+              required {...register("message")} 
+              placeholder="Type your message here."
+              className="text-sm"
+            />
             {errors.message && <p className="text-red-500 mt-1 text-sm">{errors.message?.message}</p>}
             {errors.root && <p className="text-red-500 text-sm">{errors.root.message}</p>}
             <Button type="submit" disabled={isPending}>
@@ -108,7 +114,7 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
               : "Send message"}
             </Button>
           </form>
-        </div>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   )

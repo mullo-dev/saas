@@ -66,7 +66,7 @@ export const createProducts = authActionClient
           products: {
             create: allProducts.map((prod) => ({
               assignedBy: user.user ? user.user.name : "Inconnu",
-              price: prod.price,
+              price: prod.price ? prod.price : 0,
               product: {
                 connect: {
                   id: prod.id
@@ -90,6 +90,7 @@ export const createProducts = authActionClient
       })),
     }
   } catch (error) {
+    console.log(error)
     return { success: false, error };
   }
 });

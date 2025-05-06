@@ -3,13 +3,13 @@
 import SummaryCard from "./summaryCard";
 import TotalCard from "./totalCard";
 import { useEffect, useState } from "react";
-import { GroupedAupplierAndGetPrice } from "@/actions/products/actions/get";
+import { GroupedSupplierAndGetPrice } from "@/actions/organization/actions/get";
 
 export default function tunnelPage() {
   const [groupedSupplier, setGroupedSupplier] = useState<any[]>([])
   
   const getCartProducts = async () => {
-    const response = await GroupedAupplierAndGetPrice()
+    const response = await GroupedSupplierAndGetPrice()
     if (response?.data) {
       setGroupedSupplier(response.data.groupedArray)
     }

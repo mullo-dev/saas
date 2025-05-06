@@ -6,15 +6,35 @@ export type productType = {
   name: string,
   price: number,
   catalogueId: string,
-  description: string
+  description: string,
+  enabled: boolean,
+  unit: string,
+  categories: string[],
+  tvaValue: number
 }
 
 export const productModel = {
   ref: z.string(),
-  name: z.string().min(1),
+  name: z.string().min(3),
   price: z.number(),
   catalogueId: z.string().min(1),
-  description: z.string()
+  description: z.string(),
+  enabled: z.boolean().default(true),
+  unit: z.string().optional(),
+  categories: z.array(z.string()).optional(),
+  tvaValue: z.number()
+}
+
+export const productModelUpdate = {
+  ref: z.string().optional(),
+  name: z.string().min(3).optional(),
+  price: z.number().optional(),
+  catalogueId: z.string().min(1).optional(),
+  description: z.string().optional(),
+  enabled: z.boolean().optional(),
+  unit: z.string().optional(),
+  categories: z.array(z.string()).optional(),
+  tvaValue: z.number().optional()
 }
 
 export const selectProductModel = z.object({

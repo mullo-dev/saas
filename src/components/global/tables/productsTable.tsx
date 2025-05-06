@@ -3,7 +3,7 @@
 import { addToCart } from "@/actions/cart/action"
 import { Cart } from "@/actions/cart/model"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -12,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { clearCart, getCart } from "@/lib/cart"
-import { Eye, Minus, Plus } from "lucide-react"
+import { Eye, Minus, Plus, Trash } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
@@ -37,11 +38,42 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
 
   return (
     // TO DO : mobile view
-    <div className="flex flex-row-reverse gap-4">
-      <div className="w-70">
+    <div className="flex flex-col lg:flex-row-reverse gap-4">
+      <div className="lg:w-70">
         <Card className="sticky top-5">
           <CardHeader>
-            <CardTitle>Panier</CardTitle>
+            <CardTitle className="flex justify-between items-center">
+              <h3>Panier</h3>
+              <Tooltip delayDuration={500}>
+                <TooltipTrigger asChild>
+                  <Button 
+                    className="rounded-full" 
+                    variant="ghost" 
+                    size="icon" 
+                    disabled={!cart || cart.length < 1}
+                    onClick={() => {
+                      clearCart()
+                      getProductsInCart()
+                    }}
+                  >
+                    <Trash />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Vider le panier</p>
+                </TooltipContent>
+              </Tooltip>
+            </CardTitle>
+            <CardDescription>
+              {cart && cart.length > 0 ?
+                <>
+                  <p>{new Set(cart.map(p => p.supplierId)).size} fournisseurs</p>
+                  <p>{cart.length} produits</p>
+                </>
+              : 
+                <p>Votre panier est vide</p>
+              }
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <hr />
@@ -61,8 +93,8 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
         <Table>
           <TableHeader className="top-0 sticky">
             <TableRow className="bg-muted/50">
-              {!props.viewOnly &&<TableHead>Fournisseur</TableHead>}
-              <TableHead>Référence</TableHead>
+              {!props.viewOnly &&<TableHead className="hidden lg:table-cell">Fournisseur</TableHead>}
+              <TableHead className="hidden lg:table-cell">Référence</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Prix</TableHead>
               <TableHead className="text-right">Quantité</TableHead>
@@ -81,13 +113,13 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
 
               return (
                 <TableRow key={index}>
-                  {!props.viewOnly && <TableCell className="max-w-30 truncate text-sm">{item.supplierName}</TableCell>}
-                  <TableCell className="text-sm max-w-20 truncate">
+                  {!props.viewOnly && <TableCell className="max-w-30 truncate text-sm hidden lg:table-cell">{item.supplierName}</TableCell>}
+                  <TableCell className="text-sm max-w-20 truncate hidden lg:table-cell">
                     {item.product.ref}
                   </TableCell>
-                  <TableCell className="cursor-pointer hover:text-primary text-sm truncate flex items-center gap-2 group">
-                    <div>
-                      <p className="font-bold">{item.product.name}</p>
+                  <TableCell className="max-w-80 cursor-pointer hover:text-primary text-sm flex items-center gap-2 group">
+                    <div className="">
+                      <p className="text-wrap font-bold">{item.product.name}</p>
                       <p className="text-xs hidden md:block">{item.product.description}</p>
                     </div>
                     <Eye size={18} className="onHover text-white group-has-hover:text-white-400" />
@@ -118,7 +150,7 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
                           </Button>
                         </div>
                       :
-                        <Button onClick={() => addOrRemoveProduct(item)}>
+                        <Button size="sm" onClick={() => addOrRemoveProduct(item)}>
                           Ajouter
                         </Button>
                       }

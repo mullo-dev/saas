@@ -64,7 +64,6 @@ export default function SupplierForm(props: { setOpen: any }) {
   
   const getSuppliersAvailable = async () => {
     const result = await getUsers({searchType: 'SUPPLIER'})
-    console.log(result)
     if (result?.data?.success) {
       let table = [] as any
       result.data.users?.map((s) => {
@@ -139,7 +138,7 @@ export default function SupplierForm(props: { setOpen: any }) {
 
   return (
     <div>
-      <Tabs defaultValue="supplier" className="">
+      <Tabs defaultValue="supplier">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="supplier">Trouver un fournisseur</TabsTrigger>
           <TabsTrigger value="createSupplier">Créer un fournisseur</TabsTrigger>
@@ -147,7 +146,7 @@ export default function SupplierForm(props: { setOpen: any }) {
         <TabsContent value="supplier">
           <div className="bg-gray-100 rounded-md mb-2 p-2">
             <h3 className="text-sm text-gray-900 mt-1 mb-2 font-bold">Cherchez un fournisseur déjà inscrit sur Mullo.</h3>
-            <Input placeholder="Nom, email..." className="bg-white" onChange={(e) => searchInArray(e.target.value)} />
+            <Input placeholder="Nom, email..." className="bg-white text-sm" onChange={(e) => searchInArray(e.target.value)} />
             <div className="h-56 overflow-scroll">
               <ul className="grid gap-2 mt-2">
                 {returnSuppliers.map((sup) => (

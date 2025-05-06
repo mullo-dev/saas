@@ -15,6 +15,9 @@ import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import CustomerCard from "./customerCard";
 import { getCatalogueById } from "@/actions/catalogue/actions/get";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, useCarousel } from "@/components/ui/carousel";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { addProductsInSubCatalogue } from "@/actions/catalogue/actions/update";
 
 type SelectProduct = z.infer<typeof selectProductModel>;
 
@@ -39,27 +42,21 @@ export default function CataloguePage() {
   }, [catalogueId, toast]);
 
 
-  const addProductInSubCatalogue = (productId: string, price: number, checked: boolean) => {
-    setSelectProducts((prev) => {
-      const exists = prev.find((p) => p.productId === productId);
-  
-      if (checked) {
-        if (exists) {
-          // Mise à jour du prix si déjà sélectionné
-          return prev.map((p) =>
-            p.productId === productId ? { ...p, price } : p
-          );
-        } else {
-          // Ajout si pas encore sélectionné
-          return [...prev, { productId, price }];
-        }
-      } else {
-        // Suppression si désélectionné
-        return prev.filter((p) => p.productId !== productId);
+  const addProductInSubCatalogue = (products:any) => {
+    // Filter to delete products
+    const productsIds = products.map((r: any) => r.original.id);
+    const newArray = selectProducts.filter((p) => productsIds.includes(p.productId))
+    // Add new products
+    products.map((prod:any) => {
+      if (!newArray.find((p) => p.productId === prod.original.id)) {
+        newArray.push({
+          price: prod.original.price,
+          productId: prod.original.id,
+        })
       }
-    });
+    })
+    setSelectProducts(newArray)
   };
-  
 
   const addSubCatalogue = async () => {
     if (organizations && selectProducts.length > 0) {
@@ -85,6 +82,22 @@ export default function CataloguePage() {
   }
 
 
+  const updateCustomerSubCatalogue = async () => {
+    const result = await addProductsInSubCatalogue({
+      subCatalogueId: customer.subCatId,
+      selectProducts: selectProducts
+    })
+    if (result?.data?.success) {
+      toast.success("Produits importés !")
+      setSelectProducts([])
+      setCustomer({})
+      fetchCatalogue()
+    } else {
+      toast.success("Une erreur est survenue...")
+    }
+  }
+
+
   // const updateSubCatalogue
   if (!catalogue) {
     return <p>Loading...</p>
@@ -94,56 +107,127 @@ export default function CataloguePage() {
     <div>
       {/* HEADER */}
       <div className="flex justify-between">
-        <h1 className="font-bold text-2xl">
+        <h1 className="font-bold text-xl">
           {newCustomer ?
             "Nouveau client"
           : "Catalogue : " + catalogue.name}
         </h1>
-        <Button 
-          variant="secondary" 
-          onClick={() => {
-            setNewCustomer(prev => !prev) 
-            setSelectProducts([])
-          }}
-        >
-          {newCustomer ? "Annuler" : "Nouveau client"}
-        </Button>
+        
       </div>
-      
-      {/* CARDS CUSTOMERS */}
-      {catalogue.subCatalogues.length > 0 && catalogue.subCatalogues.map((subCat:any, index:number) => (
-        <div className="flex gap-2" key={index}>
-          <CustomerCard 
-            customer={customer}
-            subCat={subCat}
-            setCustomer={setCustomer}
-          />
-        </div>
-      ))}
 
       {/* CARD ADD CUSTOMER */}
-      {newCustomer &&
+      {newCustomer ?
         <Card className="mt-5 px-4">
           <Label>Email du client</Label>
           <Input onChange={(e) => setCustomerEmail(e.target.value)} />
           <div className="flex justify-between items-center">
             <p>{selectProducts.length} produits inclus</p>
-            <Button onClick={addSubCatalogue}>Valider</Button>
+            <div className="flex gap-2">
+              <Button onClick={addSubCatalogue}>Valider</Button>
+              <Button onClick={() => setNewCustomer(false)} variant="destructive">Annuler</Button>
+            </div>
           </div>
         </Card>
+      : 
+      <>
+        {/* CARDS CUSTOMERS */}
+        <Carousel
+          opts={{
+            align: "start",
+          }}
+          className="w-full"
+        >
+          <CustomersCarousel 
+            setCustomer={setCustomer}
+            customer={customer}
+            setSelectProducts={setSelectProducts}
+            setNewCustomer={setNewCustomer}
+            catalogue={catalogue}
+          />
+        </Carousel>
+
+        <hr className="mt-4"/>
+      </>
       }
 
       {/* PRODUCTS TABLE */}
       <Shell>
         <TricksTable 
-          propsData={catalogue.products} 
-          formActive={newCustomer} 
+          catalogue={catalogue} 
+          newCustomer={newCustomer} 
           onToggleProduct={addProductInSubCatalogue}
           selectProducts={selectProducts}
+          setSelectProducts={setSelectProducts}
           selectCustomer={customer}
           reload={fetchCatalogue}
+          updateCustomerSubCatalogue={updateCustomerSubCatalogue}
         />
       </Shell>
     </div>
+  )
+}
+
+
+// Carousel for customers cards
+function CustomersCarousel(props: {
+  setNewCustomer: (value:boolean) => void,
+  setSelectProducts: (value:any) => void,
+  setCustomer: (value:any) => void
+  customer: any,
+  catalogue: any,
+}) {
+  const context = useCarousel()
+
+  return (
+    <>  
+      <div className="md:flex justify-between items-center mb-1 mt-2">
+        <h2 className="font-bold md:mb-0 text-md">Clients</h2>
+        <div className="flex justify-between gap-2 items-center">
+          <div className="flex gap-2">
+            <Button 
+              size="icon" 
+              variant="outline"
+              className="rounded-full" 
+              onClick={() => context.scrollPrev()}
+              disabled={!context.canScrollPrev}
+            >
+              <ArrowLeft />
+            </Button>
+            <Button 
+              size="icon" 
+              variant="outline"
+              className="rounded-full" 
+              onClick={() => context.scrollNext()}
+              disabled={!context.canScrollNext}
+            >
+              <ArrowRight />
+            </Button>
+          </div>
+          <Button 
+            variant="secondary" 
+            onClick={() => {
+              props.setNewCustomer(true) 
+              props.setSelectProducts([])}
+            }
+          >
+            Nouveau client
+          </Button>
+        </div>
+      </div>
+      <CarouselContent>
+        {props.catalogue.subCatalogues.length > 0 && props.catalogue.subCatalogues.map((subCat:any, index:number) => (
+          <CarouselItem key={index}  className="basis-1/1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+            <CustomerCard 
+              customer={props.customer}
+              subCat={subCat}
+              setCustomer={props.setCustomer}
+              setSelectProducts={props.setSelectProducts}
+            />
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </>
   )
 }

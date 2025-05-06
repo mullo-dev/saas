@@ -1,9 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function CustomerCard(props: {
-  customer: {customerId: string, products: object}
+  customer: {customerId: string, products: object, subCatId: string}
   subCat: any,
   setCustomer: (value: any) => void
+  setSelectProducts: (value: any) => void
 }) {
   const { customer, subCat, setCustomer } = props
 
@@ -14,8 +15,13 @@ export default function CustomerCard(props: {
         onClick={() => {
           if (customer.customerId === subCat.customerId) {
             setCustomer({})
+            props.setSelectProducts([])
           } else {
-            setCustomer({customerId: subCat.customerId, products:subCat.products})}
+            setCustomer({customerId: subCat.customerId, products:subCat.products, subCatId: subCat.id})}
+            props.setSelectProducts(subCat.products.map((p:any) => ({
+              productId: p.productId,
+              price: p.price
+            })))
           }
         }
       >

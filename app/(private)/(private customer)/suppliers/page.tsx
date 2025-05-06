@@ -1,21 +1,24 @@
 "use client"
 
 import SupplierCard from "./supplierCard"
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, useContext, useEffect, useState, useTransition } from "react"
 import { returnOnlySuppliers } from "@/actions/user/actions/get"
-import { ProductsTable } from "@/components/global/table/productsTable"
+import { ProductsTable } from "@/components/global/tables/productsTable"
 import { getAllProducts } from "@/actions/products/actions/get"
-import Link from "next/link"
-import { buttonVariants } from "@/components/ui/button"
 import { DrawerDialog } from "@/components/global/modal"
 import SupplierForm from "@/components/global/forms/supplierForm"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { useCarousel } from "@/components/ui/carousel"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 
 export default function profilPage() {
   const [filteredOrganizations, setFilteredOrganizations] = useState<any>()
   const [allProducts, setAllProducts] = useState<any>()
   const [selectSupplier, setSelectSupplier] = useState<string[]>([])
+  const [isPending, startTransition] = useTransition();
+  
 
   const selectSupplierId = (id:string, status:boolean) => {
     if (status) {
@@ -38,49 +41,30 @@ export default function profilPage() {
   }
 
   useEffect(() => {
-    filtered()
-    getProducts()
+    startTransition(async () => {
+      filtered()
+      getProducts()
+    })
   }, [])
   
 
   return (
     <div>
-      <div className="flex justify-between items-center">
-        <h2 className="font-bold text-xl">Vos fournisseurs</h2>
-        <DrawerDialog
-          title="Ajouter un nouveau fournisseur" 
-          buttonTitle={"Ajouter un fournisseur"}
-          description="Sélectionnez ou créez un fournisseur"
+      <Suspense fallback={<Skeleton className="w-full h-[100px] rounded-xl" />}>
+        {!isPending && <Carousel
+          opts={{
+            align: "start",
+          }}
+          className="w-full"
         >
-          {(props) => <SupplierForm setOpen={props.setOpen} />}
-        </DrawerDialog>
-      </div>
-      <div className="flex gap-2 mt-5">
-        <Suspense fallback={<Skeleton className="w-full h-[100px] rounded-xl" />}>
-          <Carousel
-            opts={{
-              align: "start",
-            }}
-            className="w-full"
-          >
-            <CarouselContent>
-              {filteredOrganizations?.map((orga:any, index:number) => (
-                <CarouselItem className="basis-1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-                  <SupplierCard 
-                    key={index} 
-                    organization={orga} 
-                    selectSupplierId={selectSupplierId} 
-                    isSelected={selectSupplier.includes(orga.id)} 
-                    reload={getProducts}
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-          </Suspense>
-      </div>
+          <SupplierCarousel 
+            selectSupplier={selectSupplier}
+            selectSupplierId={selectSupplierId}
+            getProducts={getProducts}
+            filteredOrganizations={filteredOrganizations}
+          />
+        </Carousel>}
+      </Suspense>
       <hr className="my-4"/>
       <h2 className="font-bold text-xl mb-4">Produits</h2>
       <Suspense fallback={<Skeleton className="w-full h-[300px] rounded-xl" />}>
@@ -89,4 +73,66 @@ export default function profilPage() {
     </div>
   )
 
+}
+
+
+
+function SupplierCarousel(props: {
+  selectSupplierId: (id:string, status:boolean) => void,
+  getProducts: () => void,
+  filteredOrganizations: any,
+  selectSupplier: any
+}) {
+  const context = useCarousel()
+
+  return (
+    <>  
+      <div className="md:flex justify-between items-center mb-3">
+        <h2 className="font-bold mb-2 md:mb-0 text-xl">Fournisseurs</h2>
+        <div className="flex justify-between gap-2 items-center">
+          <div className="flex gap-2">
+            <Button 
+              size="icon" 
+              variant="outline"
+              className="rounded-full" 
+              onClick={() => context.scrollPrev()}
+              disabled={!context.canScrollPrev}
+            >
+              <ArrowLeft />
+            </Button>
+            <Button 
+              size="icon" 
+              variant="outline"
+              className="rounded-full" 
+              onClick={() => context.scrollNext()}
+              disabled={!context.canScrollNext}
+            >
+              <ArrowRight />
+            </Button>
+          </div>
+          <DrawerDialog
+            title="Ajouter un nouveau fournisseur" 
+            buttonTitle={"Ajouter un fournisseur"}
+            description="Sélectionnez ou créez un fournisseur"
+          >
+            {(props) => <SupplierForm setOpen={props.setOpen} />}
+          </DrawerDialog>
+        </div>
+      </div>
+      <CarouselContent>
+        {props.filteredOrganizations?.map((orga:any, index:number) => (
+          <CarouselItem key={index}  className="basis-1/1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+            <SupplierCard
+              organization={orga} 
+              selectSupplierId={props.selectSupplierId} 
+              isSelected={props.selectSupplier.includes(orga.id)} 
+              reload={props.getProducts}
+            />
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </>
+  )
 }

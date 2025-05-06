@@ -170,16 +170,21 @@ model ProductOnSubCatalogue {
   @@id([subCatalogueId, productId])
 }
 
+
 model Product {
   id                      String                  @id @default(uuid())
-  ref                     String
-  name                    String
-  description             String
-  price                   Float
+  ref                     String?
+  name                    String?
+  description             String?
+  price                   Float?
   catalogueId             String
   catalogue               Catalogue               @relation(fields: [catalogueId], references: [id], onDelete: Cascade)
   productOnSubCatalogues  ProductOnSubCatalogue[]
   orders                  SupplierProductOnOrder[]
+  tvaValue                Float @default(5.5)
+  unit                    String @default("kg")
+  categories              String[]
+  enabled                 Boolean @default(true)
 
   @@map("Product")
 }

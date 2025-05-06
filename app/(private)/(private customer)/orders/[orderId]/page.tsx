@@ -1,7 +1,7 @@
 "use client"
 
 import { getOrderById } from "@/actions/orders/actions/get"
-import { ProductsTable } from "@/components/global/table/productsTable"
+import { ProductsTable } from "@/components/global/tables/productsTable"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"

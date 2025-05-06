@@ -1,4 +1,4 @@
-import { Orderstable } from "@/components/global/table/ordersTable"
+import { Orderstable } from "@/components/global/tables/ordersTable"
 import { getUser } from "@/lib/auth-session"
 import { prisma } from "@/lib/prisma"
 import { Suspense } from "react"

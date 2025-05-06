@@ -57,7 +57,7 @@ export function DrawerDialog({ title, description, buttonTitle, children, button
         <DialogTrigger asChild>
           <Button variant="outline" size={buttonSize ? buttonSize : "default"}>{buttonTitle}</Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>
@@ -77,20 +77,24 @@ export function DrawerDialog({ title, description, buttonTitle, children, button
         <Button variant="outline">{buttonTitle}</Button>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>
-            {description}
-          </DrawerDescription>
-        </DrawerHeader>
+        <div className="w-full max-h-full">
+          <DrawerHeader className="text-left">
+            <DrawerTitle>{title}</DrawerTitle>
+            <DrawerDescription>
+              {description}
+            </DrawerDescription>
+          </DrawerHeader>
 
-        {children({ setOpen })}
+          <div className="p-4 pb-0">
+            {children({ setOpen })}
+          </div>
 
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
+          <DrawerFooter className="pt-2">
+            <DrawerClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </div>
       </DrawerContent>
     </Drawer>
   )

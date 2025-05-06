@@ -1,33 +1,25 @@
 "use client"
 
 import * as React from "react"
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { CsvImporter } from "./csv-importer"
 import { useParams } from "next/navigation"
 import { createProducts } from "@/actions/products/actions/create"
 import { toast } from "sonner"
-import { Checkbox } from "../ui/checkbox"
-import { Input } from "../ui/input"
-import { Button } from "../ui/button"
-import { Trash } from "lucide-react"
+import { DataTableProducts } from "../global/tables/products/table"
+import { columnsProducts } from "../global/tables/products/columns"
+import { addProductsInSubCatalogue } from "@/actions/catalogue/actions/update"
 
 
 export function TricksTable(
-  props: { 
-    propsData: any, 
-    formActive: boolean,
-    onToggleProduct: (productId: string, price: number, checked: boolean) => void 
+  props: {
+    updateCustomerSubCatalogue: () => void,
+    setSelectProducts: (prev:any) => void,
+    catalogue: any, 
+    newCustomer: boolean,
+    onToggleProduct: (products:any) => void 
     selectProducts: any,
     selectCustomer: any,
-    reload: () => void
+    reload: () => void,
   }) {
   const { catalogueId } = useParams()
   const [returnResult, setReturnResult] = React.useState<any>()
@@ -37,10 +29,18 @@ export function TricksTable(
         ref: String(item.chooseRef),
         name: String(item.chooseName),
         description: String(item.chooseDescription),
-        price: Number.isNaN(Number(item.choosePrice.replace(',', '.')))
-          ? 0
-          : Number(item.choosePrice.replace(',', '.')),
-        catalogueId: String(catalogueId)
+        price: typeof item.choosePrice === "number" ? item.choosePrice 
+        : Number.isNaN(Number(item.choosePrice.replace(',', '.'))) ? 
+          0
+        : Number(item.choosePrice.replace(',', '.')),
+        catalogueId: String(catalogueId),
+        unit: String(item.chooseUnit),
+        tvaValue: typeof item.chooseTvaValue === "number" ? item.chooseTvaValue 
+          : Number.isNaN(Number(item.chooseTvaValue.replace(',', '.'))) ? 
+            0
+          : Number(item.chooseTvaValue.replace(',', '.')),
+        categories: [String(item.chooseCategories)],
+        enabled: true
       })
     )
 
@@ -49,21 +49,25 @@ export function TricksTable(
       toast.success("Produits importés !")
       setReturnResult(result.data)
     } else {
+      console.log(result)
       toast.success("Une erreur est survenue...")
     }
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-between items-center mt-5 mb-2">
-        <h4>{props.formActive ? "Produits à inclure :" : "Produits"}</h4>
-        {!props.formActive && 
+      <div className="flex justify-between items-center">
+        <h4 className="font-bold text-md">{props.newCustomer ? "Produits à inclure :" : "Produits"}</h4>
+        {!props.newCustomer && 
           <CsvImporter
             fields={[
               { label: "Référence", value: "chooseRef", required: true },
               { label: "Name", value: "chooseName", required: true },
               { label: "Description", value: "chooseDescription" },
-              { label: "Prix", value: "choosePrice", required: true }
+              { label: "Prix", value: "choosePrice", required: true },
+              { label: "Unité de vente", value: "chooseUnit", required: true },
+              { label: "Taux de TVA", value: "chooseTvaValue" },
+              { label: "Catégories", value: "chooseCategories" }
             ]}
             onImport={(parsedData) => toUploadData(parsedData)}
             reload={props.reload}
@@ -80,88 +84,16 @@ export function TricksTable(
         }
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50">
-              {props.formActive && 
-                <TableHead>Inc</TableHead>
-              }
-              <TableHead>Référence</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Prix</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {props.propsData.map((item:any, index:number) => {
-              const isInSubCatalogue = props.selectCustomer?.products?.find((id:any) => id.productId === item.id)
-              return (
-                <TableRow key={index} className={isInSubCatalogue && "bg-green-50"}>
-                  {props.formActive && 
-                    <TableCell className="font-medium w-15">
-                      <Checkbox onCheckedChange={(checked) => props.onToggleProduct(item.id, item.price, checked === true )} />
-                    </TableCell>
-                  }
-                  <TableCell className="font-medium w-40">
-                    <span className="line-clamp-1">{item.ref}</span>
-                  </TableCell>
-                  <TableCell className="max-w-[100px]">
-                    <span className="line-clamp-1">{item.name}</span>
-                  </TableCell>
-                  <TableCell className="max-w-[100px]">
-                    <span className="line-clamp-3">{item.description}</span>
-                  </TableCell>
-                  <TableCell className="max-w-[100px]">
-                    {props.formActive && props.selectProducts.find((select:any) => select.productId === item.id) ?
-                      <Input 
-                        type="number" 
-                        defaultValue={item.price}
-                        onBlur={(e) => props.onToggleProduct(item.id, Number(e.target.value), true )}
-                      />
-                    : isInSubCatalogue ?
-                      <div className="flex gap-2">
-                        <div className="relative flex items-center rounded-md border focus-within:ring-1 focus-within:ring-ring px-2">        
-                          <Input 
-                            type="number"
-                            className="border-0 focus-visible:ring-0 shadow-none" 
-                            defaultValue={isInSubCatalogue.price}
-                            onBlur={(e) => props.onToggleProduct(item.id, Number(e.target.value), true )}
-                          />        
-                          <span className="text-gray-500 font-bold text-xs">  
-                            Prix public : {item.price}        
-                          </span>      
-                        </div>
-                        <Button
-                          variant="destructive"
-                        >
-                          <Trash />
-                        </Button>
-                      </div>
-                    : props.selectCustomer?.products?.length > 0 ?
-                      <div className="flex justify-between">
-                        <span className="line-clamp-1">
-                          {item.price}
-                        </span>
-                        <Button 
-                          size="sm"
-                          variant="secondary"
-                        >
-                          ajouter
-                        </Button>
-                      </div>
-                    :
-                      <span className="line-clamp-1">
-                        {item.price.toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€'}
-                      </span>
-                    }
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTableProducts 
+        data={props.catalogue.products}
+        columns={columnsProducts}
+        onToggleProduct={props.onToggleProduct}
+        newCustomer={props.newCustomer}
+        selectProducts={props.selectProducts}
+        selectCustomer={props.selectCustomer}
+        setSelectProducts={props.setSelectProducts}
+        updateCustomerSubCatalogue={props.updateCustomerSubCatalogue}
+      />
     </div>
   )
 }
