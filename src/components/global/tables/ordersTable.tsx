@@ -15,7 +15,7 @@ type OrderProps = Order & {
   suppliers: SupplierOnOrder[]
 }
 
-export function Orderstable(props: { orders: any }) {
+export function Orderstable(props: { orders: any, supplier?: boolean }) {
 
   return (
     <div className="rounded-md border">
@@ -24,7 +24,7 @@ export function Orderstable(props: { orders: any }) {
           <TableRow className="bg-muted/50">
             <TableHead>N° de commande</TableHead>
             <TableHead>Date</TableHead>
-            <TableHead>Nombre de fournisseurs</TableHead>
+            {!props.supplier && <TableHead>Nombre de fournisseurs</TableHead>}
             <TableHead>Total</TableHead>
           </TableRow>
         </TableHeader>
@@ -37,14 +37,17 @@ export function Orderstable(props: { orders: any }) {
                 <TableCell className="font-medium">
                   <span className="line-clamp-1">{item.createdAt.toLocaleDateString('fr-FR')}</span>
                 </TableCell>
-                <TableCell className="font-medium w-60">
+                {!props.supplier && <TableCell className="font-medium w-60">
                   <span className="line-clamp-1">{item.suppliers.length}</span>
-                </TableCell>
+                </TableCell>}
                 <TableCell className="font-medium w-60">
                   <span className="line-clamp-1">{item.suppliers.reduce((acc, t) => acc + t.totalHt, 0).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€'}</span>
                 </TableCell>
                 <TableCell className="text-right w-[150px]">
-                  <Link href={`/orders/${item.id}`} className={buttonVariants({size: "icon", variant: "outline"})}>
+                  <Link 
+                    href={props.supplier ? `/dashboard/orders/${item.id}` : `/orders/${item.id}`} 
+                    className={buttonVariants({size: "icon", variant: "outline"})}
+                  >
                     <Plus />
                   </Link>
                 </TableCell>

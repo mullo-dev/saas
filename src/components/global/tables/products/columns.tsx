@@ -9,19 +9,9 @@ import { ArrowUpDown, Check, ChevronDown, ChevronUp, X } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { useState } from "react"
 import { toast } from "sonner"
+import { productType } from "@/actions/products/model"
 
-export type Product = {
-  id: string
-  price: number
-  description: string
-  ref: string
-  name: string
-  unit: string
-  enabled: boolean
-  tvaValue: number
-}
-
-export const columnsProducts: ColumnDef<Product>[] = [
+export const columnsProducts: ColumnDef<productType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -83,16 +73,18 @@ export const columnsProducts: ColumnDef<Product>[] = [
 
       const onUpdateProduct = async () => {
         if (!newValue || newValue.length < 3) return toast.error("Le nom doit contenir au moins 3 caractères")
-        const result = await updateProduct({
-          name: newValue,
-          productId: row.original.id
-        })
-        if (result?.data?.success) {
-          toast.success("Nom mis à jour")
-          setDisplay(newValue)
-          setUpdate(false)
-        } else {
-          toast.error('Une erreur est survenue')
+        if (row.original.id) {
+          const result = await updateProduct({
+            name: newValue,
+            productId: row.original.id
+          })
+          if (result?.data?.success) {
+            toast.success("Nom mis à jour")
+            setDisplay(newValue)
+            setUpdate(false)
+          } else {
+            toast.error('Une erreur est survenue')
+          }
         }
       }
 
@@ -143,7 +135,7 @@ export const columnsProducts: ColumnDef<Product>[] = [
   {
     accessorKey: "sellQuantity",
     header: () => <div className="max-w-10">Par colis</div>,
-    cell: ({ row }) => (<div className="max-w-10">4</div>)
+    cell: ({ row }) => (<div className="max-w-10">{row.original.sellQuantity}</div>)
   },
   {
     accessorKey: "enabled",
@@ -152,15 +144,17 @@ export const columnsProducts: ColumnDef<Product>[] = [
       const [isChecked, setIsChecked] = useState<boolean>(row.original.enabled)
 
       const change = async () => {
-        const result = await updateProduct({
-          enabled: !row.original.enabled,
-          productId: row.original.id
-        })
-        if (result?.data?.success) {
-          toast.success(`Produit rendu ${!row.original.enabled === true ? "disponible" : "indisponible"}`)
-          setIsChecked(!isChecked)
-        } else {
-          toast.error('Une erreur est survenue')
+        if (row.original.id) {
+          const result = await updateProduct({
+            enabled: !row.original.enabled,
+            productId: row.original.id
+          })
+          if (result?.data?.success) {
+            toast.success(`Produit rendu ${!row.original.enabled === true ? "disponible" : "indisponible"}`)
+            setIsChecked(!isChecked)
+          } else {
+            toast.error('Une erreur est survenue')
+          }
         }
       }
 

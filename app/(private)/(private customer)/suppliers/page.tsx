@@ -12,6 +12,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { useCarousel } from "@/components/ui/carousel"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function profilPage() {
   const [filteredOrganizations, setFilteredOrganizations] = useState<any>()
@@ -86,53 +87,70 @@ function SupplierCarousel(props: {
   const context = useCarousel()
 
   return (
-    <>  
-      <div className="md:flex justify-between items-center mb-3">
-        <h2 className="font-bold mb-2 md:mb-0 text-xl">Fournisseurs</h2>
-        <div className="flex justify-between gap-2 items-center">
-          <div className="flex gap-2">
-            <Button 
-              size="icon" 
-              variant="outline"
-              className="rounded-full" 
-              onClick={() => context.scrollPrev()}
-              disabled={!context.canScrollPrev}
+    props.filteredOrganizations ?  
+      <>
+        <div className="md:flex justify-between items-center mb-3">
+          <h2 className="font-bold mb-2 md:mb-0 text-xl">Fournisseurs</h2>
+          <div className="flex justify-between gap-2 items-center">
+            <div className="flex gap-2">
+              <Button 
+                size="icon" 
+                variant="outline"
+                className="rounded-full" 
+                onClick={() => context.scrollPrev()}
+                disabled={!context.canScrollPrev}
+              >
+                <ArrowLeft />
+              </Button>
+              <Button 
+                size="icon" 
+                variant="outline"
+                className="rounded-full" 
+                onClick={() => context.scrollNext()}
+                disabled={!context.canScrollNext}
+              >
+                <ArrowRight />
+              </Button>
+            </div>
+            <DrawerDialog
+              title="Ajouter un nouveau fournisseur" 
+              buttonTitle={"Ajouter un fournisseur"}
+              description="Sélectionnez ou créez un fournisseur"
             >
-              <ArrowLeft />
-            </Button>
-            <Button 
-              size="icon" 
-              variant="outline"
-              className="rounded-full" 
-              onClick={() => context.scrollNext()}
-              disabled={!context.canScrollNext}
-            >
-              <ArrowRight />
-            </Button>
+              {(props) => <SupplierForm setOpen={props.setOpen} />}
+            </DrawerDialog>
           </div>
+        </div>
+        <CarouselContent>
+          {props.filteredOrganizations?.map((orga:any, index:number) => (
+            <CarouselItem key={index}  className="basis-1/1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <SupplierCard
+                organization={orga} 
+                selectSupplierId={props.selectSupplierId} 
+                isSelected={props.selectSupplier.includes(orga.id)} 
+                reload={props.getProducts}
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </>
+    :
+      <Card className="mt-2">
+        <CardHeader className="text-center">
+          <CardTitle>Pas encore de fournisseur</CardTitle>
+          <CardDescription className="text-center">Ajoutez un fournisseur existant ou configurez le vous même.</CardDescription>
+        </CardHeader>
+        <CardFooter className="flex justify-center">
           <DrawerDialog
             title="Ajouter un nouveau fournisseur" 
-            buttonTitle={"Ajouter un fournisseur"}
+            buttonTitle={"Ajouter votre premier fournisseur"}
             description="Sélectionnez ou créez un fournisseur"
           >
             {(props) => <SupplierForm setOpen={props.setOpen} />}
           </DrawerDialog>
-        </div>
-      </div>
-      <CarouselContent>
-        {props.filteredOrganizations?.map((orga:any, index:number) => (
-          <CarouselItem key={index}  className="basis-1/1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-            <SupplierCard
-              organization={orga} 
-              selectSupplierId={props.selectSupplierId} 
-              isSelected={props.selectSupplier.includes(orga.id)} 
-              reload={props.getProducts}
-            />
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </>
+        </CardFooter>
+      </Card>
   )
 }

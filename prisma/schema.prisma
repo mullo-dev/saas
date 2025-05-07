@@ -185,6 +185,7 @@ model Product {
   unit                    String @default("kg")
   categories              String[]
   enabled                 Boolean @default(true)
+  sellQuantity            Float @default(1)
 
   @@map("Product")
 }

@@ -9,6 +9,7 @@ import { LoaderCircle, Send } from "lucide-react";
 import { useState, useTransition } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { getConversationById } from "@/actions/messages/actions/get";
+import SimpleTooltip from "@/components/global/tootip/tooltip";
 
 export function ConversationDrawer({ receipt }: { receipt: any }) {
   const {
@@ -45,12 +46,14 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
   return (
     <Sheet>
       <SheetTrigger>
-        <Button 
-          variant="outline" 
-          onClick={() => getConv()}
-        >
-          <Send />
-        </Button>
+        <SimpleTooltip content="Conversation">
+          <Button 
+            variant="outline" 
+            onClick={() => getConv()}
+            >
+            <Send />
+          </Button>
+        </SimpleTooltip>
       </SheetTrigger>
       <SheetContent className="">
         <SheetHeader>

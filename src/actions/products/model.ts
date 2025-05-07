@@ -10,7 +10,8 @@ export type productType = {
   enabled: boolean,
   unit: string,
   categories: string[],
-  tvaValue: number
+  tvaValue: number,
+  sellQuantity: number
 }
 
 export const productModel = {
@@ -22,7 +23,8 @@ export const productModel = {
   enabled: z.boolean().default(true),
   unit: z.string().optional(),
   categories: z.array(z.string()).optional(),
-  tvaValue: z.number()
+  tvaValue: z.number(),
+  sellQuantity: z.number().default(1)
 }
 
 export const productModelUpdate = {
@@ -34,7 +36,8 @@ export const productModelUpdate = {
   enabled: z.boolean().optional(),
   unit: z.string().optional(),
   categories: z.array(z.string()).optional(),
-  tvaValue: z.number().optional()
+  tvaValue: z.number().optional(),
+  sellQuantity: z.number().optional()
 }
 
 export const selectProductModel = z.object({

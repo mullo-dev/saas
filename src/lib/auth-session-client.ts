@@ -11,8 +11,11 @@ export function useUser() {
     setMounted(true);
   }, []);
 
+  session?.session.activeOrganizationId
+
   return {
     user: mounted ? session?.user : null,
+    activeOrganizationId: mounted ? session?.session?.activeOrganizationId : null,
     isPending: mounted ? isPending : true
   };
 } 

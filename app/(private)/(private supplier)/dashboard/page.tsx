@@ -1,4 +1,4 @@
-import OrganizationCard from "./organizationCard"
+import OrganizationCard from "../../../../src/components/global/cards/organizationCard"
 import CatalogueSection from "./catalogues/catalogueSection"
 import { Suspense } from "react"
 import { CustomerSection } from "./customers/customerSection"

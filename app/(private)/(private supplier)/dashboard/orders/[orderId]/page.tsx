@@ -1,28 +1,32 @@
 "use client"
 
 import { getOrderById } from "@/actions/orders/actions/get"
+import { SubHeader } from "@/components/global/header/subHeader"
 import { ProductsTable } from "@/components/global/tables/productsTable"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useUser } from "@/lib/auth-session-client"
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"
 import { Download } from "lucide-react"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
-export default function orderIdPage() {
+export default function supplierOrderIdPage() {
   const [order, setOrder] = useState<any>()
+  const { isPending, activeOrganizationId } = useUser()
   const { orderId } = useParams()
 
   const getOrder = async () => {
-    const result = await getOrderById({orderId: orderId as string})
+    const result = await getOrderById({orderId: orderId as string, organizationId: activeOrganizationId as string })
+    console.log(result)
     if (result?.data?.success) {
       setOrder(result.data.order)
     }
   }
 
   useEffect(() => {
-    getOrder()
-  }, [])
+    !isPending && getOrder()
+  }, [isPending])
 
   if (!order) {
     return <p>Chargement...</p>
@@ -31,54 +35,35 @@ export default function orderIdPage() {
   return (
     <div>
       <div className="flex gap-4 flex-col-reverse md:flex-row">
-        <div className="flex-1 flex flex-col gap-4">
-          {order.suppliers.map((sup:any, index:number) => (
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between">
-                  <div>
-                    <CardTitle>{sup.supplier.name}</CardTitle>
-                    <CardDescription>
-                      Total {sup.products.reduce((acc:any, t:any) => acc + t.price, 0).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€'}
-                    </CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <ConversationDrawer receipt={sup.supplier.members[0].user} />
-                    <Button size="icon" variant="outline">
-                      <Download />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ProductsTable propsData={sup.products} viewOnly />
-              </CardContent>
-            </Card>
-          ))}
+        <div className="flex-1">
+          <SubHeader title={`Commande ${order.ref}`} />
+          <h2 className="font-bold text-md mb-2">
+            {order.suppliers[0].products.length} produit{order.suppliers[0].products.length > 1 && "s"}</h2>
+          <ProductsTable propsData={order.suppliers[0].products} viewOnly />
         </div>
         <div className="w-80">
-          <Card className="sticky top-0 bg-secondary-300">
+          <Card className="sticky top-5 bg-secondary-300">
             <CardHeader>
               <CardTitle>Commande {order.ref}</CardTitle>
               <CardDescription>Effectuée le {order.createdAt.toLocaleDateString("fr-FR")}</CardDescription>
+              <hr />
             </CardHeader>
             <CardContent>
-              <ul className="mb-3">
-                {order.suppliers.map((sup:any, index:number) => (
-                  <li className="flex justify-between items-center font-bold text-gray-400 mb-1">
-                    <p className="text-xs">{sup.supplier.name}</p>
-                    <p className="text-xs">
-                      {sup.totalHt.toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€ HT'}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+              <div className="text-sm mb-5">
+                <h3 className="font-bold mb-2">Client</h3>
+                <div className="flex justify-between">
+                  <p>
+                    {order.customer.name}<br/>
+                    <span className="text-muted-foreground">{order.customer.email}</span>
+                  </p>
+                  <ConversationDrawer receipt={order.customer} />
+                </div>
+              </div>
               <hr />
               <div className="flex justify-between items-center mt-3">
                 <p className="font-bold text-sm text-gray-500">Total HT</p>
                 <p className="font-bold text-md">
-                  {order.suppliers
-                    .reduce((acc: number, p: any) => acc + p.totalHt, 0)
+                  {order.suppliers[0].totalHt
                     .toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + "€ HT"}
                 </p>
               </div>

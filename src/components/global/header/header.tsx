@@ -3,28 +3,18 @@
 import { useUser } from "@/lib/auth-session-client";
 import { Navigation } from "../nav/nav";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export function Header() {
   const { user, isPending } = useUser();
-  // const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // useEffect(() => {
-  //   setMounted(true);
-  // }, []);
-
-  // // if (!mounted) {
-  // //   return (
-  // //     <div className="bg-green-200 py-4 px-10">
-  // //       <div className="container flex justify-between items center m-auto">
-  // //         <div>Mullo</div>
-  // //         <div>Loading...</div>
-  // //       </div>
-  // //     </div>
-  // //   );
-  // // }
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <div className="container m-auto rounded-md mt-4 bg-secondary-500 py-2 md:py-4 px-6 md:px-8">
+    <div className="rounded-md mb-4 bg-secondary-500 py-2 md:py-4 px-6 md:px-8">
       <div className="container flex justify-between items center m-auto">
         <div className="flex items-center gap-2">
           <Image
@@ -43,7 +33,7 @@ export function Header() {
           /> 
           <span className="hidden md:block text-lg font-bold text-primary mt-2">- fournisseurs</span>
         </div>
-        {isPending ?
+        {!mounted && isPending ?
           <div>Loading...</div>
         :
           <Navigation user={user} />

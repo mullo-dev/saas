@@ -39,56 +39,58 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
   return (
     // TO DO : mobile view
     <div className="flex flex-col lg:flex-row-reverse gap-4">
-      <div className="lg:w-70">
-        <Card className="sticky top-5">
-          <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <h3>Panier</h3>
-              <Tooltip delayDuration={500}>
-                <TooltipTrigger asChild>
-                  <Button 
-                    className="rounded-full" 
-                    variant="ghost" 
-                    size="icon" 
-                    disabled={!cart || cart.length < 1}
-                    onClick={() => {
-                      clearCart()
-                      getProductsInCart()
-                    }}
-                  >
-                    <Trash />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Vider le panier</p>
-                </TooltipContent>
-              </Tooltip>
-            </CardTitle>
-            <CardDescription>
-              {cart && cart.length > 0 ?
-                <>
-                  <p>{new Set(cart.map(p => p.supplierId)).size} fournisseurs</p>
-                  <p>{cart.length} produits</p>
-                </>
-              : 
-                <p>Votre panier est vide</p>
-              }
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <hr />
-            <div className="flex justify-between my-3">
-              <p className="text-sm font-bold text-gray-500">Total</p>
-              <p className="text-sm font-bold">
-                {cart?.reduce((acc: number, p: any) => acc + (p.productPrice*p.quantity), 0).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + "€ HT"}
-              </p>
-            </div>
-            <Link href="/suppliers/tunnel" className={`w-full ${buttonVariants()}`}>
-              Passer commande
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      {!props.viewOnly && 
+        <div className="lg:w-70">
+          <Card className="sticky top-5">
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                <h3>Panier</h3>
+                <Tooltip delayDuration={500}>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      className="rounded-full" 
+                      variant="ghost" 
+                      size="icon" 
+                      disabled={!cart || cart.length < 1}
+                      onClick={() => {
+                        clearCart()
+                        getProductsInCart()
+                      }}
+                    >
+                      <Trash />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Vider le panier</p>
+                  </TooltipContent>
+                </Tooltip>
+              </CardTitle>
+              <CardDescription>
+                {cart && cart.length > 0 ?
+                  <>
+                    <p>{new Set(cart.map(p => p.supplierId)).size} fournisseurs</p>
+                    <p>{cart.length} produits</p>
+                  </>
+                : 
+                  <p>Votre panier est vide</p>
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <hr />
+              <div className="flex justify-between my-3">
+                <p className="text-sm font-bold text-gray-500">Total</p>
+                <p className="text-sm font-bold">
+                  {cart?.reduce((acc: number, p: any) => acc + (p.productPrice*p.quantity), 0).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + "€ HT"}
+                </p>
+              </div>
+              <Link href="/suppliers/tunnel" className={`w-full ${buttonVariants()}`}>
+                Passer commande
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      }
       <div className="rounded-md border flex-1">
         <Table>
           <TableHeader className="top-0 sticky">

@@ -40,7 +40,11 @@ export function TricksTable(
             0
           : Number(item.chooseTvaValue.replace(',', '.')),
         categories: [String(item.chooseCategories)],
-        enabled: true
+        enabled: true,
+        sellQuantity: typeof item.chooseSellQuantity === "number" ? item.chooseSellQuantity 
+          : Number.isNaN(Number(item.chooseSellQuantity.replace(',', '.'))) ? 
+            0
+          : Number(item.chooseSellQuantity.replace(',', '.')),
       })
     )
 
@@ -66,6 +70,7 @@ export function TricksTable(
               { label: "Description", value: "chooseDescription" },
               { label: "Prix", value: "choosePrice", required: true },
               { label: "Unité de vente", value: "chooseUnit", required: true },
+              { label: "Quantité par colis", value: "chooseSellQuantity", required: true },
               { label: "Taux de TVA", value: "chooseTvaValue" },
               { label: "Catégories", value: "chooseCategories" }
             ]}
