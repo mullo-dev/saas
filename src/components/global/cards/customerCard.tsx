@@ -6,51 +6,53 @@ import { Eye, File } from "lucide-react";
 import SimpleTooltip from "../tootip/tooltip";
 
 export default function CustomerCard(props: {
-  customer: {customerId: string, products: object, subCatId: string}
+  customer?: {customerId: string, products: object, subCatId: string}
   subCat: any,
-  setCustomer: (value: any) => void
-  setSelectProducts: (value: any) => void
+  setCustomer?: (value: any) => void
+  setSelectProducts?: (value: any) => void
+  withoutTools?: boolean
 }) {
-  const { customer, subCat, setCustomer } = props
-
-  console.log(subCat.customer)
+  const { withoutTools, customer, subCat } = props
+  const theCustomer = withoutTools ? subCat.user : subCat.customer
 
   return (
     <div className="w-80">
       <Card
-        className={`${customer.customerId === subCat.customerId && "bg-gray-50"}`}
+        className={`${customer?.customerId === theCustomer.id ? "bg-secondary" : "bg-secondary-800"}`}
       >
-        {subCat.customer ? 
+        {theCustomer ? 
           <>
             <CardHeader className="flex justify-between items-start">
               <div>
                 <CardTitle>
                   <h3>
-                    {subCat.customer.name}
+                    {theCustomer.name}
                   </h3>
                 </CardTitle>
                 <CardDescription>
-                  {subCat.customer.email}
+                  {theCustomer.email}
                 </CardDescription>
               </div>
-              <Button
-                size="icon"
-                variant={customer.customerId === subCat.customerId ? "secondary" : "ghost"}
-                onClick={() => {
-                  if (customer.customerId === subCat.customerId) {
-                    setCustomer({})
-                    props.setSelectProducts([])
-                  } else {
-                    setCustomer({customerId: subCat.customerId, products:subCat.products, subCatId: subCat.id})}
-                    props.setSelectProducts(subCat.products.map((p:any) => ({
-                      productId: p.productId,
-                      price: p.price
-                    })))
+              {!withoutTools &&
+                <Button
+                  size="icon"
+                  variant={customer?.customerId === theCustomer.id ? "default" : "secondary"}
+                  onClick={() => {
+                    if (customer?.customerId === theCustomer.id) {
+                      props.setCustomer?.({})
+                      props.setSelectProducts?.([])
+                    } else {
+                      props.setCustomer?.({customerId: theCustomer.id, products:subCat.products, subCatId: subCat.id})}
+                      props.setSelectProducts?.(subCat.products.map((p:any) => ({
+                        productId: p.productId,
+                        price: p.price
+                      })))
+                    }
                   }
-                }
-              >
-                <Eye />
-              </Button>
+                >
+                  <Eye />
+                </Button>
+              }
             </CardHeader>
             <CardContent></CardContent>
           </>
@@ -58,7 +60,7 @@ export default function CustomerCard(props: {
           <p>En attente</p>
         }
         <CardFooter className="flex justify-end gap-2">
-          <ConversationDrawer receipt={subCat.customer} />
+          <ConversationDrawer receipt={theCustomer} />
           <SimpleTooltip duration={100} content="Commandes">
             <Button
               size="icon"

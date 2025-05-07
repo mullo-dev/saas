@@ -13,7 +13,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import { UserCircle2 } from "lucide-react"
+import { LoaderCircle, UserCircle2 } from "lucide-react"
 import SignOutButton from "../buttons/signOutButton";
 
 const customerMenu: { title: string; href: string; description: string }[] = [
@@ -40,7 +40,7 @@ const supplierMenu: { title: string; href: string; description: string }[] = [
   },
   {
     title: "Mes ventes",
-    href: "/orders",
+    href: "/dashboard/orders",
     description:
       "Tout l'historique de mes ventes.",
   }
@@ -49,6 +49,18 @@ const supplierMenu: { title: string; href: string; description: string }[] = [
 export function Navigation(props: {
   user?: any
 }) {
+  const [pending, setPending] = React.useState(true)
+
+  if (!props.user) {
+    setTimeout(() => {
+      setPending(false)
+    }, 400)
+  }
+
+  if (pending) {
+    return <LoaderCircle className="animate-spin mt-2" />
+  }
+
   return (
     <NavigationMenu>
       <NavigationMenuList>

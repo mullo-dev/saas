@@ -23,7 +23,7 @@ const inputs: { label: string; defaultValue: string; name: InputNames; type: str
   },
 ];
 
-function CatalogueForm(props: { organizationId?: string, catalogue?: Catalogue, setOpen: any }) {
+export function CatalogueForm(props: { organizationId?: string, catalogue?: Catalogue, setOpen: any }) {
   const {
     register,
     setError,

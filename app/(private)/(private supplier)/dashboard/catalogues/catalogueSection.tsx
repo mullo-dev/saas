@@ -1,5 +1,5 @@
 import { getOrganizationCatalogues } from "@/actions/catalogue/actions/get";
-import CatalogueCard from "./catalogueCard";
+import CatalogueCard from "../../../../../src/components/global/cards/catalogueCard";
 import DrawerCatalogue from "@/components/global/forms/catalogueForm";
 
 export default async function CatalogueSection(props: {organizationId: string}) {

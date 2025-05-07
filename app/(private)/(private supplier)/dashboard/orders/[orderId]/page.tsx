@@ -1,11 +1,11 @@
 "use client"
 
 import { getOrderById } from "@/actions/orders/actions/get"
-import { SubHeader } from "@/components/global/header/subHeader"
 import { ProductsTable } from "@/components/global/tables/productsTable"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useUser } from "@/lib/auth-session-client"
+import { usePageTitle } from "@/lib/context/pageTitle"
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"
 import { Download } from "lucide-react"
 import { useParams } from "next/navigation"
@@ -15,6 +15,7 @@ export default function supplierOrderIdPage() {
   const [order, setOrder] = useState<any>()
   const { isPending, activeOrganizationId } = useUser()
   const { orderId } = useParams()
+  const { setTitle } = usePageTitle();
 
   const getOrder = async () => {
     const result = await getOrderById({orderId: orderId as string, organizationId: activeOrganizationId as string })
@@ -23,6 +24,10 @@ export default function supplierOrderIdPage() {
       setOrder(result.data.order)
     }
   }
+
+  useEffect(() => {
+    setTitle(order ? "Commande " + order.ref : "Commande");
+  }, [order]);
 
   useEffect(() => {
     !isPending && getOrder()
@@ -36,7 +41,6 @@ export default function supplierOrderIdPage() {
     <div>
       <div className="flex gap-4 flex-col-reverse md:flex-row">
         <div className="flex-1">
-          <SubHeader title={`Commande ${order.ref}`} />
           <h2 className="font-bold text-md mb-2">
             {order.suppliers[0].products.length} produit{order.suppliers[0].products.length > 1 && "s"}</h2>
           <ProductsTable propsData={order.suppliers[0].products} viewOnly />

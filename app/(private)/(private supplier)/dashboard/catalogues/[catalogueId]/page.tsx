@@ -13,12 +13,10 @@ import { selectProductModel } from "@/actions/products/model"
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
-import CustomerCard from "../../../../../../src/components/global/cards/customerCard";
 import { getCatalogueById } from "@/actions/catalogue/actions/get";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, useCarousel } from "@/components/ui/carousel";
-import { ArrowLeft, ArrowRight, ChevronLeft } from "lucide-react";
 import { addProductsInSubCatalogue } from "@/actions/catalogue/actions/update";
-import { SubHeader } from "@/components/global/header/subHeader";
+import { usePageTitle } from "@/lib/context/pageTitle";
+import CustomersCarousel from "@/components/global/carousels/customersCarousel";
 
 type SelectProduct = z.infer<typeof selectProductModel>;
 
@@ -30,18 +28,22 @@ export default function CataloguePage() {
   const [customer, setCustomer] = useState<any>({})
   const { catalogueId } = useParams()
   const { data: organizations } = authClient.useListOrganizations()
-
+  const { setTitle } = usePageTitle();
+  
   const fetchCatalogue = async () => {
     if (catalogueId) {
       const cat = await getCatalogueById({catalogueId: catalogueId as string})
       setCatalogue(cat?.data?.catalogue);
     }
   };
-
+  
   useEffect(() => {
     fetchCatalogue();
   }, [catalogueId, toast]);
-
+  
+  useEffect(() => {
+    setTitle(catalogue ? "Catalogue : " + catalogue?.name : "Catalogue");
+  }, [catalogue]);
 
   const addProductInSubCatalogue = (products:any) => {
     // Filter to delete products
@@ -106,11 +108,9 @@ export default function CataloguePage() {
 
   return (
     <div>
-      <SubHeader title={"Catalogue : " + catalogue.name} />
-
       {/* CARD ADD CUSTOMER */}
       {newCustomer ?
-        <Card className="mt-2">
+        <Card>
           <CardHeader>
             <CardTitle>Nouveau client</CardTitle>
             <CardDescription>
@@ -132,21 +132,13 @@ export default function CataloguePage() {
       : 
       <>
         {/* CARDS CUSTOMERS */}
-        <Carousel
-          opts={{
-            align: "start",
-          }}
-          className="w-full"
-        >
-          <CustomersCarousel 
-            setCustomer={setCustomer}
-            customer={customer}
-            setSelectProducts={setSelectProducts}
-            setNewCustomer={setNewCustomer}
-            catalogue={catalogue}
-          />
-        </Carousel>
-
+        <CustomersCarousel
+          setCustomer={setCustomer}
+          customer={customer}
+          setSelectProducts={setSelectProducts}
+          setNewCustomer={setNewCustomer}
+          customers={catalogue.subCatalogues}
+        />
         <hr className="mt-4"/>
       </>
       }
@@ -165,90 +157,5 @@ export default function CataloguePage() {
         />
       </Shell>
     </div>
-  )
-}
-
-
-// Carousel for customers cards
-function CustomersCarousel(props: {
-  setNewCustomer: (value:boolean) => void,
-  setSelectProducts: (value:any) => void,
-  setCustomer: (value:any) => void
-  customer: any,
-  catalogue: any,
-}) {
-  const context = useCarousel()
-
-  return (
-    <>  
-      {props.catalogue.subCatalogues.length > 0 ?
-      <>
-        <div className="md:flex justify-between items-center mb-1 mt-2">
-          <h2 className="font-bold md:mb-0 text-md">Clients</h2>
-          <div className="flex justify-between gap-2 items-center">
-            <div className="flex gap-2">
-              <Button 
-                size="icon" 
-                variant="outline"
-                className="rounded-full" 
-                onClick={() => context.scrollPrev()}
-                disabled={!context.canScrollPrev}
-              >
-                <ArrowLeft />
-              </Button>
-              <Button 
-                size="icon" 
-                variant="outline"
-                className="rounded-full" 
-                onClick={() => context.scrollNext()}
-                disabled={!context.canScrollNext}
-              >
-                <ArrowRight />
-              </Button>
-            </div>
-            <Button
-              onClick={() => {
-                props.setNewCustomer(true) 
-                props.setSelectProducts([])}
-              }
-            >
-              Nouveau client
-            </Button>
-          </div>
-        </div>
-        <CarouselContent>
-          {props.catalogue.subCatalogues.map((subCat:any, index:number) => (
-            <CarouselItem key={index}  className="basis-1/1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <CustomerCard 
-                customer={props.customer}
-                subCat={subCat}
-                setCustomer={props.setCustomer}
-                setSelectProducts={props.setSelectProducts}
-              />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </>
-      :
-      <Card className="mt-2">
-        <CardHeader className="text-center">
-          <CardTitle>Pas encore de client associé à ce catalogue</CardTitle>
-          <CardDescription className="text-center">Ajouter un client et assigné lui des produits et leur prix associé.</CardDescription>
-        </CardHeader>
-        <CardFooter className="flex justify-center">
-          <Button
-            onClick={() => {
-              props.setNewCustomer(true) 
-              props.setSelectProducts([])}
-            }
-          >
-            Ajouter le premier client
-          </Button>
-        </CardFooter>
-      </Card>
-      }
-    </>
   )
 }

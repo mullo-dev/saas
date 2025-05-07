@@ -46,6 +46,14 @@ export const getOrganizationCatalogues = authActionClient
     // Get the catalogue
     const catalogues = await prisma.catalogue.findMany({
       where: { organizationId: organizationId },
+      include: {
+        _count: {
+          select: {
+            subCatalogues: true,
+            products: true,
+          },
+        },
+      },
     });
 
     return { success: true, catalogues: catalogues };
