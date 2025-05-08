@@ -7,7 +7,6 @@ import { createProducts } from "@/actions/products/actions/create"
 import { toast } from "sonner"
 import { DataTableProducts } from "../global/tables/products/table"
 import { columnsProducts } from "../global/tables/products/columns"
-import { addProductsInSubCatalogue } from "@/actions/catalogue/actions/update"
 
 
 export function TricksTable(
@@ -25,36 +24,42 @@ export function TricksTable(
   const [returnResult, setReturnResult] = React.useState<any>()
 
   const toUploadData = async (parsedData:any) => {
-    const formattedData = parsedData.map((item:any) => ({
-        ref: String(item.chooseRef),
-        name: String(item.chooseName),
-        description: String(item.chooseDescription),
-        price: typeof item.choosePrice === "number" ? item.choosePrice 
-        : Number.isNaN(Number(item.choosePrice.replace(',', '.'))) ? 
-          0
-        : Number(item.choosePrice.replace(',', '.')),
-        catalogueId: String(catalogueId),
-        unit: String(item.chooseUnit),
-        tvaValue: typeof item.chooseTvaValue === "number" ? item.chooseTvaValue 
-          : Number.isNaN(Number(item.chooseTvaValue.replace(',', '.'))) ? 
+    try {
+      const formattedData = parsedData.map((item:any) => ({
+          ref: String(item.chooseRef),
+          name: String(item.chooseName),
+          description: String(item.chooseDescription),
+          price: typeof item.choosePrice === "number" ? item.choosePrice 
+          : Number.isNaN(Number(item.choosePrice.replace(',', '.'))) ? 
             0
-          : Number(item.chooseTvaValue.replace(',', '.')),
-        categories: [String(item.chooseCategories)],
-        enabled: true,
-        sellQuantity: typeof item.chooseSellQuantity === "number" ? item.chooseSellQuantity 
-          : Number.isNaN(Number(item.chooseSellQuantity.replace(',', '.'))) ? 
-            0
-          : Number(item.chooseSellQuantity.replace(',', '.')),
-      })
-    )
-
-    const result = await createProducts({products: formattedData, catalogueId: catalogueId as string})
-    if (result?.data?.success) {
-      toast.success("Produits importés !")
-      setReturnResult(result.data)
-    } else {
-      console.log(result)
+          : Number(item.choosePrice.replace(',', '.')),
+          catalogueId: String(catalogueId),
+          unit: String(item.chooseUnit),
+          tvaValue: typeof item.chooseTvaValue === "number" ? item.chooseTvaValue 
+            : Number.isNaN(Number(item.chooseTvaValue.replace(',', '.'))) ? 
+              0
+            : Number(item.chooseTvaValue.replace(',', '.')),
+          categories: [String(item.chooseCategories)],
+          enabled: true,
+          sellQuantity: typeof item.chooseSellQuantity === "number" ? item.chooseSellQuantity 
+            : Number.isNaN(Number(item.chooseSellQuantity.replace(',', '.'))) ? 
+              0
+            : Number(item.chooseSellQuantity.replace(',', '.')),
+        })
+      )
+  
+      const result = await createProducts({products: formattedData, catalogueId: catalogueId as string})
+      if (result?.data?.success) {
+        toast.success("Produits importés !")
+        setReturnResult(result.data)
+        return {success: true, error: {}}
+      } else {
+        toast.success("Une erreur est survenue...")
+        return {success: false, error: result?.data?.error}
+      }
+    } catch (error) {
       toast.success("Une erreur est survenue...")
+      return {success: false, error: error}
     }
   }
 

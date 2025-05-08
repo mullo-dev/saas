@@ -40,6 +40,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { FileUploader } from "./file-uploader"
+import { Input } from "../ui/input"
+import { toast } from "sonner"
 
 interface CsvImporterProps
   extends React.ComponentPropsWithoutRef<typeof DialogTrigger>,
@@ -55,7 +57,7 @@ interface CsvImporterProps
    * Receives an array of records as key-value pairs.
    * @example onImport={(data) => console.log(data)}
    */
-  onImport: (data: Record<string, unknown>[]) => void
+  onImport: (data: Record<string, unknown>[]) => Promise<{ success: boolean, error: any }>
   reload: () => void
 }
 
@@ -69,6 +71,7 @@ export function CsvImporter({
 }: CsvImporterProps) {
   const [open, setOpen] = React.useState(false)
   const [step, setStep] = React.useState<"upload" | "map" | "done">("upload")
+  const [error, setError] = React.useState<any>()
   const {
     data,
     fieldMappings,
@@ -77,6 +80,7 @@ export function CsvImporter({
     onFieldToggle,
     onFieldsReset,
     getSanitizedData,
+    updateData,
   } = useParseCsv({ fields })
   const { onUpload, isUploading } = useUploadFile("csvUploader")
 
@@ -117,7 +121,10 @@ export function CsvImporter({
             <DialogHeader className="flex-1">
               <DialogTitle>Correspondance des champs</DialogTitle>
               <DialogDescription>
-                Faire correspondre les colonnes avec les en tête du CSV.
+                Faire correspondre les colonnes avec les en tête du CSV. Vous pouvez modifier directement dans le tableau.
+                <p className="text-destructive">
+                  {error?.message.includes("undefined") && error.message.match(/item\.choose(\w+)/)[1] + " doit exister"}
+                </p>
               </DialogDescription>
             </DialogHeader>
             <Button
@@ -156,11 +163,17 @@ export function CsvImporter({
                     {fields.map((field) => (
                       <TableCell
                         key={field.value}
-                        className="border-r last:border-r-0 max-w-[500px]"
+                        className="border-r last:border-r-0 max-w-[500px] p-0"
                       >
-                        <span className="line-clamp-1">
-                          {String(row[field.value] ?? "")}
-                        </span>
+                        <Input 
+                          className="line-clamp-1 shadow-none border-0 rounded-none" 
+                          value={String(row[field.value] ?? "")}
+                          onChange={(e) => {
+                            const newData = [...data]
+                            newData[i] = { ...newData[i], [field.value]: e.target.value }
+                            updateData(newData)
+                          }}
+                        />
                       </TableCell>
                     ))}
                   </TableRow>
@@ -174,13 +187,13 @@ export function CsvImporter({
             </Button>
             <Button
               onClick={async () => {
-                try {
-                  await new Promise((resolve) => setTimeout(resolve, 100))
-                  getSanitizedData({ data })
-                  onImport(getSanitizedData({ data }))
+                await new Promise((resolve) => setTimeout(resolve, 100))
+                getSanitizedData({ data })
+                const error = await onImport(getSanitizedData({ data }))
+                if (error.success) {
                   setStep("done")
-                } catch (error) {
-                  console.log(error)
+                } else {
+                  setError(error.error)
                 }
               }}
             >

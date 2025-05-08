@@ -233,6 +233,23 @@ export function useParseCsv({
     return parseData
   }
 
+  function updateData(newData: Record<string, unknown>[]) {
+    console.log('Original data:', csvState.data)
+    console.log('New data to update:', newData)
+    setCsvState((prevState) => {
+      console.log('Previous state:', prevState)
+      const newState = {
+        ...prevState,
+        data: {
+          ...prevState.data,
+          mapped: newData,
+        },
+      }
+      console.log('New state:', newState)
+      return newState
+    })
+  }
+
   return {
     fileName: csvState.fileName,
     data: csvState.data.mapped,
@@ -243,5 +260,6 @@ export function useParseCsv({
     onFieldChange,
     onFieldToggle,
     onFieldsReset,
+    updateData,
   }
 }
