@@ -8,7 +8,7 @@ export default function CatalogueCard({ catalogue }: { catalogue?: any }) {
     <Link href={`/dashboard/catalogues/${catalogue.id}`}>
       <Card className="bg-primary-500 hover:bg-primary-300">
         <CardContent>
-          <CardTitle className="text-primary-dark mb-4">{catalogue.name}</CardTitle>
+          <CardTitle className="text-white font-bold text-lg mb-4">{catalogue.name}</CardTitle>
           <div className="flex items-center text-white gap-2 text-xs font-bold mb-2">
             <Box size={20} /> {catalogue._count.products} produit{catalogue._count.products > 1 && "s"}
           </div>

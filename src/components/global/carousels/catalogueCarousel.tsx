@@ -110,7 +110,7 @@ function CataloguesCarouselContent(props: {
       </div>
       <CarouselContent>
         {props.catalogues.map((cat:any, index:number) => (
-          <CarouselItem key={index} className="basis-1/1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+          <CarouselItem key={index} className="basis-1/1 sm:basis-1/2 lg:basis-1/3 2xl:basis-1/4">
             <CatalogueCard catalogue={cat} />
           </CarouselItem>
         ))}

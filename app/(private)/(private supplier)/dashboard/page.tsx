@@ -23,13 +23,13 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="flex gap-6">
-      <div className="w-xs">
+    <div className="flex flex-col xl:flex-row gap-6">
+      <div className="xl:w-xs">
         <Suspense fallback={<p>Chargement...</p>}>
           <OrganizationCard organization={activeOrganizationId ? org?.data?.organization : ""} />
         </Suspense>
       </div>
-      <div className="flex-1 flex flex-col gap-10 ml-8">
+      <div className="flex-1 flex flex-col gap-10 xl:ml-8">
         {activeOrganizationId ? 
           <>
             <Suspense fallback={<p>Chargement...</p>}>

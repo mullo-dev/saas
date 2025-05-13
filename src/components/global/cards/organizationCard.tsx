@@ -26,8 +26,8 @@ export default function OrganizationCard({ organization }: { organization?: any 
   }
 
   return (
-    <Card className="sticky top-5 rounded-none shadow-none min-h-[85vh] p-0 border-l-0 border-t-0 border-b-0">
-      <CardHeader>
+    <Card className="sticky top-5 rounded-none shadow-none xl:min-h-[85vh] p-0 border-0 border-b-1 xl:border-b-0 xl:border-r-1">
+      <CardHeader className="px-0 xl:px-6">
         <CardTitle className="flex items-center justify-between">
           <h3 className="text-xl">
             {organization ? organization.name : "Votre entreprise"}
@@ -49,7 +49,7 @@ export default function OrganizationCard({ organization }: { organization?: any 
       {/* add content here (address) */}
       </CardContent>
       {organization &&
-          <div className="px-6">
+          <div className="xl:px-6">
             <div className="flex justify-between items-center mb-2">
               <h3 className="font-bold text-md">Membres</h3>
               <DrawerDialog 

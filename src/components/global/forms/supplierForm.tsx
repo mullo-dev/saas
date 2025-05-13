@@ -19,34 +19,30 @@ import { toast } from "sonner";
 import { sendRequestMember } from "@/actions/invitations/actions/create";
 
 type InputNames = "name" | "supplierName" | "email" | "phone" ;
-const inputs: { label: string; defaultValue: string; name: InputNames; type: string; col: number }[] = [
+const inputs: { label: string; defaultValue: string; name: InputNames; type: string; }[] = [
   {
     label: "Name",
     defaultValue: "",
     name: "name",
     type: "text",
-    col: 2,
   },
   {
     label: "Prénom et nom",
     defaultValue: "",
     name: "supplierName",
     type: "text",
-    col: 2,
   },
   {
     label: "Email",
     defaultValue: "",
     name: "email",
     type: "text",
-    col: 2,
   },
   {
     label: "Téléphone",
     defaultValue: "",
     name: "phone",
     type: "text",
-    col: 2,
   },
 ];
 

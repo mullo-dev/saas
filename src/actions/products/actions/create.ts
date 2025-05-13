@@ -94,3 +94,21 @@ export const createProducts = authActionClient
     return { success: false, error };
   }
 });
+
+
+export const createSingleProduct = authActionClient
+.metadata({ actionName: "createProduct" }) 
+.schema(z.object(productModel))
+.action(async ({ parsedInput }) => {
+  
+  try {
+    const product = await prisma.product.create({ 
+      data: parsedInput 
+    });
+
+    return { success: true, product: product };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error };
+  }
+});

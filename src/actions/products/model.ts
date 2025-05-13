@@ -1,3 +1,4 @@
+import { Option } from "@/components/ui/multiselect"
 import { z } from "zod"
 
 export type productType = {
@@ -45,3 +46,46 @@ export const selectProductModel = z.object({
   price: z.number(),
   productId: z.string().min(1, "Product is required")
 })
+
+export const categoriesOption: Option[] = [
+  {
+    value: "vegetable",
+    label: "Légume",
+  },
+  {
+    value: "fruit",
+    label: "Fruit",
+  },
+  {
+    value: "dairy",
+    label: "Crémerie",
+  },
+  {
+    value: "meat",
+    label: "Viande",
+  },
+  {
+    value: "fish",
+    label: "Poisson",
+  },
+  {
+    value: "bakery",
+    label: "Boulangerie",
+  },
+  {
+    value: "grocery",
+    label: "Épicery",
+  },
+  {
+    value: "beverage",
+    label: "Boisson",
+  },
+  {
+    value: "frozen",
+    label: "Surgelé",
+  },
+  {
+    value: "other",
+    label: "Autre",
+  }
+];

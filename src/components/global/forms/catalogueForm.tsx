@@ -11,6 +11,7 @@ import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
 import { createCatalogue } from "@/actions/catalogue/actions/create";
 import { toast } from "sonner";
 import { DrawerDialog } from "../modal";
+import { getColSpanClass } from "@/lib/sanitized/class-css";
 
 type InputNames = "name";
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; col: number }[] = [
@@ -63,7 +64,7 @@ export function CatalogueForm(props: { organizationId?: string, catalogue?: Cata
         {errors.root && <p className="text-red-500 text-sm">{errors.root.message}</p>}
         <div className="grid grid-cols-2 gap-4">
           {inputs.map((input, index) => (
-            <div key={index} className={`col-span-${input.col}`}>
+            <div key={index} className={getColSpanClass(input.col)}>
               <Label>
                 {input.label}
                 <Input 
