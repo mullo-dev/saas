@@ -1,28 +1,36 @@
 "use client"
 
 import { getOrderById } from "@/actions/orders/actions/get"
+import { OrderWithRelations } from "@/actions/orders/model"
 import { ProductsTable } from "@/components/global/tables/productsTable"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { usePageTitle } from "@/lib/context/pageTitle"
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"
 import { Download } from "lucide-react"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export default function orderIdPage() {
-  const [order, setOrder] = useState<any>()
+  const [order, setOrder] = useState<OrderWithRelations | null>(null)
   const { orderId } = useParams()
+  const { setTitle } = usePageTitle();
 
   const getOrder = async () => {
     const result = await getOrderById({orderId: orderId as string})
     if (result?.data?.success) {
-      setOrder(result.data.order)
+      setOrder(result.data.order as unknown as OrderWithRelations)
     }
   }
 
   useEffect(() => {
     getOrder()
   }, [])
+
+  useEffect(() => {
+    setTitle(order ? "Commande : " + order?.ref : "Commande");
+  }, [order])
+  
 
   if (!order) {
     return <p>Chargement...</p>

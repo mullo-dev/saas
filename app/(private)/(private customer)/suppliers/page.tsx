@@ -1,6 +1,6 @@
 "use client"
 
-import SupplierCard from "./supplierCard"
+import SupplierCard from "../../../../src/components/global/cards/supplierCard"
 import { Suspense, useContext, useEffect, useState, useTransition } from "react"
 import { returnOnlySuppliers } from "@/actions/user/actions/get"
 import { ProductsTable } from "@/components/global/tables/productsTable"
@@ -14,13 +14,12 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function profilPage() {
+export default function suppliersPage() {
   const [filteredOrganizations, setFilteredOrganizations] = useState<any>()
   const [allProducts, setAllProducts] = useState<any>()
   const [selectSupplier, setSelectSupplier] = useState<string[]>([])
   const [isPending, startTransition] = useTransition();
   
-
   const selectSupplierId = (id:string, status:boolean) => {
     if (status) {
       setSelectSupplier((prev) => [...prev, id])
@@ -123,7 +122,7 @@ function SupplierCarousel(props: {
         </div>
         <CarouselContent>
           {props.filteredOrganizations?.map((orga:any, index:number) => (
-            <CarouselItem key={index}  className="basis-1/1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+            <CarouselItem key={index}  className="basis-1/1 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
               <SupplierCard
                 organization={orga} 
                 selectSupplierId={props.selectSupplierId} 

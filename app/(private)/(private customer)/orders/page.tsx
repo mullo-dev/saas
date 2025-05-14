@@ -1,24 +1,32 @@
-import { Orderstable } from "@/components/global/tables/ordersTable"
-import { getUser } from "@/lib/auth-session"
-import { prisma } from "@/lib/prisma"
-import { Suspense } from "react"
+"use client"
 
-export default async function profilPage() {
-  const user = await getUser()
-  const orders = await prisma.order.findMany({ 
-    where: {customerId: user?.user?.id },
-    include: {
-      suppliers: {
-        select: {
-          totalHt: true
-        }
+import { getUsersOrders } from "@/actions/orders/actions/get"
+import { Orderstable } from "@/components/global/tables/ordersTable"
+import { Suspense, useEffect, useState } from "react"
+import { toast } from "sonner"
+import { Order } from "@prisma/client"
+import { usePageTitle } from "@/lib/context/pageTitle"
+
+export default function ordersPage() {
+  const [orders, setOrders] = useState<Order[]>([])
+  const { setTitle } = usePageTitle();
+  
+  useEffect(() => {
+    setTitle("Commandes");
+    const getOrders = async () => {
+      const result = await getUsersOrders()
+      if (result?.data?.success) {
+        setOrders(result.data.orders ?? [])
+      } else {
+        toast.error("Une erreur est survenue")
       }
     }
-  })
+    getOrders()
+  }, [])
+  
 
   return (
     <div>
-      <h1>Vos commandes</h1>
       <Suspense fallback={<p>Chargement...</p>}>
         <Orderstable orders={orders} />
       </Suspense>

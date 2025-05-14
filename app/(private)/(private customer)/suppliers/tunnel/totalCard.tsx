@@ -2,15 +2,28 @@
 
 import { createOrder } from "@/actions/orders/actions/create"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export default function TotalCard(props:{ suppliers: any }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter()
+
+  const returnPrice = () => {
+    const priceHt = props.suppliers.reduce((acc:any, sup:any) => acc + sup.totalPriceHt,0)
+    const priceTva = props.suppliers.reduce((acc:any, sup:any) => acc + sup.totalTva,0)
+    const priceTtc = props.suppliers.reduce((acc:any, sup:any) => acc + sup.totalPriceHt + sup.totalTva,0)
+
+    const array = [
+      {type: "totalHt", label: "Total HT", value: priceHt },
+      {type: "totalTva", label: "TVA", value: priceTva },
+      {type: "totalTtc", label: "Total TTC", value: priceTtc },
+    ]
+    return array
+  }
 
   const submitOrder = () => {
     startTransition(async () => {
@@ -23,18 +36,33 @@ export default function TotalCard(props:{ suppliers: any }) {
   }
 
   return (
-    <Card>
+    <Card className="bg-primary-300/60 lg:sticky lg:top-5 mt-10">
       <CardHeader>
-        <CardTitle>Récapitulatif</CardTitle>
+        <CardTitle className="text-primary-dark">Récapitulatif</CardTitle>
+        <CardDescription className="text-primary">Finaliser la commande et valider</CardDescription>
       </CardHeader>
       <CardContent>
         {props.suppliers.map((t:any, index:number) => (
-          <p key={index}>{t.supplier.name}-{t.totalPriceHt}</p>
+          <div key={index} className="flex justify-between mb-2 text-primary-dark text-sm">
+            <p>{t.supplier.name}</p>
+            <p className="font-bold">{t.totalPriceHt.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</p>
+          </div>
         ))}
-        <Button className="w-full" variant="destructive" onClick={() => submitOrder()} disabled={isPending}>
+        <hr className="border-primary-500" />
+        <div className="mt-2 mb-5">
+          {returnPrice().map((item, index) => ( // {item.type === "totalHt" ? "HT" : item.type === "totalTtc" ? "TTC" : "" }
+            <div key={index} className="flex justify-end gap-2 text-primary-dark text-md mb-1">
+              <p>{item.label} :</p>
+              <p className="font-bold w-24 text-end text-primary">
+                {item.value.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+              </p> 
+            </div>
+          ))}
+        </div>
+        <Button className="w-full"  onClick={() => submitOrder()} disabled={isPending}>
           {isPending ?
             <LoaderCircle className="animate-spin" />
-          : "Passer commande"}
+          : "Suivant"}
         </Button>
       </CardContent>
     </Card>

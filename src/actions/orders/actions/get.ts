@@ -4,6 +4,28 @@ import { authActionClient } from "@/lib/auth-action";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+export const getUsersOrders = authActionClient
+.metadata({ actionName: "getUsersOrders" })
+.action(async ({ ctx: { user }}) => {
+
+  try {
+    const orders = await prisma.order.findMany({ 
+      where: {customerId: user?.user?.id },
+      include: {
+        suppliers: {
+          select: {
+            totalHt: true
+          }
+        }
+      }
+    })
+    return { success: true, orders: orders };
+  } catch (error) {
+    return { success: false, error };
+  }
+});
+
+
 export const getOrderBySupplier = authActionClient
   .metadata({ actionName: "getOrderBySupplier" }) 
   .schema(z.object({organizationId: z.string()}))

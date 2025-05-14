@@ -8,15 +8,38 @@ import { productModel } from "../model"
 export const createProducts = authActionClient
 .metadata({ actionName: "createProduct" }) 
 .schema(z.object({
-  products: z.array(z.object(productModel)),
+  products: z.any(),
   createByCustomer: z.boolean().default(false).optional(),
   catalogueId: z.string()
 }))
 .action(async ({ parsedInput: { products, createByCustomer, catalogueId }, ctx: { user } }) => {
   
   try {
+    const formattedData = products.map((item:any) => ({
+      ref: String(item.chooseRef),
+      name: String(item.chooseName),
+      description: String(item.chooseDescription),
+      price: typeof item.choosePrice === "number" ? item.choosePrice 
+      : Number.isNaN(Number(item.choosePrice.replace(',', '.'))) ? 
+        0
+      : Number(item.choosePrice.replace(',', '.')),
+      catalogueId: String(catalogueId),
+      unit: String(item.chooseUnit),
+      tvaValue: typeof item.chooseTvaValue === "number" ? item.chooseTvaValue 
+        : Number.isNaN(Number(item.chooseTvaValue.replace(',', '.'))) ? 
+          0
+        : Number(item.chooseTvaValue.replace(',', '.')),
+      categories: [String(item.chooseCategories)],
+      enabled: true,
+      sellQuantity: typeof item.chooseSellQuantity === "number" ? item.chooseSellQuantity 
+        : Number.isNaN(Number(item.chooseSellQuantity.replace(',', '.'))) ? 
+          0
+        : Number(item.chooseSellQuantity.replace(',', '.')),
+      })
+    )
+
     // Chek if products are validated
-    const results = products.map((product) => {
+    const results = formattedData.map((product: typeof productModel) => {
       const result = z.object(productModel).safeParse(product)
       return {
         success: result.success,
@@ -25,8 +48,8 @@ export const createProducts = authActionClient
       }
     })
     
-    const validProducts = results.filter(r => r.success).map(r => r.data)
-    const invalidProducts = results.filter(r => !r.success)
+    const validProducts = results.filter((r:any) => r.success).map((r:any) => r.data)
+    const invalidProducts = results.filter((r:any) => !r.success)
     const created: any[] = []
     const updated: any[] = []
 
@@ -54,7 +77,7 @@ export const createProducts = authActionClient
     if (createByCustomer) {
       const allProducts = await prisma.product.findMany({
         where: {
-          catalogueId: products[0].catalogueId
+          catalogueId: catalogueId
         }
       })
       // Create the subCatalogue
@@ -62,7 +85,7 @@ export const createProducts = authActionClient
         data: {
           customerId: user?.user?.id,
           status: "memberInvited",
-          catalogueId: products[0].catalogueId,
+          catalogueId: catalogueId,
           products: {
             create: allProducts.map((prod) => ({
               assignedBy: user.user ? user.user.name : "Inconnu",
@@ -83,14 +106,13 @@ export const createProducts = authActionClient
       created: created.length,
       updated: updated.length,
       failed: invalidProducts.length,
-      errors: invalidProducts.map((r, index) => ({
+      errors: invalidProducts.map((r:any, index:number) => ({
         index,
         product: r.data,
         error: r.error,
       })),
     }
   } catch (error) {
-    console.log(error)
     return { success: false, error };
   }
 });

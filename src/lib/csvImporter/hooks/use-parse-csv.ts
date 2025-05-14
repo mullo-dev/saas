@@ -234,10 +234,7 @@ export function useParseCsv({
   }
 
   function updateData(newData: Record<string, unknown>[]) {
-    console.log('Original data:', csvState.data)
-    console.log('New data to update:', newData)
     setCsvState((prevState) => {
-      console.log('Previous state:', prevState)
       const newState = {
         ...prevState,
         data: {
@@ -245,7 +242,6 @@ export function useParseCsv({
           mapped: newData,
         },
       }
-      console.log('New state:', newState)
       return newState
     })
   }

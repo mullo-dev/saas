@@ -28,30 +28,7 @@ export function TricksTable(
 
   const toUploadData = async (parsedData:any) => {
     try {
-      const formattedData = parsedData.map((item:any) => ({
-        ref: String(item.chooseRef),
-        name: String(item.chooseName),
-        description: String(item.chooseDescription),
-        price: typeof item.choosePrice === "number" ? item.choosePrice 
-        : Number.isNaN(Number(item.choosePrice.replace(',', '.'))) ? 
-          0
-        : Number(item.choosePrice.replace(',', '.')),
-        catalogueId: String(catalogueId),
-        unit: String(item.chooseUnit),
-        tvaValue: typeof item.chooseTvaValue === "number" ? item.chooseTvaValue 
-          : Number.isNaN(Number(item.chooseTvaValue.replace(',', '.'))) ? 
-            0
-          : Number(item.chooseTvaValue.replace(',', '.')),
-        categories: [String(item.chooseCategories)],
-        enabled: true,
-        sellQuantity: typeof item.chooseSellQuantity === "number" ? item.chooseSellQuantity 
-          : Number.isNaN(Number(item.chooseSellQuantity.replace(',', '.'))) ? 
-            0
-          : Number(item.chooseSellQuantity.replace(',', '.')),
-        })
-      )
-  
-      const result = await createProducts({products: formattedData, catalogueId: catalogueId as string})
+      const result = await createProducts({products: parsedData, catalogueId: catalogueId as string})
       if (result?.data?.success) {
         toast.success("Produits importés !")
         setReturnResult(result.data)

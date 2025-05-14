@@ -16,14 +16,14 @@ export const createCatalogue = authActionClient
 
   try {
     // New organization
-    await prisma.catalogue.create({
+    const catalogue = await prisma.catalogue.create({
       data: {
         ...parsedInput,
       }
     })
 
     revalidatePath("/dashboard")
-    return { success: true };
+    return { success: true, catalogue: catalogue };
   } catch (error) {
     console.log(error);
     return { success: false, error };

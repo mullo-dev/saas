@@ -68,7 +68,7 @@ export const GroupedSupplierAndGetPrice = authActionClient
 .action(async () => {
     const response = await getCart()
 
-    const grouped: Record<string, { supplierId: string; supplier: any, products: Cart, fullProducts?: any[], totalPriceHt?: number }> = {};
+    const grouped: Record<string, { supplierId: string; supplier: any, products: Cart, fullProducts?: any[], totalPriceHt?: number, totalTva?: number }> = {};
 
     for (const item of response) {
       if (!grouped[item.supplierId]) {
@@ -90,6 +90,7 @@ export const GroupedSupplierAndGetPrice = authActionClient
           ...item,
           fullProducts: products?.data?.products ? products.data.products : [],
           totalPriceHt: products?.data?.totalPriceHt ? products.data.totalPriceHt : 0,
+          totalTva: products?.data?.totalTva ? products.data.totalTva : 0,
         };
       })
     );

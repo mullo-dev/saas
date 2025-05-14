@@ -13,7 +13,7 @@ export const getAllProducts = authActionClient
     // New products
     const subCatalogues = await prisma.subCatalogue.findMany({
       where: {
-        customerId: user?.user?.id
+        customerId: user?.user?.id,
       },
       include: {
         catalogue: {
@@ -27,6 +27,11 @@ export const getAllProducts = authActionClient
           }
         },
         products: {
+          where: {
+            product: {
+              enabled: true
+            }
+          },
           select: {
             product: {
               select: {
@@ -84,23 +89,26 @@ export const getInCartProducts = authActionClient
             product: {
               select: {
                 name: true,
-                ref: true
+                ref: true,
+                tvaValue: true
               }
             },
             productId: true,
-            price: true
+            price: true,
           }
         }
       }
     });
 
-    let totalPriceHt = 0;
+    let totalPriceHt = 0, totalTva = 0;
     const allProducts =  subCatalogues.flatMap(sub =>
       sub.products.map(product => {
         const matched = products?.find(p => p.productId === product.productId)
         const priceHt = matched ? matched.quantity * product.price : 0;
+        const tva = matched ? ((priceHt * product.product.tvaValue)/100) : 0;
 
         totalPriceHt += priceHt;
+        totalTva += tva
     
         return {
           id: product.productId,
@@ -108,11 +116,12 @@ export const getInCartProducts = authActionClient
           ref: product.product.ref,
           quantity: matched ? matched.quantity : 0,
           priceHt,
+          tva
         }
       })
     );
 
-    return { success: true, products: allProducts, totalPriceHt: totalPriceHt };
+    return { success: true, products: allProducts, totalPriceHt: totalPriceHt, totalTva: totalTva };
   } catch (error) {
     return { success: false, error };
   }

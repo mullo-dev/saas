@@ -1,5 +1,4 @@
 import { getCart, setCart } from '@/lib/cart'
-import { prisma } from '@/lib/prisma'
 
 export async function addToCart(productId: string, supplierId: string, quantity: number = 1, productPrice: number) {
   let cart = await getCart()

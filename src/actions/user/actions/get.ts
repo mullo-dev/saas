@@ -68,7 +68,7 @@ export const getUserById = authActionClient
 
 export const returnOnlySuppliers = authActionClient
   .metadata({ actionName: "inviteNewUser" }) 
-  .action(async ({ parsedInput, ctx: { user } }) => {
+  .action(async ({ ctx: { user } }) => {
 
   try {
     if (!user?.user) throw new Error("Invalid user")
@@ -78,7 +78,7 @@ export const returnOnlySuppliers = authActionClient
       where: {
         members: {
           some: {
-            userId: user.user.id,  // à remplacer par l'ID du user connecté
+            userId: user.user.id,
             role: { in: ["customer", "customerOfInternSupplier"] }
           }
         }
@@ -87,18 +87,30 @@ export const returnOnlySuppliers = authActionClient
         catalogues: {
           where: {
             subCatalogues: {
-              some: {            // <- IMPORTANT : `some` pour dire "au moins un subCatalogue"
+              some: {
                 customerId: user.user.id,
               },
             },
           },
           select: {
-            id: true
-          }
+            id: true,
+            subCatalogues: {
+              where: {
+                customerId: user.user.id
+              },
+              include: {
+                _count: {
+                  select: {
+                    products: true,
+                  },
+                },
+              },
+            },
+          },
         },
         members: {
           where: {
-            role: 'customer' // ou 'owner' selon ta définition de l'enum
+            role: 'customer'
           },
           include: {
             user: {

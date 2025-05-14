@@ -10,6 +10,7 @@ import { createProducts } from "@/actions/products/actions/create"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Edit } from "lucide-react"
 import { useState } from "react"
+import { createCatalogue } from "@/actions/catalogue/actions/create"
 
 export default function SupplierCard(props: { 
   organization: any,
@@ -33,28 +34,36 @@ export default function SupplierCard(props: {
   }
 
   const toUploadData = async (parsedData:any) => {
-    if (!props.organization.catalogues[0]) throw new Error("Catalogue not found")
+    if (!props.organization) throw new Error("Organization not found")
+    let theCatalogue
 
-    const theCatalogue = props.organization.catalogues[0].id
-    const formattedData = parsedData.map((item:any) => {
-      return {
-      ref: String(item.chooseRef),
-      name: String(item.chooseName),
-      description: String(item.chooseDescription),
-      price: Number.isNaN(Number(item.choosePrice.replace(',', '.')))
-        ? 0
-        : Number(item.choosePrice.replace(',', '.')),
-      catalogueId: String(theCatalogue)
+    if (props.organization.catalogues[0]) {
+      theCatalogue = props.organization.catalogues[0].id
+      console.log("déjà la")
+    } else {
+      const result = await createCatalogue({
+        name: "Catalogue",
+        organizationId: props.organization.id
+      })
+      console.log("coucou")
+      if (result?.data?.catalogue) {
+        theCatalogue = result?.data?.catalogue.id
+      } else {
+        throw new Error("Catalogue not found")
       }
-    })
+    }
 
-    const result = await createProducts({products: formattedData, createByCustomer: true, catalogueId: theCatalogue})
+    console.log(theCatalogue)
+
+    const result = await createProducts({products: parsedData, createByCustomer: true, catalogueId: theCatalogue})
     if (result?.data?.success) {
       toast.success("Produits importés !")
       setReturnResult(result.data)
+      return { success: true, error: null }
     } else {
       toast.success("Une erreur est survenue...")
-      console.log(result?.data?.error)
+      console.log(result?.validationErrors)
+      return { success: false, error: result?.data?.error }
     }
   }
 
@@ -65,25 +74,23 @@ export default function SupplierCard(props: {
   return ( 
     <Card 
       className={`
-        flex h-full
+        flex h-full bg-primary-800
         ${props.organization.invit && "opacity-50 hover:opacity-80 transition-all"} 
-        ${props.isSelected && "bg-gray-100"}
+        ${props.isSelected && "bg-primary"}
       `}
     >
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <h3>
-            {props.organization.name}
-          </h3>
+        <CardTitle className="flex justify-between font-bold text-white">
+          {props.organization.name}
           <Checkbox className="cursor-pointer" onCheckedChange={e => props.selectSupplierId(props.organization.id, e as boolean)} />
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-white">
           {props.organization.slug}
         </CardDescription>
       </CardHeader>
       <CardFooter className="flex-1 items-end">
         {props.organization.invit ? // if the invitation isn't accepted yet
-          <p>Invité : 
+          <p>En attente : 
             <Button 
               onClick={() => props.organization.invit && invitationValidation()} 
               className="font-italic text-orange-400"
@@ -92,12 +99,12 @@ export default function SupplierCard(props: {
             </Button>
           </p>
         : 
-          props.organization.members[0] ? // the supplier is real
-            <div>
-              <ConversationDrawer receipt={props.organization.members[0].user} />
-            </div>
+          // the supplier is real
+          props.organization.members[0] ? 
+            <ConversationDrawer receipt={props.organization.members[0].user} />
+
           // the supplier was created by the customer...
-          : props.organization.catalogues[0] ? // ...and have a catalogue
+          : props.organization.catalogues[0]?.subCatalogues.reduce((acc:any, subCat:any) => acc + subCat._count.products,0) > 0 ? // ...and have a catalogue
             <Button size="icon" variant="outline">
               <Edit />
             </Button>
@@ -107,7 +114,11 @@ export default function SupplierCard(props: {
                 { label: "Référence", value: "chooseRef", required: true },
                 { label: "Name", value: "chooseName", required: true },
                 { label: "Description", value: "chooseDescription" },
-                { label: "Prix", value: "choosePrice", required: true }
+                { label: "Prix", value: "choosePrice", required: true },
+                { label: "Unité de vente", value: "chooseUnit", required: true },
+                { label: "Quantité par colis", value: "chooseSellQuantity", required: true },
+                { label: "Taux de TVA", value: "chooseTvaValue" },
+                { label: "Catégories", value: "chooseCategories" }
               ]}
               onImport={(parsedData) => toUploadData(parsedData)}
               reload={props.reload}
@@ -121,7 +132,7 @@ export default function SupplierCard(props: {
                 </li>}
               </ul>
             </CsvImporter>
-        }
+          }
       </CardFooter>
     </Card>
   )
