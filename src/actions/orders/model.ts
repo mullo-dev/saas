@@ -19,3 +19,15 @@ export type OrderWithRelations = {
     name: string;
   };
 }
+
+
+export type OrderType = {
+  suppliers: Array<{
+      totalHt: number;
+  }>;
+  ref: string;
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  customerId: string;
+}

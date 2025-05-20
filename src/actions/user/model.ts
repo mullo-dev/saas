@@ -1,5 +1,9 @@
 import { z } from "zod"
-import { UserType } from '@prisma/client'
+
+export enum UserTypeEnum {
+  SUPPLIER = "SUPPLIER",
+  CUSTOMER = "CUSTOMER",
+}
 
 export type usersType = {
   id: string,
@@ -8,7 +12,7 @@ export type usersType = {
 }
 
 export const userModel = {
-  type: z.nativeEnum(UserType).optional(),
+  type: z.nativeEnum(UserTypeEnum).optional(),
   email: z.string().email().optional(),
   name: z.string().optional()
 }

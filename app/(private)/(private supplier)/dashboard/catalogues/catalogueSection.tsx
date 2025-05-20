@@ -19,7 +19,7 @@ export default async function CatalogueSection(props: {organizationId: string}) 
       </div>
       <hr />
 
-      {catalogues.map((cat, index) => (
+      {catalogues.map((cat:any, index:number) => (
         <CatalogueCard key={index} catalogue={cat} />
       ))}
     </div>

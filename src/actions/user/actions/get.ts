@@ -2,12 +2,12 @@
 
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
-import { UserType } from '@prisma/client'
 import { z } from 'zod';
+import { UserTypeEnum } from '../model';
 
 export const getUsers = authActionClient
   .metadata({ actionName: "getUsers" })
-  .schema(z.object({searchType: z.nativeEnum(UserType).optional()}))
+  .schema(z.object({searchType: z.nativeEnum(UserTypeEnum).optional()}))
   .action(async ({ parsedInput, ctx: { user } }) => {
 
   try {
@@ -145,7 +145,7 @@ export const returnOnlySuppliers = authActionClient
         },
       });
 
-      invitedOrganizationsWithFlag = invitedOrganizations.map((org) => ({
+      invitedOrganizationsWithFlag = invitedOrganizations.map((org:any) => ({
         ...org,
         invit: true, // we add the invit flag
       }));

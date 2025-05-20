@@ -4,11 +4,11 @@ import { getUsersOrders } from "@/actions/orders/actions/get"
 import { Orderstable } from "@/components/global/tables/ordersTable"
 import { Suspense, useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Order } from "@prisma/client"
 import { usePageTitle } from "@/lib/context/pageTitle"
+import { OrderType } from "@/actions/orders/model"
 
 export default function ordersPage() {
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<OrderType[]>([])
   const { setTitle } = usePageTitle();
   
   useEffect(() => {

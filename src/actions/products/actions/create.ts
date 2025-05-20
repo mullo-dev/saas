@@ -87,7 +87,7 @@ export const createProducts = authActionClient
           status: "memberInvited",
           catalogueId: catalogueId,
           products: {
-            create: allProducts.map((prod) => ({
+            create: allProducts.map((prod:any) => ({
               assignedBy: user.user ? user.user.name : "Inconnu",
               price: prod.price ? prod.price : 0,
               product: {

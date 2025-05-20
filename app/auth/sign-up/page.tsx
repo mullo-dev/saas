@@ -17,8 +17,8 @@ import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { updateUser } from "@/actions/user/actions/update";
-import { UserType } from '@prisma/client'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { UserTypeEnum } from "@/actions/user/model";
 
 export default function SignUp() {
 	const searchParams = useSearchParams()
@@ -27,7 +27,7 @@ export default function SignUp() {
 	const [lastName, setLastName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [type, setType] = useState<UserType>(userType ? userType as UserType : "CUSTOMER");
+	const [type, setType] = useState<UserTypeEnum>(userType ? userType as UserTypeEnum : UserTypeEnum.CUSTOMER);
 	const [passwordConfirmation, setPasswordConfirmation] = useState("");
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export default function SignUp() {
 					<RadioGroup 
 						className="mb-2" 
 						defaultValue={userType ? userType : "CUSTOMER"} 
-						onValueChange={(e) => setType(e as UserType)}
+						onValueChange={(e) => setType(e as UserTypeEnum)}
 					>
 						<div className="flex items-center space-x-2">
 							<RadioGroupItem value="CUSTOMER" id="customer" />

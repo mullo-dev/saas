@@ -38,7 +38,7 @@ export default function SignOutButton(props: {
       {loading ? (
         <Loader2 size={16} className="animate-spin" />
       ) : (
-        "Sign out"
+        "Déconnexion"
       )}
     </Button>
   );

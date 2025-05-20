@@ -31,7 +31,7 @@ export const acceptInvitation = authActionClient
 
       if (checkSubCatalogue.length > 0) {
         // Here update SubCatalogue for add userId
-        checkSubCatalogue.map(async (cat) => (
+        checkSubCatalogue.map(async (cat:any) => (
           await updateSubCatalogueFromInvitation({subCatalogueId: cat.id})
         ))
       }

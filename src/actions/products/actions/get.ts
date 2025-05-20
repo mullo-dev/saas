@@ -47,8 +47,8 @@ export const getAllProducts = authActionClient
       }
     });
 
-    const allProducts =  subCatalogues.flatMap(sub =>
-      sub.products.map(product => ({
+    const allProducts =  subCatalogues.flatMap((sub:any) =>
+      sub.products.map((product:any) => ({
         ...product,
         supplierName: sub.catalogue.organization.name,
         organizationId: sub.catalogue.organization.id
@@ -101,8 +101,8 @@ export const getInCartProducts = authActionClient
     });
 
     let totalPriceHt = 0, totalTva = 0;
-    const allProducts =  subCatalogues.flatMap(sub =>
-      sub.products.map(product => {
+    const allProducts =  subCatalogues.flatMap((sub:any) =>
+      sub.products.map((product:any) => {
         const matched = products?.find(p => p.productId === product.productId)
         const priceHt = matched ? matched.quantity * product.price : 0;
         const tva = matched ? ((priceHt * product.product.tvaValue)/100) : 0;
