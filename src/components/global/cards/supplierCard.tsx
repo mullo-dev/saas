@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { acceptInvitation } from "@/actions/invitations/actions/accept"
 import { toast } from "sonner"
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"

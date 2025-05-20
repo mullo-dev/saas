@@ -8,6 +8,8 @@ import { resend } from "@/lib/resend";
 import NewOrderEmail from "@/components/emails/newOrder";
 import { GroupedSupplierAndGetPrice } from "../../organization/actions/get";
 
+const URL = process.env.APP_URL
+
 export const createOrder = authActionClient
   .metadata({ actionName: "createOrder" }) 
   .action(async ({ ctx: { user } }) => {
@@ -84,7 +86,7 @@ export const createOrder = authActionClient
         react: NewOrderEmail({
           products: organization?.fullProducts,
           client: user?.user?.name,
-          href: `http://localhost:3000/orders/${order.id}`
+          href: `${URL}/orders/${order.id}`
         })
       })
     })
@@ -98,7 +100,7 @@ export const createOrder = authActionClient
     //     authorName: user?.user?.name,
     //     authorEmail: user?.user?.email,
     //     reviewText: "Vos fournisseurs ont reçu les instructions. Votre commande sera traîtée par leur soint dans les meilleurs délais.",
-    //     href: "http://localhost:3000/orders/id_de_la_commande" // put id here
+    //     href: `${URL}/orders/id_de_la_commande` // PUT ID HERE
     //   })
     // })
 

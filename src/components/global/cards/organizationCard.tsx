@@ -3,7 +3,7 @@
 import MemberForm from "@/components/global/forms/memberForm";
 import OrganizationForm from "@/components/global/forms/organizationForm";
 import { DrawerDialog } from "@/components/global/modal";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { memberTypeFull } from "@/actions/members/model";
 import { Button } from "@/components/ui/button";

@@ -21,7 +21,8 @@ export default function SignOutButton(props: {
       router.refresh()
       router.push("/auth/sign-in")
     } catch (error) {
-      toast.error("Error signing out");
+      toast.error("Impossible de se déconnecter : une erreur est survenue");
+      console.log(error)
     } finally {
       setLoading(false);
     }

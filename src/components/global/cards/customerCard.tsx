@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Eye, File } from "lucide-react";
 import SimpleTooltip from "../tootip/tooltip";
 

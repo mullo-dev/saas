@@ -3,7 +3,7 @@
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SubmitHandler, useForm } from "react-hook-form"
@@ -15,12 +15,12 @@ export function ExpandPanel(props: {row:any}) {
   const [tvaValue, setTvaValue] = useState<number>(props.row.original.tvaValue)
   const {
     register,
-    setError,
-    clearErrors,
+    // setError,
+    // clearErrors,
     reset,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { },
   } = useForm<any>({
     defaultValues: {
       description: props.row.original.description,

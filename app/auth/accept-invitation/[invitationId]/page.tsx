@@ -17,6 +17,7 @@ export default function SignIn() {
   const { invitationId } = useParams()
   const searchParams = useSearchParams()
   const findEmail = searchParams.get('email')
+  const findRole = searchParams.get('role')
   const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
 	const [email, setEmail] = useState(findEmail ? findEmail : "");
@@ -83,7 +84,7 @@ export default function SignIn() {
 							type="email"
 							placeholder="m@example.com"
 							required
-              // disabled
+              disabled
 							onChange={(e) => {
 								setEmail(e.target.value);
 							}}
@@ -126,6 +127,7 @@ export default function SignIn() {
                     password,
                     name: `${firstName} ${lastName}`,
                     callbackURL: "/dashboard",
+                    type: findRole !== "customer" ? "SUPPLIER" : "CUSTOMER",
                     fetchOptions: {
                       onResponse: () => {
                         setLoading(false);
@@ -137,7 +139,7 @@ export default function SignIn() {
                         toast.error(ctx.error.message);
                       },
                       onSuccess: async () => {
-                        const { data, error } = await signIn.email({ email, password }, {
+                        await signIn.email({ email, password }, {
                           onRequest: () => {
                             setLoading(true);
                           },

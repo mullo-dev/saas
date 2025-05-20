@@ -16,8 +16,12 @@ import {
 interface NewOrderEmailProps {
   client?: string;
   products?: {
-    name: string,
-    quantity: number,
+    id: string;
+    name: string | null;
+    ref: string | null;
+    quantity: number;
+    priceHt: number;
+    tva: number;
   }[];
   href?: string
 }
@@ -43,7 +47,7 @@ export default function NewOrderEmail({ client, products, href }: NewOrderEmailP
               <Text style={heading}>{client} a effectué une nouvelle commande</Text>
               <Text style={review}>
                 <ul style={listContent}>
-                  {products?.map((p:{name:string,quantity:number}, index:number) => (
+                  {products?.map((p:{name:string | null,quantity:number}, index:number) => (
                     <li key={index} style={list}>
                       <p>{p.name}</p>
                       <p>{p.quantity}</p>

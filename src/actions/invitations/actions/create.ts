@@ -7,6 +7,8 @@ import { cookies } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { resend } from '@/lib/resend';
 
+const URL = process.env.APP_URL
+
 export const inviteMember = authActionClient
   .metadata({ actionName: "inviteMember" }) 
   .schema(z.object({
@@ -52,7 +54,7 @@ export const sendRequestMember = authActionClient
 
   try {
 
-    const path = `http://localhost:3000/auth/accept-request?organization=${organizationId}&customer=${user?.user?.id}&owner=${supplierId}`
+    const path = `${URL}/auth/accept-request?organization=${organizationId}&customer=${user?.user?.id}&owner=${supplierId}`
 
     await resend.emails.send({
       from: 'noreply@mullo.fr',

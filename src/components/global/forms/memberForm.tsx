@@ -26,7 +26,7 @@ export default function MemberForm(props: { organizationId: string, setOpen: any
   const {
     register,
     control,
-    setValue,
+    // setValue,
     setError,
     clearErrors,
     handleSubmit,

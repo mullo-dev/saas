@@ -41,7 +41,6 @@ import {
 } from "@/components/ui/table"
 import { FileUploader } from "./file-uploader"
 import { Input } from "../ui/input"
-import { toast } from "sonner"
 
 interface CsvImporterProps
   extends React.ComponentPropsWithoutRef<typeof DialogTrigger>,

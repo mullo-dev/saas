@@ -8,6 +8,8 @@ import { messageModel } from '../model';
 import { resend } from '@/lib/resend';
 import ReviewEmail from '@/components/emails/reviewEmail'
 
+const URL = process.env.APP_URL
+
 export const createMessage = authActionClient
   .metadata({ actionName: "createMessage" })
   .schema(z.object(messageModel))
@@ -60,7 +62,7 @@ export const createMessage = authActionClient
         authorName: user.user.name,
         authorEmail: user.user.email,
         reviewText: parsedInput.message,
-        href: "http://localhost:3000/compte"
+        href: `${URL}/compte`
       })
     })
 

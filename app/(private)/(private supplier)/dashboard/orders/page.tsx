@@ -1,9 +1,7 @@
 "use client" 
 
 import { getOrderBySupplier } from '@/actions/orders/actions/get'
-import { SubHeader } from '@/components/global/header/subHeader'
 import { Orderstable } from '@/components/global/tables/ordersTable'
-import { getUser } from '@/lib/auth-session'
 import { useUser } from '@/lib/auth-session-client'
 import { usePageTitle } from '@/lib/context/pageTitle'
 import React, { useEffect, useState } from 'react'

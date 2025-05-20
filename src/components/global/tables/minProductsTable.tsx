@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Minus, Plus, Trash } from "lucide-react"
+import { Minus, Plus } from "lucide-react"
 
 
 export function MinProductsTable(props: { propsData: any, supplierId: string, getCartProducts: () => void }) {

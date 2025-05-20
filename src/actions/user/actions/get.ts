@@ -46,7 +46,7 @@ export const getUsers = authActionClient
 export const getUserById = authActionClient
   .metadata({ actionName: "getUserById" })
   .schema(z.object({userId: z.string()}))
-  .action(async ({ parsedInput, ctx: { user } }) => {
+  .action(async ({ parsedInput }) => {
 
   try {
     const user = await prisma.user.findUnique({
