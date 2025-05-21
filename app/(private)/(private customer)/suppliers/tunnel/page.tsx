@@ -12,7 +12,7 @@ export default function tunnelPage() {
   
   const getCartProducts = async () => {
     const response = await GroupedSupplierAndGetPrice()
-    if (response?.data) {
+    if (response?.data?.success) {
       setGroupedSupplier(response.data.groupedArray)
     }
   }

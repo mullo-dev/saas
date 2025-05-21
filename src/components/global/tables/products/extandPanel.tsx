@@ -31,7 +31,7 @@ export function ExpandPanel(props: {row:any}) {
     }
   });
 
-  const onSubmit: SubmitHandler<any> = async (data) => {
+  const onSubmit: SubmitHandler<any> = async (data:any) => {
     const result = await updateProduct({
       productId: props.row.original.id,
       ...data
@@ -97,7 +97,7 @@ export function ExpandPanel(props: {row:any}) {
           <Label className="text-sm">TVA</Label>
           <Select 
             defaultValue={String(tvaValue)}
-            onValueChange={(value) => {
+            onValueChange={(value:any) => {
               setOnChange(true)
               setTvaValue(Number(value))
             }}

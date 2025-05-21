@@ -8,12 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Plus } from "lucide-react"
-import { Order, SupplierOnOrder } from "@prisma/client"
 import Link from "next/link"
-
-type OrderProps = Order & {
-  suppliers: SupplierOnOrder[]
-}
+import { OrderTypeWithSuppliers } from "@/actions/orders/model"
 
 export function Orderstable(props: { orders: any, supplier?: boolean }) {
 
@@ -29,7 +25,7 @@ export function Orderstable(props: { orders: any, supplier?: boolean }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {props.orders?.map((item: OrderProps, index:number) => (
+          {props.orders?.map((item: OrderTypeWithSuppliers, index:number) => (
               <TableRow key={index}>
                 <TableCell className="font-medium w-60">
                   <span className="line-clamp-1">{item.ref}</span>

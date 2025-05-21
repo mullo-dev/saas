@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/navigation-menu"
 import { LoaderCircle, UserCircle2 } from "lucide-react"
 import SignOutButton from "../buttons/signOutButton";
+import { UserTypeEnum } from "@/actions/user/model"
 
 const customerMenu: { title: string; href: string; description: string }[] = [
   {
@@ -70,7 +71,7 @@ export function Navigation(props: {
               <NavigationMenuTrigger>Menu</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <div className="flex flex-col gap-2 w-60">
-                  {props.user.type === "CUSTOMER" ? customerMenu.map((component) => (
+                  {props.user.type === UserTypeEnum.CUSTOMER ? customerMenu.map((component:any) => (
                     <ListItem
                       key={component.title}
                       title={component.title}
@@ -80,7 +81,7 @@ export function Navigation(props: {
                     </ListItem>
                   ))
                   :
-                  supplierMenu.map((component) => (
+                  supplierMenu.map((component:any) => (
                     <ListItem
                       key={component.title}
                       title={component.title}
@@ -96,7 +97,7 @@ export function Navigation(props: {
               <NavigationMenuTrigger><UserCircle2 /></NavigationMenuTrigger>
               <NavigationMenuContent>
                 <div className="flex flex-col gap-2 w-60">
-                  {props.user.type === "SUPPLIER" && <ListItem
+                  {props.user.type === UserTypeEnum.SUPPLIER && <ListItem
                     title="Mon entreprise"
                     href="/dashboard"
                   />}

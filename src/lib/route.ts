@@ -1,9 +1,10 @@
 import { logger } from "better-auth";
 import { createZodRoute } from "next-zod-route"
-import { NextResponse } from "next/server";
+import { NextResponse } from "next/dist/server/web/spec-extension/response";
 import { getUser } from "./auth-session";
 import { z } from "zod"
 import { metadata } from "@app/layout";
+import { getOrganizationById } from "@/actions/organization/actions/get";
 
 export class SafeRouteError extends Error {
   status?: number;
@@ -14,29 +15,23 @@ export class SafeRouteError extends Error {
 }
 
 export const route = createZodRoute({
-  handleServerError: (e: Error) => {
-    logger.error(e);
+  handleServerError: (e: Error): Response => {
+    logger.error(e.message);
     if (e instanceof SafeRouteError) {
       return NextResponse.json(
         { message: e.message, status: e.status },
         {
           status: e.status,
         }
-      )
+      );
     }
-  }
 
-  if (e instanceof AuthError) {
     return NextResponse.json(
-      { 
-        message: e.message,
-      }
-      {
-        status: 401,
-      }
-    )
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
-})
+});
 
 export const authRoute = route.use(async ({ next }) => {
   const user = await getUser();
@@ -47,7 +42,7 @@ export const authRoute = route.use(async ({ next }) => {
   return next({
     ctx: { user },
   })
-})
+});
 
 // To use only on route orgaId
 export const orgRoute = authRoute
@@ -59,12 +54,18 @@ export const orgRoute = authRoute
   )
   .use(async ({ next, metadata }) => {
     try {
-      const organization = await getOrganization(metadata);
+      if (!metadata?.roles) {
+        throw new SafeRouteError("Organization ID is required");
+      }
+      const result = await getOrganizationById({ organizationId: metadata.roles });
+      if (!result?.data?.success) {
+        throw new SafeRouteError("You need to be part of an organization");
+      }
 
       return next({
-        ctx: { organization },
+        ctx: { organization: result.data.organization },
       });
     } catch {
       throw new SafeRouteError("You need to be part of an organization")
     }
-})
+  });

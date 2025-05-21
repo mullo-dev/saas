@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { clearCart, getCart } from "@/lib/cart"
 import { Eye, Minus, Plus, Trash } from "lucide-react"
 import Link from "next/link"
@@ -41,7 +41,7 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
     <div className="flex flex-col lg:flex-row-reverse gap-4">
       {!props.viewOnly && 
         <div className="lg:w-70">
-          <Card className="sticky top-5">
+          <Card className="sticky top-5 bg-secondary-500">
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
                 <h3>Panier</h3>
@@ -68,7 +68,7 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
               <CardDescription>
                 {cart && cart.length > 0 ?
                   <>
-                    <p>{new Set(cart.map(p => p.supplierId)).size} fournisseurs</p>
+                    <p>{new Set(cart.map((p:any) => p.supplierId)).size} fournisseurs</p>
                     <p>{cart.length} produits</p>
                   </>
                 : 

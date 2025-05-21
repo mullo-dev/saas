@@ -7,6 +7,8 @@ COPY package.json package-lock.json ./
 RUN npm install
 
 COPY . .
+# Generate Prisma client before building
+RUN npx prisma generate
 RUN npm run build
 
 # Étape 2 : Production image
@@ -17,9 +19,6 @@ WORKDIR /app
 COPY --from=builder /app ./
 
 ENV NODE_ENV=production
-
-# Si tu utilises Prisma, tu dois générer les fichiers client dans le build
-RUN npx prisma generate
 
 EXPOSE 3000
 

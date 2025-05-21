@@ -95,5 +95,5 @@ export const GroupedSupplierAndGetPrice = authActionClient
       })
     );
 
-    return { groupedArray: groupedArray }
+    return { success: true, groupedArray: groupedArray }
   })

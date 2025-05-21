@@ -17,6 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { sendRequestMember } from "@/actions/invitations/actions/create";
+import { UserTypeEnum } from "@/actions/user/model";
 
 type InputNames = "name" | "supplierName" | "email" | "phone" ;
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; }[] = [
@@ -59,10 +60,10 @@ export default function SupplierForm(props: { setOpen: any }) {
 
   
   const getSuppliersAvailable = async () => {
-    const result = await getUsers({searchType: 'SUPPLIER'})
+    const result = await getUsers({searchType: UserTypeEnum.SUPPLIER})
     if (result?.data?.success) {
       let table = [] as any
-      result.data.users?.map((s) => {
+      result.data.users?.map((s:any) => {
         s.members[0] && table.push({
           organizationId: s.members[0].organizationId,
           organizationName: s.members[0].organization.name,
@@ -111,7 +112,7 @@ export default function SupplierForm(props: { setOpen: any }) {
   }
   
 
-  const onSubmit: SubmitHandler<supplierType> = async (data) => {
+  const onSubmit: SubmitHandler<supplierType> = async (data:any) => {
     const supplier = {
       createByCustomer: true,
       metadata: {
@@ -165,7 +166,7 @@ export default function SupplierForm(props: { setOpen: any }) {
               <h3 className="text-sm text-gray-900 mt-1 mb-2 font-bold">Ajoutez sur votre compte un fournisseur externe.</h3>
               {errors.root && <p className="text-red-500 text-sm">{errors.root.message}</p>}
               <div className="grid grid-cols-1 gap-2">
-                {inputs.map((input, index) => (
+                {inputs.map((input:any, index:number) => (
                   <div key={index} className="grid gap-2">
                     <Label>
                       {input.label}
@@ -174,7 +175,7 @@ export default function SupplierForm(props: { setOpen: any }) {
                       className="bg-white"
                       {...register(input.name)}
                     />
-                    {errors[input.name] && <p className="text-red-500 mt-1 text-sm">{errors[input.name]?.message}</p>}
+                    {errors[input.name as keyof typeof errors] && <p className="text-red-500 mt-1 text-sm">{errors[input.name as keyof typeof errors]?.message}</p>}
                   </div>
                 ))}
               </div>

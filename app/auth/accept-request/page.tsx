@@ -3,7 +3,7 @@
 import SignInForm from "../../../src/components/global/forms/signInForm";
 import { CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { signOut } from "@/lib/auth-client";
 import { useUser } from "@/lib/auth-session-client";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { acceptRequestMember } from "@/actions/invitations/actions/accept";
 import { getUserById } from "@/actions/user/actions/get";
 import { toast } from "sonner";
 
-export default function SignIn() {
+function AcceptRequestContent() {
   const { user, isPending } = useUser();
   const searchParams = useSearchParams()
   const ownerId = searchParams.get('owner')
@@ -21,7 +21,6 @@ export default function SignIn() {
   const [customer, setCustomer] = useState<any>()
   const route = useRouter()
 
-  
   const signOutForSignIn = async () => {
     await signOut();
     route.refresh()
@@ -80,5 +79,13 @@ export default function SignIn() {
         </>
       }
     </>
+  );
+}
+
+export default function AcceptRequest() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AcceptRequestContent />
+    </Suspense>
   );
 }

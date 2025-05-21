@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Catalogue } from "@prisma/client";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { createCatalogue } from "@/actions/catalogue/actions/create";
 import { toast } from "sonner";
 import { DrawerDialog } from "../modal";
 import { getColSpanClass } from "@/lib/sanitized/class-css";
+import { catalogueType } from "@/actions/catalogue/model";
 
 type InputNames = "name";
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; col: number }[] = [
@@ -24,7 +24,7 @@ const inputs: { label: string; defaultValue: string; name: InputNames; type: str
   },
 ];
 
-export function CatalogueForm(props: { organizationId?: string, catalogue?: Catalogue, setOpen: any }) {
+export function CatalogueForm(props: { organizationId?: string, catalogue?: catalogueType, setOpen: any }) {
   const {
     register,
     setError,

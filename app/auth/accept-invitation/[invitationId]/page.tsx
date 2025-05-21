@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { signIn, signUp } from "@/lib/auth-client";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ import Link from "next/link";
 import { checkEmail } from "@/actions/members/actions/get";
 import { acceptInvitation } from "@/actions/invitations/actions/accept";
 
-export default function SignIn() {
+function AcceptInvitationContent() {
   const { invitationId } = useParams()
   const searchParams = useSearchParams()
   const findEmail = searchParams.get('email')
@@ -211,5 +211,13 @@ export default function SignIn() {
         </CardFooter>
       </CardContent>
     </>
+  );
+}
+
+export default function AcceptInvitation() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AcceptInvitationContent />
+    </Suspense>
   );
 }

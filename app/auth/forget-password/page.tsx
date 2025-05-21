@@ -7,10 +7,10 @@ import { authClient } from "@/lib/auth-client";
 import { ChevronLeft, CircleCheckBig } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { toast } from "sonner";
 
-export default function ForgetPassword() {
+function ForgetPasswordContent() {
   const [emailSend, setEmailSend] = useState(false) 
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -115,4 +115,12 @@ export default function ForgetPassword() {
         </CardContent>
     </>
   )
+}
+
+export default function ForgetPassword() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ForgetPasswordContent />
+    </Suspense>
+  );
 }

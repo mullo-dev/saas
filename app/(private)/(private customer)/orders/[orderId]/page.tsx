@@ -36,12 +36,13 @@ export default function orderIdPage() {
     return <p>Chargement...</p>
   }
 
+  console.log(order.suppliers)
   return (
     <div>
-      <div className="flex gap-4 flex-col-reverse md:flex-row">
+      <div className="flex gap-4 flex-col-reverse lg:flex-row">
         <div className="flex-1 flex flex-col gap-4">
           {order.suppliers.map((sup:any, index:number) => (
-            <Card>
+            <Card key={index}>
               <CardHeader>
                 <div className="flex justify-between">
                   <div>
@@ -51,7 +52,7 @@ export default function orderIdPage() {
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
-                    <ConversationDrawer receipt={sup.supplier.members[0].user} />
+                    {sup?.supplier?.members[0] && <ConversationDrawer receipt={sup.supplier.members[0].user} />}
                     <Button size="icon" variant="outline">
                       <Download />
                     </Button>
@@ -64,16 +65,16 @@ export default function orderIdPage() {
             </Card>
           ))}
         </div>
-        <div className="w-80">
+        <div className="w-full lg:w-80">
           <Card className="sticky top-0 bg-secondary-300">
             <CardHeader>
-              <CardTitle>Commande {order.ref}</CardTitle>
+              <CardTitle>N° {order.ref}</CardTitle>
               <CardDescription>Effectuée le {order.createdAt.toLocaleDateString("fr-FR")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="mb-3">
                 {order.suppliers.map((sup:any, index:number) => (
-                  <li className="flex justify-between items-center font-bold text-gray-400 mb-1">
+                  <li key={index} className="flex justify-between items-center font-bold text-gray-400 mb-1">
                     <p className="text-xs">{sup.supplier.name}</p>
                     <p className="text-xs">
                       {sup.totalHt.toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€ HT'}
@@ -87,7 +88,7 @@ export default function orderIdPage() {
                 <p className="font-bold text-md">
                   {order.suppliers
                     .reduce((acc: number, p: any) => acc + p.totalHt, 0)
-                    .toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + "€ HT"}
+                    .toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "€ HT"}
                 </p>
               </div>
               <div className="flex justify-between items-center mt-3">
@@ -95,8 +96,8 @@ export default function orderIdPage() {
                 <p className="font-bold text-md">
                   {order.suppliers
                     .flatMap((s: any) => s.products)
-                    .reduce((acc: number, p: any) => acc + p.price + (p.price*p.tvaValue), 0)
-                    .toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + "€ TTC"}
+                    .reduce((acc: number, p: any) => acc + p.price + ((p.price*p.product.tvaValue)/100), 0)
+                    .toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "€ TTC"}
                 </p>
               </div>
               <Button className="w-full mt-4">

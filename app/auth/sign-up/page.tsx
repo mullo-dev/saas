@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { signUp } from "@/lib/auth-client";
 import { toast } from "sonner";
@@ -20,7 +20,7 @@ import { updateUser } from "@/actions/user/actions/update";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserTypeEnum } from "@/actions/user/model";
 
-export default function SignUp() {
+function SignUpContent() {
 	const searchParams = useSearchParams()
 	const userType = searchParams.get("type")
 	const [firstName, setFirstName] = useState("");
@@ -162,5 +162,13 @@ export default function SignUp() {
 				</CardFooter>
 			</CardContent>
 		</>
+	);
+}
+
+export default function SignUp() {
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<SignUpContent />
+		</Suspense>
 	);
 }
