@@ -25,7 +25,7 @@ export function Header() {
             alt="Logo de Mullo"
             className="block md:hidden"
           /> 
-          <span className="hidden md:block text-lg font-bold text-primary mt-2">- fournisseurs</span>
+          <span className="hidden md:block text-lg font-bold text-primary mt-2">- commandes</span>
         </div>
         <Navigation user={user} />
       </div>

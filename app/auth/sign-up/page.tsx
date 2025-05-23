@@ -149,14 +149,14 @@ function SignUpContent() {
 						{loading ? (
 							<Loader2 size={16} className="animate-spin" />
 						) : (
-							"Create an account"
+							"Créer un compte"
 						)}
 					</Button>
 				</div>
 				<CardFooter>
 					<div className="flex justify-center w-full border-t py-4">
 						<p className="text-center text-xs text-neutral-500">
-							Already have an account ? <Link href={"/auth/sign-in"} className="text-orange-400">sign in here</Link>
+							Déjà un compte ? <Link href={"/auth/sign-in"} className="text-orange-400">connectez-vous ici</Link>
 						</p>
 					</div>
 				</CardFooter>
@@ -167,7 +167,7 @@ function SignUpContent() {
 
 export default function SignUp() {
 	return (
-		<Suspense fallback={<div>Loading...</div>}>
+		<Suspense fallback={<div>Chargement...</div>}>
 			<SignUpContent />
 		</Suspense>
 	);

@@ -120,13 +120,33 @@ export const createProducts = authActionClient
 
 export const createSingleProduct = authActionClient
 .metadata({ actionName: "createProduct" }) 
-.schema(z.object(productModel))
-.action(async ({ parsedInput }) => {
+.schema(z.object({createByCustomer: z.boolean().default(false), ...productModel}))
+.action(async ({ parsedInput: { createByCustomer, ...parsedInput }, ctx: { user } }) => {
   
   try {
     const product = await prisma.product.create({ 
       data: parsedInput 
     });
+
+    if (createByCustomer && user.user?.id) {
+      const subCatalogue = await prisma.subCatalogue.findFirst({
+        where: {
+          customerId: user.user.id,
+          catalogueId: product.catalogueId,
+        },
+      });
+    
+      if (subCatalogue) {
+        await prisma.productOnSubCatalogue.create({
+          data: {
+            productId: product.id,
+            subCatalogueId: subCatalogue.id,
+            assignedBy: user.user.name,
+            price: product.price ? product.price : 0
+          },
+        });
+      }
+    }
 
     return { success: true, product: product };
   } catch (error) {

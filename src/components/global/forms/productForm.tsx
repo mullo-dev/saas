@@ -72,7 +72,7 @@ const inputs: { label: string; defaultValue: string | number; name: InputNames; 
   }
 ];
 
-export default function ProductForm(props: {catalogueId: string, setOpen: any, reload: () => void}) {
+export default function ProductForm(props: {catalogueId: string, setOpen: any, reload: () => void, createByCustomer?: boolean}) {
   const {
     register,
     setError,
@@ -106,7 +106,7 @@ export default function ProductForm(props: {catalogueId: string, setOpen: any, r
         : Number(String(data.sellQuantity).replace(',', '.')),
     }
 
-    const result = await createSingleProduct(formattedData);
+    const result = await createSingleProduct({createByCustomer: props.createByCustomer, ...formattedData});
     if (result?.data?.success) {
       props.setOpen(false)
       props.reload()

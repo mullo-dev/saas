@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Edit } from "lucide-react"
 import { useState } from "react"
 import { createCatalogue } from "@/actions/catalogue/actions/create"
+import SimpleTooltip from "../tootip/tooltip"
+import { AddProductModal } from "../modal/addProductsModal"
 
 export default function SupplierCard(props: { 
   organization: any,
@@ -52,8 +54,6 @@ export default function SupplierCard(props: {
         throw new Error("Catalogue not found")
       }
     }
-
-    console.log(theCatalogue)
 
     const result = await createProducts({products: parsedData, createByCustomer: true, catalogueId: theCatalogue})
     if (result?.data?.success) {
@@ -102,12 +102,21 @@ export default function SupplierCard(props: {
           // the supplier is real
           props.organization.members[0] ? 
             <ConversationDrawer receipt={props.organization.members[0].user} />
-
           // the supplier was created by the customer...
           : props.organization.catalogues[0]?.subCatalogues.reduce((acc:any, subCat:any) => acc + subCat._count.products,0) > 0 ? // ...and have a catalogue
-            <Button size="icon" variant="outline">
-              <Edit />
-            </Button>
+            <>
+              <Button size="icon" variant="outline" className="mr-2">
+                <Edit />
+              </Button>
+              <SimpleTooltip content="Ajouter produit(s)">
+                <AddProductModal 
+                  catalogueId={props.organization.catalogues[0].id}
+                  toUploadData={(parsedData) => toUploadData(parsedData)}
+                  reload={props.reload}
+                  returnResult={returnResult}
+                />
+              </SimpleTooltip>
+            </>
           : // ...don't have catagloue yet
             <CsvImporter
               fields={[

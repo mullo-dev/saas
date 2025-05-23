@@ -64,7 +64,7 @@ export default function SignInForm(props: { redirectPath: string, onlySignin?: b
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Checkbox
               id="remember"
               onClick={() => {
@@ -72,7 +72,7 @@ export default function SignInForm(props: { redirectPath: string, onlySignin?: b
               }}
             />
             <Label htmlFor="remember">Se souvenir de moi</Label>
-          </div>
+          </div> */}
 
           <Button
             type="submit"
@@ -98,11 +98,11 @@ export default function SignInForm(props: { redirectPath: string, onlySignin?: b
             {loading ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
-              "Login"
+              "Connexion"
             )}
           </Button>
 
-          <div 
+          {/* <div 
             className={cn(
               "w-full gap-2 flex items-center",
               "justify-between flex-col"
@@ -153,7 +153,7 @@ export default function SignInForm(props: { redirectPath: string, onlySignin?: b
 			        </svg>
               Sign in with Github
             </Button>
-          </div>
+          </div> */}
         </div>
         {!props.onlySignin && <CardFooter>
           <div className="flex justify-center w-full border-t py-4 mt-4">
