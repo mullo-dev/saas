@@ -10,6 +10,9 @@ import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/
 import { Download } from "lucide-react"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
+import { PDFDownloadLink } from "@react-pdf/renderer"
+import { DeliveryNotePDF } from "@/components/pdf/deliveryNote"
+import PDFTestButton from "@/components/pdf/DownloadPDFButton"
 
 export default function orderIdPage() {
   const [order, setOrder] = useState<OrderWithRelations | null>(null)
@@ -36,7 +39,6 @@ export default function orderIdPage() {
     return <p>Chargement...</p>
   }
 
-  console.log(order.suppliers)
   return (
     <div>
       <div className="flex gap-4 flex-col-reverse lg:flex-row">
@@ -53,9 +55,7 @@ export default function orderIdPage() {
                   </div>
                   <div className="flex gap-2">
                     {sup?.supplier?.members[0] && <ConversationDrawer receipt={sup.supplier.members[0].user} />}
-                    <Button size="icon" variant="outline">
-                      <Download />
-                    </Button>
+                    <PDFTestButton order={order} supplier={sup} />
                   </div>
                 </div>
               </CardHeader>
