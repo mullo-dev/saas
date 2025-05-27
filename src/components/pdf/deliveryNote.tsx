@@ -22,13 +22,16 @@ export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, ord
         Date : {new Date(order.createdAt).toLocaleDateString()}
       </Text>
       <Text style={{fontSize: "8px", marginBottom: 5}}>
-        Demandeur : {order.customerId}
+        Demandeur : {order.customer.name}
+      </Text>
+      <Text style={{fontSize: "8px", marginBottom: 5}}>
+        Contact : {order.customer.email}
       </Text>
       <Text style={{fontSize: "8px"}}>
         Adresse : 10 rue Cabronne 75015 Paris
       </Text>
     </View>
-    {all ? order.suppliers((sup:any, index:number) => (
+    {all ? order.suppliers.map((sup:any, index:number) => (
       <View
         key={index}
         style={{paddingTop: 20}}
@@ -62,36 +65,43 @@ export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, ord
               <Text style={{fontSize: 8, textAlign: "right"}}>Total</Text>
             </View>
           </View>
-          {sup?.products?.map((product:any, index:number) => {
-            const border = index !== sup.products.length-1 ? "0.01rem solid black" : ""
-            
-            return (
-              <View
-                key={index}
-                style={{
-                  position: "relative",
-                  height: 15,
-                  marginLeft: 5,
-                  marginRight: 5,
-                  marginBottom: 2,
-                  borderBottom: border
-                }}
-              >
-                <View style={{position: "absolute", width: "70%"}}>
-                  <Text style={{fontSize: 8}}>{product.product.name}</Text>
-                </View>
-                <View style={{position: "absolute", width: "10%", left: "70%"}}>
-                  <Text style={{fontSize: 8}}>{(product.price/product.quantity).toFixed(2)} €</Text>
-                </View>
-                <View style={{position: "absolute", width: "10%", left: "80%"}}>
-                  <Text style={{fontSize: 8}}>{product.quantity}</Text>
-                </View>
-                <View style={{position: "absolute", width: "10%", left: "90%"}}>
-                  <Text style={{fontSize: 8, textAlign: "right"}}>{product.price.toFixed(2)} €</Text>
-                </View>
+          {sup?.products?.map((product:any, index:number) => (
+            <View
+              key={index}
+              style={{
+                position: "relative",
+                height: 15,
+                marginLeft: 5,
+                marginRight: 5,
+                marginBottom: 2,
+                borderBottom: "0.01rem solid black"
+              }}
+            >
+              <View style={{position: "absolute", width: "70%"}}>
+                <Text style={{fontSize: 8}}>{product.product.name}</Text>
               </View>
-            )
-          })}
+              <View style={{position: "absolute", width: "10%", left: "70%"}}>
+                <Text style={{fontSize: 8}}>{(product.price/product.quantity).toFixed(2)} €</Text>
+              </View>
+              <View style={{position: "absolute", width: "10%", left: "80%"}}>
+                <Text style={{fontSize: 8}}>{product.quantity}</Text>
+              </View>
+              <View style={{position: "absolute", width: "10%", left: "90%"}}>
+                <Text style={{fontSize: 8, textAlign: "right"}}>{product.price.toFixed(2)} €</Text>
+              </View>
+            </View>
+          ))}
+          <View
+            style={{
+              position: "relative",
+              height: 15,
+              marginLeft: 5,
+              marginRight: 5,
+              marginBottom: 2
+            }}
+          >
+            <Text style={{fontSize: 8, textAlign: "right"}}>Total : {sup?.products.reduce((acc: number, p: any) => acc + p.price, 0).toFixed(2)} € HT</Text>
+        </View>
         </View>
       </View>
     )) :
@@ -127,36 +137,43 @@ export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, ord
               <Text style={{fontSize: 8, textAlign: "right"}}>Total</Text>
             </View>
           </View>
-          {supplier?.products?.map((product:any, index:number) => {
-            const border = index !== supplier.products.length-1 ? "0.01rem solid black" : ""
-            
-            return (
-              <View
-                key={index}
-                style={{
-                  position: "relative",
-                  height: 15,
-                  marginLeft: 5,
-                  marginRight: 5,
-                  marginBottom: 2,
-                  borderBottom: border
-                }}
-              >
-                <View style={{position: "absolute", width: "70%"}}>
-                  <Text style={{fontSize: 8}}>{product.product.name}</Text>
-                </View>
-                <View style={{position: "absolute", width: "10%", left: "70%"}}>
-                  <Text style={{fontSize: 8}}>{(product.price/product.quantity).toFixed(2)} €</Text>
-                </View>
-                <View style={{position: "absolute", width: "10%", left: "80%"}}>
-                  <Text style={{fontSize: 8}}>{product.quantity}</Text>
-                </View>
-                <View style={{position: "absolute", width: "10%", left: "90%"}}>
-                  <Text style={{fontSize: 8, textAlign: "right"}}>{product.price.toFixed(2)} €</Text>
-                </View>
+          {supplier?.products?.map((product:any, index:number) => (
+            <View
+              key={index}
+              style={{
+                position: "relative",
+                height: 15,
+                marginLeft: 5,
+                marginRight: 5,
+                marginBottom: 2,
+                borderBottom: "0.01rem solid black"
+              }}
+            >
+              <View style={{position: "absolute", width: "70%"}}>
+                <Text style={{fontSize: 8}}>{product.product.name}</Text>
               </View>
-            )
-          })}
+              <View style={{position: "absolute", width: "10%", left: "70%"}}>
+                <Text style={{fontSize: 8}}>{(product.price/product.quantity).toFixed(2)} €</Text>
+              </View>
+              <View style={{position: "absolute", width: "10%", left: "80%"}}>
+                <Text style={{fontSize: 8}}>{product.quantity}</Text>
+              </View>
+              <View style={{position: "absolute", width: "10%", left: "90%"}}>
+                <Text style={{fontSize: 8, textAlign: "right"}}>{product.price.toFixed(2)} €</Text>
+              </View>
+            </View>
+          ))}
+            <View
+              style={{
+                position: "relative",
+                height: 15,
+                marginLeft: 5,
+                marginRight: 5,
+                marginBottom: 2
+              }}
+            >
+              <Text style={{fontSize: 8, textAlign: "right"}}>Total : {supplier?.products.reduce((acc: number, p: any) => acc + p.price, 0).toFixed(2)} € HT</Text>
+          </View>
         </View>
       </View>
     }

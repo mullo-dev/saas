@@ -8,7 +8,7 @@ import { usePageTitle } from "@/lib/context/pageTitle"
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import PDFDownloadButton from "@/components/pdf/DownloadPDFButton"
+import PDFDownloadButton from "@/components/global/buttons/DownloadPDFButton"
 
 export default function orderIdPage() {
   const [order, setOrder] = useState<OrderWithRelations | null>(null)
@@ -34,8 +34,6 @@ export default function orderIdPage() {
   if (!order) {
     return <p>Chargement...</p>
   }
-
-  console.log(order)
 
   return (
     <div>

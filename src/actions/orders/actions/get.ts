@@ -102,9 +102,7 @@ export const getOrderById = authActionClient
             }
           }
         },
-        ...(organizationId && {
-          customer: true
-        })
+        customer: true
       }
     });
 
