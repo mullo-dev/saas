@@ -1,31 +1,30 @@
 'use client';
 
 import React from 'react';
-import { PDFDownloadLink, Document, Page, Text } from '@react-pdf/renderer';
+import { PDFDownloadLink, Document, Page } from '@react-pdf/renderer';
 import { DeliveryNotePDF } from './deliveryNote';
 import { Button } from '../ui/button';
 import { Download, Loader2 } from 'lucide-react';
 
-const MyDoc = ({order, supplier}: {order: any, supplier: any}) => (
+const MyDoc = ({order, supplier, all}: {order: any, supplier?: any, all?: boolean}) => (
   <Document>
     <Page size="A4" style={{ padding: 30 }}>
-
       <DeliveryNotePDF
         order={order}
         supplier={supplier}
-        products={supplier.products}
+        all={all}
       />
     </Page>
   </Document>
 );
 
-export default function PDFTestButton({order, supplier}: {order: any, supplier: any}) {
-  console.log(supplier)
+export default function PDFDownloadButton({order, supplier, all}: {order: any, supplier?: any, all?: boolean}) {
+
   return (
-    <PDFDownloadLink document={<MyDoc order={order} supplier={supplier} />} fileName="test.pdf">
+    <PDFDownloadLink document={<MyDoc order={order} supplier={supplier} all={all} />} fileName="test.pdf">
       {({ loading }) =>
-        <Button size="icon" variant="outline">
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <Download />}
+        <Button size={all ? "default" : "icon"} className={all ? "w-full mt-4" : ""} variant={all ? "default" : "outline"}>
+          {all && "Bon de livraison"} {loading ? <Loader2 size={16} className="animate-spin" /> : <Download />}
         </Button>
       }
     </PDFDownloadLink>

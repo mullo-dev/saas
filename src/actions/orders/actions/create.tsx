@@ -8,7 +8,6 @@ import { resend } from "@/lib/resend";
 import NewOrderEmail from "@/components/emails/newOrder";
 import { GroupedSupplierAndGetPrice } from "../../organization/actions/get";
 
-
 export const createOrder = authActionClient
   .metadata({ actionName: "createOrder" }) 
   .action(async ({ ctx: { user } }) => {
