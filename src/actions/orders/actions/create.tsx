@@ -8,8 +8,6 @@ import { resend } from "@/lib/resend";
 import NewOrderEmail from "@/components/emails/newOrder";
 import { GroupedSupplierAndGetPrice } from "../../organization/actions/get";
 
-const URL = process.env.APP_URL
-
 export const createOrder = authActionClient
   .metadata({ actionName: "createOrder" }) 
   .action(async ({ ctx: { user } }) => {
@@ -63,6 +61,7 @@ export const createOrder = authActionClient
             supplierId: supplier.supplierId,
             totalHt: supplier.totalHt,
             totalTtc: supplier.totalTtc,
+            deliveryNote: "",
             products: {
               create: supplier.products
             }
@@ -78,6 +77,24 @@ export const createOrder = authActionClient
 
     order.suppliers.map(async (supplier:any) => {
       const organization = grouped?.data?.groupedArray.find((sup) => sup.supplierId === supplier.supplierId)
+      // const filePath = path.join(process.cwd(), 'public', 'pdf', `order-${order.ref}.pdf`);
+      // const stream = fs.createWriteStream(filePath);
+      // const pdfStream = await renderToBuffer(<DeliveryNotePDF order={order} supplier={supplier} products={supplier.products} />);
+      // pdfStream.pipe(stream);
+      // await new Promise((resolve) => stream.on('finish', () => resolve(undefined)));
+
+      // const publicUrl = `/pdf/order-${order.ref}.pdf`
+
+      // await prisma.supplierOnOrder.update({
+      //   where: {
+      //     id: supplier.id
+      //   },
+      //   data: {
+      //     deliveryNote: publicUrl
+      //   }
+      // });
+
+      // ADD DELIVERYNOTE IN THE MAIL
       await resend.emails.send({
         from: 'noreply@mullo.fr',
         to: organization?.supplier.metadata.email ? organization?.supplier.metadata.email : organization?.supplier.members[0].user.email,
@@ -90,6 +107,9 @@ export const createOrder = authActionClient
         })
       })
     })
+
+    
+
 
     // await resend.emails.send({
     //   from: 'noreply@mullo.fr',

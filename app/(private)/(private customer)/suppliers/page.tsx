@@ -1,7 +1,7 @@
 "use client"
 
 import SupplierCard from "../../../../src/components/global/cards/supplierCard"
-import { Suspense, useContext, useEffect, useState, useTransition } from "react"
+import { Suspense, useEffect, useState, useTransition } from "react"
 import { returnOnlySuppliers } from "@/actions/user/actions/get"
 import { ProductsTable } from "@/components/global/tables/productsTable"
 import { getAllProducts } from "@/actions/products/actions/get"
@@ -41,16 +41,19 @@ export default function suppliersPage() {
   }
 
   useEffect(() => {
-    startTransition(async () => {
+    startTransition(() => {
       filtered()
       getProducts()
     })
   }, [])
-  
 
+  if (isPending) {
+    return <Skeleton className="w-full h-80" />
+  }
+  
   return (
     <div>
-      <Suspense fallback={<Skeleton className="w-full h-[100px] rounded-xl" />}>
+      <Suspense fallback={<Skeleton className="w-full h-[200px] rounded-xl" />}>
         {!isPending && <Carousel
           opts={{
             align: "start",
@@ -86,7 +89,7 @@ function SupplierCarousel(props: {
   const context = useCarousel()
 
   return (
-    props.filteredOrganizations ?  
+    props.filteredOrganizations.length > 0 ?  
       <>
         <div className="md:flex justify-between items-center mb-3">
           <h2 className="font-bold mb-2 md:mb-0 text-xl">Fournisseurs</h2>

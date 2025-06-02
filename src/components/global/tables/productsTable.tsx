@@ -81,11 +81,13 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
               <div className="flex justify-between my-3">
                 <p className="text-sm font-bold text-gray-500">Total</p>
                 <p className="text-sm font-bold">
-                  {cart?.reduce((acc: number, p: any) => acc + (p.productPrice*p.quantity), 0).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + "€ HT"}
+                  {cart?.reduce((acc: number, p: any) => acc + (p.productPrice*p.quantity), 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "€ HT"}
                 </p>
               </div>
-              <Link href="/suppliers/tunnel" className={`w-full ${buttonVariants()}`}>
-                Passer commande
+              <Link href={!cart || cart.length < 1 ? "" : "/suppliers/tunnel"} className={!cart || cart.length < 1 ? "cursor-not-allowed" : ""}>
+                <Button className="w-full" disabled={!cart || cart.length < 1}>
+                  Passer commande
+                </Button>
               </Link>
             </CardContent>
           </Card>
@@ -129,7 +131,7 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
                   {props.viewOnly &&
                     <>
                       <TableCell className="text-sm">
-                        {(item.price/item.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
+                        {(item.price/item.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </TableCell>
                       <TableCell className="text-sm">
                         {item.quantity}
@@ -137,7 +139,7 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
                     </>
                   }
                   <TableCell className="text-sm">
-                    {item.price.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}€
+                    {item.price.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                   </TableCell>
                   {!props.viewOnly &&
                     <TableCell className="text-right">
@@ -159,7 +161,7 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
                     </TableCell>
                   }
                   <TableCell className="text-sm text-right font-bold">
-                    {inTheCart && (item.price*inTheCart.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€'}
+                    {inTheCart && (item.price*inTheCart.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '€'}
                   </TableCell>
                 </TableRow>
               )

@@ -3,13 +3,12 @@
 import { getOrderById } from "@/actions/orders/actions/get"
 import { OrderWithRelations } from "@/actions/orders/model"
 import { ProductsTable } from "@/components/global/tables/productsTable"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { usePageTitle } from "@/lib/context/pageTitle"
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"
-import { Download } from "lucide-react"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
+import PDFDownloadButton from "@/components/global/buttons/DownloadPDFButton"
 
 export default function orderIdPage() {
   const [order, setOrder] = useState<OrderWithRelations | null>(null)
@@ -36,7 +35,6 @@ export default function orderIdPage() {
     return <p>Chargement...</p>
   }
 
-  console.log(order.suppliers)
   return (
     <div>
       <div className="flex gap-4 flex-col-reverse lg:flex-row">
@@ -53,9 +51,7 @@ export default function orderIdPage() {
                   </div>
                   <div className="flex gap-2">
                     {sup?.supplier?.members[0] && <ConversationDrawer receipt={sup.supplier.members[0].user} />}
-                    <Button size="icon" variant="outline">
-                      <Download />
-                    </Button>
+                    <PDFDownloadButton order={order} supplier={sup} />
                   </div>
                 </div>
               </CardHeader>
@@ -77,7 +73,7 @@ export default function orderIdPage() {
                   <li key={index} className="flex justify-between items-center font-bold text-gray-400 mb-1">
                     <p className="text-xs">{sup.supplier.name}</p>
                     <p className="text-xs">
-                      {sup.totalHt.toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€ HT'}
+                      {sup.totalHt.toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + '€'}
                     </p>
                   </li>
                 ))}
@@ -100,10 +96,7 @@ export default function orderIdPage() {
                     .toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "€ TTC"}
                 </p>
               </div>
-              <Button className="w-full mt-4">
-                {/* TO DO */}
-                Bons de livraison <Download /> 
-              </Button>
+              <PDFDownloadButton order={order} all />
             </CardContent>
           </Card>
         </div>
