@@ -3,7 +3,7 @@ services:
   app:
     build: .
     ports:
-      - “6555:3000”
+      - "6555:3000"
     environment:
       DATABASE_URL: postgresql://remybeauperin:mullopassword@db:8233/saas-v2
     depends_on:
@@ -12,7 +12,7 @@ services:
     image: postgres:15
     restart: always
     ports:
-      - “8233:8233"
+      - "8233:8233"
     environment:
       POSTGRES_USER: remybeauperin
       POSTGRES_PASSWORD: mullopassword
