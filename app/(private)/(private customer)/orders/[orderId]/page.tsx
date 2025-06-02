@@ -8,7 +8,7 @@ import { usePageTitle } from "@/lib/context/pageTitle"
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import PDFDownloadButton from "@/components/global/buttons/DownloadPDFButton"
+import DownloadPDFButton from "@/components/global/buttons/DownloadPDFButton"
 
 export default function orderIdPage() {
   const [order, setOrder] = useState<OrderWithRelations | null>(null)
@@ -51,7 +51,7 @@ export default function orderIdPage() {
                   </div>
                   <div className="flex gap-2">
                     {sup?.supplier?.members[0] && <ConversationDrawer receipt={sup.supplier.members[0].user} />}
-                    <PDFDownloadButton order={order} supplier={sup} />
+                    <DownloadPDFButton order={order} supplier={sup} />
                   </div>
                 </div>
               </CardHeader>
@@ -96,7 +96,7 @@ export default function orderIdPage() {
                     .toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "€ TTC"}
                 </p>
               </div>
-              <PDFDownloadButton order={order} all />
+              <DownloadPDFButton order={order} all />
             </CardContent>
           </Card>
         </div>

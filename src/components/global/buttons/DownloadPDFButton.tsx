@@ -19,7 +19,7 @@ const MyDoc = ({order, supplier, all}: {order: any, supplier?: any, all?: boolea
   </Document>
 );
 
-export default function PDFDownloadButton({order, supplier, all}: {order: any, supplier?: any, all?: boolean}) {
+export default function DownloadPDFButton({order, supplier, all}: {order: any, supplier?: any, all?: boolean}) {
 
   return (
     <PDFDownloadLink 
