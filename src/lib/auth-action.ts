@@ -3,6 +3,7 @@ import {
 } from "next-safe-action";
 import { z } from "zod";
 import { getUser } from "./auth-session";
+import { unauthorized } from "next/navigation";
 
 class ActionError extends Error {}
 
@@ -33,7 +34,7 @@ export const authActionClient = actionClient
   .use(async ({ next }) => {
     const user = await getUser()
 
-    if (!user) {
+    if (!user.user) {
       throw new Error("Session not found!");
     }
 

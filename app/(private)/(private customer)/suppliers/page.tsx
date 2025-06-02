@@ -13,9 +13,10 @@ import { useCarousel } from "@/components/ui/carousel"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { unauthorized } from "next/navigation"
 
 export default function suppliersPage() {
-  const [filteredOrganizations, setFilteredOrganizations] = useState<any>()
+  const [filteredOrganizations, setFilteredOrganizations] = useState<any>([])
   const [allProducts, setAllProducts] = useState<any>()
   const [selectSupplier, setSelectSupplier] = useState<string[]>([])
   const [isPending, startTransition] = useTransition();
@@ -30,14 +31,17 @@ export default function suppliersPage() {
 
   const filtered = async () => {
     const result = await returnOnlySuppliers()
+    console.log(result?.data)
     if (result?.data?.success) {
-      setFilteredOrganizations(result?.data?.filteredOrganizations)
+      setFilteredOrganizations(result.data.filteredOrganizations)
     }
   }
 
   const getProducts = async () => {
     const result = await getAllProducts()
-    setAllProducts(result?.data?.products)
+    if (result?.data?.success) {
+      setAllProducts(result.data.products)
+    }
   }
 
   useEffect(() => {

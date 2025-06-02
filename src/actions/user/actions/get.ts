@@ -71,7 +71,9 @@ export const returnOnlySuppliers = authActionClient
   .action(async ({ ctx: { user } }) => {
 
   try {
-    if (!user?.user) throw new Error("Invalid user")
+    if (!user?.user) {
+      throw new Error("Session not found")
+    }
       
     // We get organization customers
     const filteredOrganizations = await prisma.organization.findMany({

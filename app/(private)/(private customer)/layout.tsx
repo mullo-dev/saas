@@ -1,5 +1,6 @@
 import { getUser } from "@/lib/auth-session";
-import { redirect, unauthorized } from "next/navigation";
+import { redirect } from "next/navigation";
+import Unauthorized from "@app/unauthorized";
 
 export default async function LayoutPrivateCustomer({
   children,
@@ -9,10 +10,10 @@ export default async function LayoutPrivateCustomer({
   const { user } = await getUser()
 
   if (!user) {
-    unauthorized()
+    return <Unauthorized />
   }
 
-  if (user?.type === "SUPPLIER") {
+  if (user.type === "SUPPLIER") {
     redirect("/dashboard")
   }
 
