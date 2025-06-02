@@ -5,6 +5,7 @@ import { PDFDownloadLink, Document, Page } from '@react-pdf/renderer';
 import { DeliveryNotePDF } from '../../pdf/deliveryNote';
 import { Button } from '../../ui/button';
 import { Download, Loader2 } from 'lucide-react';
+import SimpleTooltip from '../tootip/tooltip';
 
 const MyDoc = ({order, supplier, all}: {order: any, supplier?: any, all?: boolean}) => (
   <Document>
@@ -26,9 +27,11 @@ export default function PDFDownloadButton({order, supplier, all}: {order: any, s
       fileName={`bon-de-livraison-${order.ref}.pdf`}
     >
       {({ loading }) =>
-        <Button size={all ? "default" : "icon"} className={all ? "w-full mt-4" : ""} variant={all ? "default" : "outline"}>
-          {all && "Bon de livraison"} {loading ? <Loader2 size={16} className="animate-spin" /> : <Download />}
-        </Button>
+        <SimpleTooltip content={all ? "Télécharger le récapitulatif global" : "Bon de commande"}>
+          <Button size={all ? "default" : "icon"} className={all ? "w-full mt-4" : ""} variant={all ? "default" : "outline"}>
+            {all && "Récapitulatif "} {loading ? <Loader2 size={16} className="animate-spin" /> : <Download />}
+          </Button>
+        </SimpleTooltip>
       }
     </PDFDownloadLink>
   );

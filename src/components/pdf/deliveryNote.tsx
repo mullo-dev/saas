@@ -1,9 +1,11 @@
 // components/DeliveryNotePDF.tsx
-import { Text, View } from '@react-pdf/renderer';
+import { Image, Text, View } from '@react-pdf/renderer';
 
 export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, order?: any, all?: boolean }) => (
   <View>
-    <Text style={{ marginBottom: 10, fontWeight: "bold" }}>Bon de Livraison</Text>
+    <Text style={{ marginBottom: 10, fontWeight: "bold" }}>
+      Bon de commande
+    </Text>
     <View 
       style={{
         paddingLeft:10,
@@ -153,13 +155,13 @@ export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, ord
                 <Text style={{fontSize: 8}}>{product.product.name}</Text>
               </View>
               <View style={{position: "absolute", width: "10%", left: "70%"}}>
-                <Text style={{fontSize: 8}}>{(product.price/product.quantity).toFixed(2)} €</Text>
+                <Text style={{fontSize: 8}}>{(product.price/product.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</Text>
               </View>
               <View style={{position: "absolute", width: "10%", left: "80%"}}>
                 <Text style={{fontSize: 8}}>{product.quantity}</Text>
               </View>
               <View style={{position: "absolute", width: "10%", left: "90%"}}>
-                <Text style={{fontSize: 8, textAlign: "right"}}>{product.price.toFixed(2)} €</Text>
+                <Text style={{fontSize: 8, textAlign: "right"}}>{product.price.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</Text>
               </View>
             </View>
           ))}
@@ -172,10 +174,20 @@ export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, ord
                 marginBottom: 2
               }}
             >
-              <Text style={{fontSize: 8, textAlign: "right"}}>Total : {supplier?.products.reduce((acc: number, p: any) => acc + p.price, 0).toFixed(2)} € HT</Text>
+              <Text style={{fontSize: 8, textAlign: "right"}}>Total : {supplier?.products.reduce((acc: number, p: any) => acc + p.price, 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € HT</Text>
           </View>
         </View>
       </View>
     }
+    <Text style={{marginTop: 10, color: "gray", fontSize: 7, width: "50%", fontStyle: "italic" }}>
+      Ce papier ne constitue pas une preuve de règlement : il atteste seulement le passage d'une commande. Les fournisseurs sont en devoir de fournir une facture correspondante.
+    </Text>
+    <Text style={{marginTop: 4, color: "gray", fontSize: 8 }}>
+      Généré avec 
+      <Image 
+        src="/logo.png"
+        style={{ width: 30, marginLeft: 2 }}
+      />
+    </Text>
   </View>
 );
