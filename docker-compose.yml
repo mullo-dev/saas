@@ -1,4 +1,4 @@
-version: ‘3.8’
+version: '3.8'
 services:
   app:
     build: .
@@ -20,5 +20,15 @@ services:
       PGPORT: 8233
     volumes:
       - db-data:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+
 volumes:
   db-data:
