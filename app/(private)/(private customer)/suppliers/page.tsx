@@ -31,7 +31,6 @@ export default function suppliersPage() {
 
   const filtered = async () => {
     const result = await returnOnlySuppliers()
-    console.log(result?.data)
     if (result?.data?.success) {
       setFilteredOrganizations(result.data.filteredOrganizations)
     }
