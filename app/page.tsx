@@ -88,14 +88,14 @@ export default async function Home() {
           </div>
 
           {/* FOR CUSTOMER */}
-          <div className="md:flex justify-center items-center mt-14">
-            <div className="mb-5 md:mb-0">
+          <div className="md:flex justify-center items-center mt-14 gap-24">
+            <div className="mb-5 md:mb-0 flex justify-end">
               <img
                 src="/maquette-suppliers.png"
-                className="w-3/4 mx-auto"
+                className="w-3/4"
               />
             </div>
-            <div className="w-3/4 md:w-auto mx-auto">
+            <div className="w-3/4 md:w-auto">
               <h5 className="font-bold text-lg mb-3">Pour les acheteurs</h5>
               {CustomersInfos.map((item:any, index:number) => (
                 <LittleCard 
@@ -110,8 +110,8 @@ export default async function Home() {
           </div>
 
           {/* FOR SUPPLIER */}
-          <div className="flex flex-col-reverse md:flex-row justify-center items-center mt-20">
-            <div className="w-3/4 md:w-auto mx-auto">
+          <div className="flex flex-col-reverse md:flex-row justify-center items-center mt-20 gap-24">
+            <div className="w-3/4 md:w-auto">
               <h5 className="font-bold text-lg mb-3">Pour les fournisseurs</h5>
               {SuppliersInfos.map((item:any, index:number) => (
                 <LittleCard 
@@ -126,7 +126,7 @@ export default async function Home() {
             <div className="mb-5 md:mb-0">
               <img
                 src="/maquette-suppliers.png"
-                className="w-3/4 mx-auto"
+                className="w-3/4"
               />
             </div>
           </div>

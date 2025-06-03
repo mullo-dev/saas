@@ -2,7 +2,7 @@ import OrganizationCard from "../../../../src/components/global/cards/organizati
 import { Suspense } from "react"
 import { getUser } from "@/lib/auth-session"
 import { getOrganizationById } from "@/actions/organization/actions/get"
-import { redirect, unauthorized } from "next/navigation"
+import { redirect } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { passActiveOrganization } from "@/actions/organization/actions/active"

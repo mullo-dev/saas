@@ -5,6 +5,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from './prisma';
 import { organization } from "better-auth/plugins"
 import { ac, admin, customer, member, owner, customerOfInternSupplier } from './permissions';
+import InvitationEmail from "@/components/emails/invitation";
 
 const URL = process.env.APP_URL
 
@@ -54,12 +55,17 @@ export const auth = betterAuth({
         customerOfInternSupplier
       },
       async sendInvitationEmail(data) {
-        const inviteLink = `${URL}/auth/accept-invitation/${data.id}?email=${data.email}?type=${data.role}`
+        const inviteLink = `${URL}/auth/accept-invitation/${data.id}?email=${data.email}&type=${data.role}`
           await resend.emails.send({
             from: "noreply@mullo.fr",
             to: data.email,
             subject: data.inviter.user.name + " vous invite à rejoindre " + data.organization.name,
             text: `Accept invite here : ${inviteLink}`,
+            react: InvitationEmail({
+              owner: data.inviter.user.name,
+              organization: data.organization.name,
+              href: inviteLink
+            })
           })
         },
     }),

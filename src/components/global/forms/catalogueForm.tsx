@@ -24,7 +24,7 @@ const inputs: { label: string; defaultValue: string; name: InputNames; type: str
   },
 ];
 
-export function CatalogueForm(props: { organizationId?: string, catalogue?: catalogueType, setOpen: any }) {
+export function CatalogueForm(props: { organizationId?: string, catalogue?: catalogueType, setOpen: any, reload: () => void }) {
   const {
     register,
     setError,
@@ -46,6 +46,7 @@ export function CatalogueForm(props: { organizationId?: string, catalogue?: cata
     }
     if (result?.data?.success) {
       toast.success("Catalogue créé !")
+      props.reload()
       props.setOpen(false)
     } else {
       toast.error("Oups une erreur est survenue...")
@@ -84,20 +85,4 @@ export function CatalogueForm(props: { organizationId?: string, catalogue?: cata
       </form>
     </div>
   );
-}
-
-
-// EXPORT WITH DRAWER
-export default function DrawerCatalogue(props: { organizationId?: string }) {
-
-  return (
-    <DrawerDialog 
-      title="Nouveau catalogue" 
-      buttonTitle="ajouter"
-      buttonSize="sm"
-      description="Ajoutez un catalogue"
-    >
-      {(p) => <CatalogueForm organizationId={props.organizationId} setOpen={p.setOpen}/>}
-    </DrawerDialog>
-  )
 }

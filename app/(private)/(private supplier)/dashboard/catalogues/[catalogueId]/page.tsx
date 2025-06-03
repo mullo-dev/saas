@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { createSubCatalogue } from "@/actions/catalogue/actions/create";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { TricksTable } from "@/components/csv-importer/tricks-table";
 import { Shell } from "@/components/csv-importer/shell";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,8 @@ import { getCatalogueById } from "@/actions/catalogue/actions/get";
 import { addProductsInSubCatalogue } from "@/actions/catalogue/actions/update";
 import { usePageTitle } from "@/lib/context/pageTitle";
 import CustomersCarousel from "@/components/global/carousels/customersCarousel";
+import { Trash2 } from "lucide-react";
+import { deleteCatalogue } from "@/actions/catalogue/actions/delete";
 
 type SelectProduct = z.infer<typeof selectProductModel>;
 
@@ -29,6 +31,21 @@ export default function CataloguePage() {
   const { catalogueId } = useParams()
   const { data: organizations } = authClient.useListOrganizations()
   const { setTitle } = usePageTitle();
+  const route = useRouter()
+
+  const deleteCatalogueAction = async () => {
+    const result = await deleteCatalogue({
+      catalogueId: catalogue.id,
+      organizationId: catalogue.organizationId
+    })
+    console.log(result)
+    if (result?.data?.success) {
+      toast.info("Catalogue supprimé")
+      route.push("/dashboard")
+    } else {
+      toast.error("Une erreur est survenue")
+    }
+  }
   
   const fetchCatalogue = async () => {
     if (catalogueId) {
@@ -42,7 +59,18 @@ export default function CataloguePage() {
   }, [catalogueId, toast]);
   
   useEffect(() => {
-    setTitle(catalogue ? "Catalogue : " + catalogue?.name : "Catalogue");
+    setTitle({
+      title: catalogue ? "Catalogue : " + catalogue?.name : "Catalogue",
+      menuContent: 
+        <Button 
+          variant="outline" 
+          className='hover:bg-destructive' 
+          size="icon" 
+          onClick={() => deleteCatalogueAction()}
+        >
+          <Trash2 />
+        </Button>
+    });
   }, [catalogue]);
 
   const addProductInSubCatalogue = (products:any) => {

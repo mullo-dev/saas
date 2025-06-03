@@ -47,6 +47,8 @@ export default function CataloguesCarousel(props:{
       >
         <CataloguesCarouselContent 
           catalogues={catalogues}
+          organizationId={props.organizationId} 
+          reload={fetchCatalogues}
         />
       </Carousel>
     :
@@ -62,7 +64,7 @@ export default function CataloguesCarousel(props:{
             buttonSize="sm"
             description="Ajoutez un catalogue"
           >
-            {(p) => <CatalogueForm organizationId={props.organizationId} setOpen={p.setOpen}/>}
+            {(p) => <CatalogueForm organizationId={props.organizationId} setOpen={p.setOpen} reload={fetchCatalogues}/>}
           </DrawerDialog>
         </CardFooter>
       </Card>
@@ -72,7 +74,9 @@ export default function CataloguesCarousel(props:{
 
 // Carousel for customers cards
 function CataloguesCarouselContent(props: {
-  catalogues: any
+  catalogues: any,
+  organizationId: string,
+  reload: () => void
 }) {
   const context = useCarousel()
 
@@ -100,11 +104,14 @@ function CataloguesCarouselContent(props: {
             >
               <ArrowRight />
             </Button>
-            <Button
-              size="sm"
+            <DrawerDialog 
+              title="Nouveau catalogue" 
+              buttonTitle="Nouveau catalogue"
+              buttonSize="sm"
+              description="Ajoutez un catalogue"
             >
-              Nouveau Catalogue
-            </Button>
+              {(p) => <CatalogueForm organizationId={props.organizationId} setOpen={p.setOpen} reload={props.reload}/>}
+            </DrawerDialog>
           </div>
         </div>
       </div>

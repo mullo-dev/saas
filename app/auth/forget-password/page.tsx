@@ -21,13 +21,13 @@ function ForgetPasswordContent() {
       <>
         <CardHeader>
           <CardTitle className="text-lg md:text-xl">
-            {emailSend ? "Email send !" : "Reset password"}
+            {emailSend ? "Email envoyé !" : "Modifier votre mot de passe"}
           </CardTitle>
           <CardDescription className="text-xs md:text-sm">
             {emailSend ? 
-              "Click on the reset link in the email" 
+              "Cliquer sur le lien de réinitialisation dans le mail." 
             : 
-              "We will send you a reset link to your email"
+              "Vous recevrez un mail pour réinitialiser votre mot de passe."
             }
           </CardDescription>
         </CardHeader>
@@ -62,9 +62,9 @@ function ForgetPasswordContent() {
                   required
                   placeholder="Your email"
                 />
-                <Button type="submit">Send reset link</Button>
+                <Button type="submit">Valider</Button>
               </form>
-              <Link className={buttonVariants({ variant: "ghost" }) + " mt-2"} href="/auth/sign-in"><ChevronLeft />Back</Link>
+              <Link className={buttonVariants({ variant: "ghost" }) + " mt-2"} href="/auth/sign-in"><ChevronLeft />Retour</Link>
             </>
           }
         </CardContent>
@@ -76,10 +76,10 @@ function ForgetPasswordContent() {
     <>
       <CardHeader>
           <CardTitle className="text-lg md:text-xl">
-            Reset password
+            Modifier votre mot de passe
           </CardTitle>
           <CardDescription className="text-xs md:text-sm">
-            Choose a new password
+            Choisir un nouveau mot de passe.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -110,7 +110,7 @@ function ForgetPasswordContent() {
               required
               placeholder="New password"
             />
-            <Button type="submit">Reset password</Button>
+            <Button type="submit">Valider le nouveau mot de passe</Button>
           </form>
         </CardContent>
     </>
@@ -119,7 +119,7 @@ function ForgetPasswordContent() {
 
 export default function ForgetPassword() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Chargement...</div>}>
       <ForgetPasswordContent />
     </Suspense>
   );
