@@ -13,7 +13,6 @@ import { useCarousel } from "@/components/ui/carousel"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { unauthorized } from "next/navigation"
 
 export default function suppliersPage() {
   const [filteredOrganizations, setFilteredOrganizations] = useState<any>([])
@@ -68,6 +67,7 @@ export default function suppliersPage() {
             selectSupplierId={selectSupplierId}
             getProducts={getProducts}
             filteredOrganizations={filteredOrganizations}
+            reload={filtered}
           />
         </Carousel>}
       </Suspense>
@@ -87,7 +87,8 @@ function SupplierCarousel(props: {
   selectSupplierId: (id:string, status:boolean) => void,
   getProducts: () => void,
   filteredOrganizations: any,
-  selectSupplier: any
+  selectSupplier: any,
+  reload: () => void
 }) {
   const context = useCarousel()
 
@@ -122,7 +123,7 @@ function SupplierCarousel(props: {
               buttonTitle={"Ajouter un fournisseur"}
               description="Sélectionnez ou créez un fournisseur"
             >
-              {(props) => <SupplierForm setOpen={props.setOpen} />}
+              {(p) => <SupplierForm reload={props.reload} setOpen={p.setOpen} />}
             </DrawerDialog>
           </div>
         </div>
@@ -133,7 +134,10 @@ function SupplierCarousel(props: {
                 organization={orga} 
                 selectSupplierId={props.selectSupplierId} 
                 isSelected={props.selectSupplier.includes(orga.id)} 
-                reload={props.getProducts}
+                reload={() => {
+                  props.reload()
+                  props.getProducts()
+                }}
               />
             </CarouselItem>
           ))}
@@ -153,7 +157,7 @@ function SupplierCarousel(props: {
             buttonTitle={"Ajouter votre premier fournisseur"}
             description="Sélectionnez ou créez un fournisseur"
           >
-            {(props) => <SupplierForm setOpen={props.setOpen} />}
+            {(p) => <SupplierForm reload={props.reload} setOpen={p.setOpen} />}
           </DrawerDialog>
         </CardFooter>
       </Card>

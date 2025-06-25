@@ -7,6 +7,8 @@ import { clearCart } from "@/lib/cart";
 import { resend } from "@/lib/resend";
 import NewOrderEmail from "@/components/emails/newOrder";
 import { GroupedSupplierAndGetPrice } from "../../organization/actions/get";
+import OrderValidate from "@/components/emails/orderValidate";
+import { sendSms } from "@/lib/send-sms";
 
 export const createOrder = authActionClient
   .metadata({ actionName: "createOrder" }) 
@@ -75,6 +77,17 @@ export const createOrder = authActionClient
       }
     });
 
+    if (user?.user?.email) {
+      await resend.emails.send({
+        from: 'noreply@mullo.fr',
+        to: user.user.email,
+        subject: "Commande validée",
+        react: OrderValidate({
+          href: `${URL}/orders/${order.id}`
+        })
+      })
+    }
+
     order.suppliers.map(async (supplier:any) => {
       const organization = grouped?.data?.groupedArray.find((sup) => sup.supplierId === supplier.supplierId)
       // const filePath = path.join(process.cwd(), 'public', 'pdf', `order-${order.ref}.pdf`);
@@ -103,26 +116,15 @@ export const createOrder = authActionClient
         react: NewOrderEmail({
           products: organization?.fullProducts,
           client: user?.user?.name,
-          href: `${URL}/orders/${order.id}`
+          href: `${URL}/dashboard/orders/${order.id}`
         })
       })
+
+      if (organization?.supplier.metadata.contactPreference?.includes("sms")) {
+        const messsage = `Nouvelle commande de ${user?.user?.name}:\n\n${organization?.supplier.metadata.contactMessage}\n\voir la commande : ${URL}/dashboard/orders/${order.id}`;
+        await sendSms("",organization?.supplier.metadata.phone,messsage)
+      }
     })
-
-    
-
-
-    // await resend.emails.send({
-    //   from: 'noreply@mullo.fr',
-    //   to: user.user.email,
-    //   subject: "Commande validée",
-    //   // replyTo: `reply+${conversation.id}@mullo.fr`,
-    //   react: ReviewEmail({ // change template here
-    //     authorName: user?.user?.name,
-    //     authorEmail: user?.user?.email,
-    //     reviewText: "Vos fournisseurs ont reçu les instructions. Votre commande sera traîtée par leur soint dans les meilleurs délais.",
-    //     href: `${URL}/orders/id_de_la_commande` // PUT ID HERE
-    //   })
-    // })
 
     revalidatePath("/dashboard")
     await clearCart()

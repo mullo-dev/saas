@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { createOrganization } from "@/actions/organization/actions/create";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { sendRequestMember } from "@/actions/invitations/actions/create";
 import { UserTypeEnum } from "@/actions/user/model";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type InputNames = "name" | "supplierName" | "email" | "phone" ;
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; }[] = [
@@ -47,8 +49,15 @@ const inputs: { label: string; defaultValue: string; name: InputNames; type: str
   },
 ];
 
-export default function SupplierForm(props: { setOpen: any }) {
+const contactOptions = [
+  { value: "email", label: "Email" },
+  { value: "sms", label: "SMS" },
+  { value: "whatsapp", label: "WhatsApp" },
+];
+
+export default function SupplierForm(props: { setOpen: any, reload: () => void }) {
   const {
+    control,
     register,
     setError,
     clearErrors,
@@ -106,6 +115,7 @@ export default function SupplierForm(props: { setOpen: any }) {
     if (send?.data?.success) {
       toast.success("Demande de connexion envoyé")
       props.setOpen(false)
+      props.reload()
     } else {
       toast.error("Une erreur est survenue")
     }
@@ -118,7 +128,8 @@ export default function SupplierForm(props: { setOpen: any }) {
       metadata: {
         email: data.email,
         supplierName: data.supplierName,
-        phone: data.phone
+        phone: data.phone,
+        contactPreference: data.contactPreference
       },
       name: data.name,
       slug: data.name.toLocaleLowerCase().replace(' ', '-')
@@ -127,6 +138,7 @@ export default function SupplierForm(props: { setOpen: any }) {
 
     if (result?.data?.success) {
       props.setOpen(false)
+      props.reload()
     } else {
       handleFormErrors(result, setError);
     }
@@ -178,6 +190,35 @@ export default function SupplierForm(props: { setOpen: any }) {
                     {errors[input.name as keyof typeof errors] && <p className="text-red-500 mt-1 text-sm">{errors[input.name as keyof typeof errors]?.message}</p>}
                   </div>
                 ))}
+                <Controller
+                  name="contactPreference"
+                  control={control}
+                  render={({ field }) => {
+                    const value: string[] = field.value || [];
+
+                    const toggleValue = (option: string) => {
+                      const newValue = value.includes(option)
+                        ? value.filter((v) => v !== option)
+                        : [...value, option];
+                      field.onChange(newValue);
+                    };
+
+                    return (
+                      <div className="space-y-2">
+                        {contactOptions.map((option) => (
+                          <div key={option.value} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={option.value}
+                              checked={value.includes(option.value)}
+                              onCheckedChange={() => toggleValue(option.value)}
+                            />
+                            <Label htmlFor={option.value}>{option.label}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }}
+                />
               </div>
             </div>
             <Button type="submit" className="w-full" onClick={() => clearErrors()}>

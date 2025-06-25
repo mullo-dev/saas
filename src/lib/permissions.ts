@@ -1,5 +1,5 @@
 import { createAccessControl } from "better-auth/plugins/access";
-import { adminAc, defaultStatements, memberAc } from "better-auth/plugins/organization/access";
+import { adminAc, defaultStatements, memberAc, ownerAc } from "better-auth/plugins/organization/access";
  
 const statement = {
   ...defaultStatements,
@@ -17,7 +17,7 @@ const admin = ac.newRole({
 }); 
 
 const owner = ac.newRole({ 
-  ...adminAc.statements
+  ...ownerAc.statements
 }); 
 
 const customer = ac.newRole({ 

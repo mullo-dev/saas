@@ -13,13 +13,16 @@ export type organizationType = {
 }
 
 export const organizationModel = {
+  organizationId: z.string().optional(),
   name: z.string().min(1, "Name is required"),
-  slug: z.string(),
-  createByCustomer: z.boolean().default(false),
+  slug: z.string().optional(),
+  createByCustomer: z.boolean().default(false).optional(),
   metadata: z.object({
     email: z.string(),
     supplierName: z.string(),
-    phone: z.string()
+    phone: z.string(),
+    contactPreference: z.array(z.string()).optional(),
+    contactMessage: z.string().optional()
   }).optional()
 }
 
@@ -37,5 +40,7 @@ export type supplierType = {
   logo?: string,
   email: string,
   supplierName: string,
-  phone: string
+  phone: string,
+  contactPreference?: string[],
+  contactMessage?: string
 }

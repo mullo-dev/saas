@@ -18,6 +18,7 @@ export function AddProductModal(props: {
       buttonTitle={<Plus />}
       buttonSize={"icon"}
       description="Importer ou créer un produit"
+      toastTitle="Ajouter des produits"
     >
       {(p) => (
         <>

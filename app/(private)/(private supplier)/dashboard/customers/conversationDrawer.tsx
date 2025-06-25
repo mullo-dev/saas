@@ -32,7 +32,12 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
       if (!receipt.email) {
         return setError("root", { type: "manual", message: "Le client n'a pas été trouvé." })
       }
-      const result = await createMessage({receiptId: receipt.id, toEmail: receipt.email, message: data.message})
+      const result = await createMessage({
+        receiptId: receipt.id, 
+        toEmail: receipt.email, 
+        message: data.message,
+        number: receipt.phone ? receipt.phone : undefined
+      })
       
       if (result?.data?.success) {
         setValue("message", "")

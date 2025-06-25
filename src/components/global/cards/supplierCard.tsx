@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { acceptInvitation } from "@/actions/invitations/actions/accept"
 import { toast } from "sonner"
 import { ConversationDrawer } from "@app/(private)/(private supplier)/dashboard/customers/conversationDrawer"
@@ -8,11 +8,14 @@ import { Button } from "@/components/ui/button"
 import { CsvImporter } from "@/components/csv-importer/csv-importer"
 import { createProducts } from "@/actions/products/actions/create"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Edit } from "lucide-react"
+import { Edit, Mail, MessageCircle, MessageSquare } from "lucide-react"
 import { useState } from "react"
 import { createCatalogue } from "@/actions/catalogue/actions/create"
-import SimpleTooltip from "../tootip/tooltip"
 import { AddProductModal } from "../modal/addProductsModal"
+import SupplierFormEdit from "../forms/supplierFormEdit"
+import { DrawerDialog } from "../modal"
+import { useUser } from "@/lib/auth-session-client"
+import SimpleTooltip from "../tootip/tooltip"
 
 export default function SupplierCard(props: { 
   organization: any,
@@ -21,7 +24,10 @@ export default function SupplierCard(props: {
   reload: () => void
 }) {
   const [returnResult, setReturnResult] = useState<any>()
+  const { user } = useUser()
+  const contactPreference = props.organization.members.find((m:any) => m.userId === user?.id)?.role === "customer" ? props.organization.members.find((m:any) => m.userId === user?.id)?.contactPreference : JSON.parse(props.organization.metadata)?.contactPreference
 
+  // To accept the supplier invitation
   const invitationValidation = async () => {
     const confirmed = window.confirm("Es-tu sûr de vouloir accepter cette invitation ?");
 
@@ -35,19 +41,19 @@ export default function SupplierCard(props: {
     )
   }
 
+  // To upload products when the user is the creater of the organization
   const toUploadData = async (parsedData:any) => {
     if (!props.organization) throw new Error("Organization not found")
     let theCatalogue
 
+    // If the organization don't have a catalogue yet
     if (props.organization.catalogues[0]) {
       theCatalogue = props.organization.catalogues[0].id
-      console.log("déjà la")
     } else {
       const result = await createCatalogue({
         name: "Catalogue",
         organizationId: props.organization.id
       })
-      console.log("coucou")
       if (result?.data?.catalogue) {
         theCatalogue = result?.data?.catalogue.id
       } else {
@@ -62,7 +68,6 @@ export default function SupplierCard(props: {
       return { success: true, error: null }
     } else {
       toast.success("Une erreur est survenue...")
-      console.log(result?.validationErrors)
       return { success: false, error: result?.data?.error }
     }
   }
@@ -88,6 +93,30 @@ export default function SupplierCard(props: {
           {props.organization.slug}
         </CardDescription>
       </CardHeader>
+      <CardContent>
+        {contactPreference ? 
+          <div className="flex gap-2">
+            <SimpleTooltip content="Envoie par sms">
+              <MessageSquare className={contactPreference.includes("sms") ? "text-white" : "text-white/30"} />
+            </SimpleTooltip>
+            <SimpleTooltip content="Envoie par mail">
+              <Mail className={contactPreference.includes("email") ? "text-white" : "text-white/30"} />
+            </SimpleTooltip>
+            <SimpleTooltip content="Envoie par WhatsApp">
+              <MessageCircle className={contactPreference.includes("whatsapp") ? "text-white" : "text-white/30"} />
+            </SimpleTooltip>
+          </div> 
+        : 
+          <DrawerDialog
+            title="Modifier votre fournisseur" 
+            buttonTitle={"Préférences de contact"}
+            buttonSize={"sm"}
+            description=""
+          >
+            {(p) => <SupplierFormEdit organization={props.organization} setOpen={p.setOpen} reload={props.reload} />}
+          </DrawerDialog>
+        }
+      </CardContent>
       <CardFooter className="flex-1 items-end">
         {props.organization.invit ? // if the invitation isn't accepted yet
           <p>En attente : 
@@ -95,28 +124,43 @@ export default function SupplierCard(props: {
               onClick={() => props.organization.invit && invitationValidation()} 
               className="font-italic text-orange-400"
             >
-              Accepter l'invitation
+              Accepter
             </Button>
           </p>
         : 
           // the supplier is real
-          props.organization.members[0] ? 
-            <ConversationDrawer receipt={props.organization.members[0].user} />
+          props.organization.members.find((m:any) => m.userId === user?.id)?.role === "customer" ? 
+            <div className="flex gap-2">
+              <DrawerDialog
+                title="Modifier vos préférences de contact" 
+                buttonTitle={<Edit />}
+                buttonSize={"icon"}
+                description=""
+                toastTitle="Modifier"
+              >
+                {(p) => <SupplierFormEdit organization={props.organization} setOpen={p.setOpen} reload={props.reload} />}
+              </DrawerDialog>
+              <ConversationDrawer receipt={props.organization.members[0].user} />
+            </div>
           // the supplier was created by the customer...
           : props.organization.catalogues[0]?.subCatalogues.reduce((acc:any, subCat:any) => acc + subCat._count.products,0) > 0 ? // ...and have a catalogue
-            <>
-              <Button size="icon" variant="outline" className="mr-2">
-                <Edit />
-              </Button>
-              <SimpleTooltip content="Ajouter produit(s)">
-                <AddProductModal 
-                  catalogueId={props.organization.catalogues[0].id}
-                  toUploadData={(parsedData) => toUploadData(parsedData)}
-                  reload={props.reload}
-                  returnResult={returnResult}
-                />
-              </SimpleTooltip>
-            </>
+            <div className="flex gap-2">
+              <DrawerDialog
+                title="Modifier votre fournisseur" 
+                buttonTitle={<Edit />}
+                buttonSize={"icon"}
+                description=""
+                toastTitle="Modifier"
+              >
+                {(p) => <SupplierFormEdit organization={props.organization} setOpen={p.setOpen} reload={props.reload} />}
+              </DrawerDialog>
+              <AddProductModal 
+                catalogueId={props.organization.catalogues[0].id}
+                toUploadData={(parsedData) => toUploadData(parsedData)}
+                reload={props.reload}
+                returnResult={returnResult}
+              />
+            </div>
           : // ...don't have catagloue yet
             <CsvImporter
               fields={[

@@ -18,7 +18,7 @@ export const createOrganization = authActionClient
   try {
     // Check slug and change it if already taken
     const slugTaken = await authClient.organization.checkSlug({
-      slug: parsedInput.slug,
+      slug: parsedInput.slug || parsedInput.name.toLowerCase().trim(),
     });
     if (!slugTaken) parsedInput.slug = parsedInput.slug + "-" + parsedInput.name.toLowerCase().trim()
 
@@ -28,7 +28,7 @@ export const createOrganization = authActionClient
     const org = await auth.api.createOrganization({
       body: {
         name: parsedInput.name,
-        slug: parsedInput.slug,
+        slug: parsedInput.slug || parsedInput.name.toLowerCase().trim(),
         logo: "",
         metadata: parsedInput.createByCustomer ? parsedInput.metadata : {}
       },

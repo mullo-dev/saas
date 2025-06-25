@@ -112,7 +112,7 @@ export const returnOnlySuppliers = authActionClient
         },
         members: {
           where: {
-            role: 'customer'
+            role: { in: ["customer", "customerOfInternSupplier"] }
           },
           include: {
             user: {

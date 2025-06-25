@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { messageModel } from '../model';
 import { resend } from '@/lib/resend';
 import ReviewEmail from '@/components/emails/reviewEmail'
+import { sendSms } from '@/lib/send-sms';
 
 const URL = process.env.APP_URL
 
@@ -65,6 +66,12 @@ export const createMessage = authActionClient
         href: `${URL}/compte`
       })
     })
+
+
+    if (parsedInput.number) {
+      const messsage = `Vous avez reçu un message de ${user?.user?.name}:\n\n${parsedInput.message}\n\ncontact : +33770079644`;
+      await sendSms("+33770079644",parsedInput.number,messsage)
+    }
 
     revalidatePath("/dashboard")
     return { success: true, conversation: conversation };

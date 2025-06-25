@@ -21,6 +21,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
+import SimpleTooltip from "../tootip/tooltip"
 
 interface DrawerDialogProps {
   title: string;
@@ -29,6 +30,7 @@ interface DrawerDialogProps {
   children: (props: { setOpen: (open: boolean) => void }) => React.ReactNode;
   onlyDrawer?: boolean;
   buttonSize?: "default" | "sm" | "lg" | "icon" | null | undefined;
+  toastTitle?: string
 }
 
 
@@ -37,7 +39,15 @@ interface DrawerDialogProps {
 // To pass a component you must do : {(props) => <TheComponent setOpen={props.setOpen} otherProps={otherProps} />}
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-export function DrawerDialog({ title, description, buttonTitle, children, buttonSize, onlyDrawer = false }: DrawerDialogProps) {
+export function DrawerDialog({ 
+  title, 
+  description, 
+  buttonTitle, 
+  children, 
+  buttonSize, 
+  onlyDrawer = false,
+  toastTitle
+}: DrawerDialogProps) {
   const [open, setOpen] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
@@ -54,9 +64,17 @@ export function DrawerDialog({ title, description, buttonTitle, children, button
   if (isDesktop && !onlyDrawer) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" size={buttonSize ? buttonSize : "default"}>{buttonTitle}</Button>
-        </DialogTrigger>
+        {toastTitle ?
+          <SimpleTooltip content={toastTitle}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size={buttonSize ? buttonSize : "default"}>{buttonTitle}</Button>
+            </DialogTrigger>
+          </SimpleTooltip>
+          :
+          <DialogTrigger asChild>
+            <Button variant="outline" size={buttonSize ? buttonSize : "default"}>{buttonTitle}</Button>
+          </DialogTrigger>
+        }
         <DialogContent className="">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
