@@ -1,4 +1,4 @@
-// import type { Metadata } from "next";
+import type { Metadata } from "next";
 // import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -14,10 +14,10 @@ import { TooltipProvider } from "@radix-ui/react-tooltip";
 //   subsets: ["latin"],
 // });
 
-// export const metadata: Metadata = {
-//   title: "Approvisionnement alimentaire - Mullo",
-//   description: "Centraliser l'approvisionnement professionnels",
-// };
+export const metadata: Metadata = {
+  title: "Approvisionnement alimentaire - Mullo",
+  description: "Centraliser l'approvisionnement professionnels",
+};
 
 export default function RootLayout({
   children,
@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`antialiased bg-gray-50`}
+        className={`antialiased bg-gray-50`} // ${geistSans.variable} ${geistMono.variable} 
       >
         <TooltipProvider disableHoverableContent>
           <Toaster />
