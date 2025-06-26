@@ -26,8 +26,12 @@ export default function TotalCard(props:{ suppliers: any }) {
   }
 
   const submitOrder = () => {
+    const messages = Array.from(props.suppliers.values()).map((supplier:any) => ({
+      supplierId: supplier.supplierId,
+      message: supplier.message
+    }))
     startTransition(async () => {
-      const response = await createOrder()
+      const response = await createOrder({messages})
       if (response?.data?.success) {
         toast.success("Commande validée")
         router.push(`/orders/${response.data.order?.id}`)

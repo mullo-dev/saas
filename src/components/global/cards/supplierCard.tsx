@@ -102,9 +102,9 @@ export default function SupplierCard(props: {
             <SimpleTooltip content="Envoie par mail">
               <Mail className={contactPreference.includes("email") ? "text-white" : "text-white/30"} />
             </SimpleTooltip>
-            <SimpleTooltip content="Envoie par WhatsApp">
+            {/* <SimpleTooltip content="Envoie par WhatsApp">
               <MessageCircle className={contactPreference.includes("whatsapp") ? "text-white" : "text-white/30"} />
-            </SimpleTooltip>
+            </SimpleTooltip> */}
           </div> 
         : 
           <DrawerDialog

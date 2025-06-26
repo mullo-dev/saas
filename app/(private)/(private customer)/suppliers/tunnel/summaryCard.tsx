@@ -1,12 +1,26 @@
 "use client"
 
 import { MinProductsTable } from "@/components/global/tables/minProductsTable"
-import { ProductsTable } from "@/components/global/tables/productsTable"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useUser } from "@/lib/auth-session-client"
 
-export default function SummaryCard(props:{ supplier: any, getCartProducts: () => void }) {
+export default function SummaryCard(props:{ supplier: any, getCartProducts: () => void, setGroupedSupplier: (prev:any) => void }) {
+  const user = useUser()
+  const message = props.supplier.supplier.metadata?.contentMessage 
+    || props.supplier?.supplier?.members?.find((e:any) => user?.user?.id === e.userId)?.contentMessage
+    || `Bonjour ${props.supplier.supplier.name}, tu trouveras ci-joint ma dernière commande. Belle journée`
+
+  const handleChange = (data: string) => {
+    props.setGroupedSupplier((prev: any[]) =>
+      prev.map((supplier) =>
+        supplier.id === props.supplier.id
+          ? { ...supplier, message: data }
+          : supplier
+      )
+    );
+  };
   
   return (
     <Card className="bg-secondary-500">
@@ -28,7 +42,8 @@ export default function SummaryCard(props:{ supplier: any, getCartProducts: () =
             <Label>Informations</Label>
             <Textarea
               className="mt-2 bg-white"
-              defaultValue={`Bonjour ${props.supplier.supplier.name}, tu trouveras ci-joint ma dernière commande. Belle journée`}
+              defaultValue={message }
+              onChange={(e) => handleChange(e.target.value)}
               rows={4}
             />
           </div>

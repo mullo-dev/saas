@@ -26,7 +26,7 @@ interface NewOrderEmailProps {
   href?: string
 }
 
-export default function OrderValidate({ client, products, href }: NewOrderEmailProps) {
+export default function OrderValidate({ href }: NewOrderEmailProps) {
   return (
     <Html>
       <Head />

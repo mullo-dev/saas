@@ -2,7 +2,7 @@
 
 import { addToCart } from "@/actions/cart/action"
 import { Cart } from "@/actions/cart/model"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
@@ -102,12 +102,9 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
               <TableHead>Name</TableHead>
               <TableHead>Prix</TableHead>
               <TableHead className="text-right">Quantité</TableHead>
-              <TableHead className="text-right">Panier</TableHead>
-              {props.viewOnly &&
-                <>
-                  <TableHead>Quantité</TableHead>
-                  <TableHead>Total</TableHead>
-                </>
+              {props.viewOnly ?
+                  <TableHead className="text-right">Total</TableHead>
+                : <TableHead className="text-right">Panier</TableHead>
               }
             </TableRow>
           </TableHeader>
@@ -133,12 +130,12 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
                       <TableCell className="text-sm">
                         {(item.price/item.quantity).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-right text-sm">
                         {item.quantity}
                       </TableCell>
                     </>
                   }
-                  <TableCell className="text-sm">
+                  <TableCell className="text-right text-sm">
                     {item.price.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                   </TableCell>
                   {!props.viewOnly &&

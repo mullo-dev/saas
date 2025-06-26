@@ -23,10 +23,11 @@ interface NewOrderEmailProps {
     priceHt: number;
     tva: number;
   }[];
-  href?: string
+  href?: string,
+  message?: string
 }
 
-export default function NewOrderEmail({ client, products, href }: NewOrderEmailProps) {
+export default function NewOrderEmail({ client, products, href, message }: NewOrderEmailProps) {
   return (
     <Html>
       <Head />
@@ -45,6 +46,9 @@ export default function NewOrderEmail({ client, products, href }: NewOrderEmailP
           <Section style={{ paddingBottom: '20px' }}>
             <Row>
               <Text style={heading}>{client} a effectué une nouvelle commande</Text>
+              <Text style={paragraph}>
+                {message}
+              </Text>
               <Text style={review}>
                 <ul style={listContent}>
                   {products?.map((p:{name:string | null,quantity:number}, index:number) => (

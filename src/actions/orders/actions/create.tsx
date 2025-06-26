@@ -9,12 +9,22 @@ import NewOrderEmail from "@/components/emails/newOrder";
 import { GroupedSupplierAndGetPrice } from "../../organization/actions/get";
 import OrderValidate from "@/components/emails/orderValidate";
 import { sendSms } from "@/lib/send-sms";
+import { z } from "zod";
 
 export const createOrder = authActionClient
   .metadata({ actionName: "createOrder" }) 
-  .action(async ({ ctx: { user } }) => {
+  .schema(
+    z.object({messages: z.array(
+      z.object({ 
+        supplierId: z.string(), 
+        message: z.string() 
+      })
+    )})
+  )
+  .action(async ({ parsedInput: { messages }, ctx: { user } }) => {
 
   try {
+    const url = "https://localhost:3000"
     const grouped = await GroupedSupplierAndGetPrice()
 
     if (!grouped?.data) throw new Error("Cart not found")
@@ -83,13 +93,14 @@ export const createOrder = authActionClient
         to: user.user.email,
         subject: "Commande validée",
         react: OrderValidate({
-          href: `${URL}/orders/${order.id}`
+          href: `${url}/orders/${order.id}`
         })
       })
     }
 
     order.suppliers.map(async (supplier:any) => {
       const organization = grouped?.data?.groupedArray.find((sup) => sup.supplierId === supplier.supplierId)
+      const message = messages.find((m:any) => m.supplierId === supplier.supplierId)?.message
       // const filePath = path.join(process.cwd(), 'public', 'pdf', `order-${order.ref}.pdf`);
       // const stream = fs.createWriteStream(filePath);
       // const pdfStream = await renderToBuffer(<DeliveryNotePDF order={order} supplier={supplier} products={supplier.products} />);
@@ -110,20 +121,21 @@ export const createOrder = authActionClient
       // ADD DELIVERYNOTE IN THE MAIL
       await resend.emails.send({
         from: 'noreply@mullo.fr',
-        to: organization?.supplier.metadata.email ? organization?.supplier.metadata.email : organization?.supplier.members[0].user.email,
+        to: organization?.supplier.metadata.email ? organization?.supplier.metadata.email.trim() : organization?.supplier.members[0].user.email.trim(),
         subject: "Vous avez une nouvelle commande à traîter",
         // replyTo: `reply+${conversation.id}@mullo.fr`,
         react: NewOrderEmail({
           products: organization?.fullProducts,
           client: user?.user?.name,
-          href: `${URL}/dashboard/orders/${order.id}`
+          href: `${url}/dashboard/orders/${order.id}`,
+          message: message
         })
       })
 
-      if (organization?.supplier.metadata.contactPreference?.includes("sms")) {
-        const messsage = `Nouvelle commande de ${user?.user?.name}:\n\n${organization?.supplier.metadata.contactMessage}\n\voir la commande : ${URL}/dashboard/orders/${order.id}`;
-        await sendSms("",organization?.supplier.metadata.phone,messsage)
-      }
+      // if (organization?.supplier.metadata.contactPreference?.includes("sms")) {
+        const smsMessage = `Nouvelle commande de ${user?.user?.name}:\n\n${message}\n\nvoir la commande : ${url}/dashboard/orders/${order.id}`;
+        await sendSms("+33770079644","+33770079644",smsMessage) // organization?.supplier.metadata.phone
+      // }
     })
 
     revalidatePath("/dashboard")

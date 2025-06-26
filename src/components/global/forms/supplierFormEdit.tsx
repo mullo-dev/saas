@@ -46,7 +46,7 @@ const inputs: { label: string; defaultValue: string; name: InputNames; type: str
 const contactOptions = [
   { value: "email", label: "Email" },
   { value: "sms", label: "SMS" },
-  { value: "whatsapp", label: "WhatsApp" },
+  // { value: "whatsapp", label: "WhatsApp" },
 ];
 
 export default function SupplierFormEdit(props: { 

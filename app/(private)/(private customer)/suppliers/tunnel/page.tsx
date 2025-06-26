@@ -27,7 +27,12 @@ export default function tunnelPage() {
       <div className="flex-1 flex flex-col gap-4">
         <h2 className="font-bold text-lg">Détails de la commande</h2>
         {groupedSupplier.map((supplier: any, index:number) => (
-          <SummaryCard key={index} supplier={supplier} getCartProducts={getCartProducts} />
+          <SummaryCard 
+            key={index}
+            supplier={supplier}
+            getCartProducts={getCartProducts}
+            setGroupedSupplier={setGroupedSupplier}
+          />
         ))}
       </div>
       <div className="w-full lg:w-96">
