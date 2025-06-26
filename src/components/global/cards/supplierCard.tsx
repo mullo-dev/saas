@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { CsvImporter } from "@/components/csv-importer/csv-importer"
 import { createProducts } from "@/actions/products/actions/create"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Edit, Mail, MessageCircle, MessageSquare } from "lucide-react"
+import { Edit, Mail, MessageSquare } from "lucide-react"
 import { useState } from "react"
 import { createCatalogue } from "@/actions/catalogue/actions/create"
 import { AddProductModal } from "../modal/addProductsModal"
@@ -20,7 +20,8 @@ import SimpleTooltip from "../tootip/tooltip"
 export default function SupplierCard(props: { 
   organization: any,
   selectSupplierId: (id:string,status:boolean) => void, 
-  isSelected: boolean 
+  isSelected: boolean,
+  openDialog?: boolean
   reload: () => void
 }) {
   const [returnResult, setReturnResult] = useState<any>()
@@ -140,7 +141,7 @@ export default function SupplierCard(props: {
               >
                 {(p) => <SupplierFormEdit organization={props.organization} setOpen={p.setOpen} reload={props.reload} />}
               </DrawerDialog>
-              <ConversationDrawer receipt={props.organization.members[0].user} />
+              <ConversationDrawer receipt={props.organization.members.find((u:any) => u.role === "owner").user} open={props.openDialog} />
             </div>
           // the supplier was created by the customer...
           : props.organization.catalogues[0]?.subCatalogues.reduce((acc:any, subCat:any) => acc + subCat._count.products,0) > 0 ? // ...and have a catalogue

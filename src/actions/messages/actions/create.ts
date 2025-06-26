@@ -23,17 +23,19 @@ export const createMessage = authActionClient
     }
 
     const userType = await prisma.user.findUnique({where: {id: user.user.id}})
+    const theCustomerId = userType?.type === "CUSTOMER" ? userType.id : parsedInput.receiptId
+    const theSupplierId = userType?.type === "SUPPLIER" ? userType.id : parsedInput.receiptId
 
     const conversation = await prisma.conversation.upsert({
       where: {
         customerId_supplierId: {
-          customerId: userType?.type === "CUSTOMER" ? userType.id : parsedInput.receiptId,
-          supplierId: userType?.type === "SUPPLIER" ? userType.id : parsedInput.receiptId
+          customerId: theCustomerId,
+          supplierId: theSupplierId
         }
       },
       create: {
-        customerId: userType?.type === "CUSTOMER" ? userType.id : parsedInput.receiptId,
-        supplierId: userType?.type === "SUPPLIER" ? userType.id : parsedInput.receiptId,
+        customerId: theCustomerId,
+        supplierId: theSupplierId,
         messages: {
           create: {
             body: parsedInput.message,
@@ -63,7 +65,7 @@ export const createMessage = authActionClient
         authorName: user.user.name,
         authorEmail: user.user.email,
         reviewText: parsedInput.message,
-        href: `${URL}/compte`
+        href: user.user.type === "SUPPLIER" ? `${URL}/dashboard?messageId=${theCustomerId}` : `${URL}/suppliers?messageId=${theSupplierId}`
       })
     })
 

@@ -11,6 +11,8 @@ import OrderValidate from "@/components/emails/orderValidate";
 import { sendSms } from "@/lib/send-sms";
 import { z } from "zod";
 
+const URL = process.env.APP_URL
+
 export const createOrder = authActionClient
   .metadata({ actionName: "createOrder" }) 
   .schema(
@@ -24,7 +26,6 @@ export const createOrder = authActionClient
   .action(async ({ parsedInput: { messages }, ctx: { user } }) => {
 
   try {
-    const url = "https://localhost:3000"
     const grouped = await GroupedSupplierAndGetPrice()
 
     if (!grouped?.data) throw new Error("Cart not found")
@@ -93,7 +94,7 @@ export const createOrder = authActionClient
         to: user.user.email,
         subject: "Commande validée",
         react: OrderValidate({
-          href: `${url}/orders/${order.id}`
+          href: `${URL}/orders/${order.id}`
         })
       })
     }
@@ -127,15 +128,15 @@ export const createOrder = authActionClient
         react: NewOrderEmail({
           products: organization?.fullProducts,
           client: user?.user?.name,
-          href: `${url}/dashboard/orders/${order.id}`,
+          href: `${URL}/dashboard/orders/${order.id}`,
           message: message
         })
       })
 
-      // if (organization?.supplier.metadata.contactPreference?.includes("sms")) {
-        const smsMessage = `Nouvelle commande de ${user?.user?.name}:\n\n${message}\n\nvoir la commande : ${url}/dashboard/orders/${order.id}`;
-        await sendSms("+33770079644","+33770079644",smsMessage) // organization?.supplier.metadata.phone
-      // }
+      if (organization?.supplier.metadata.contactPreference?.includes("sms")) {
+        const smsMessage = `Nouvelle commande de ${user?.user?.name}:\n\n${message}\n\nvoir la commande : ${URL}/dashboard/orders/${order.id}`;
+        await sendSms("+33770079644",organization.supplier.metadata.phone,smsMessage) // organization?.supplier.metadata.phone
+      }
     })
 
     revalidatePath("/dashboard")

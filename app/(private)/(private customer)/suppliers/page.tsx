@@ -13,6 +13,7 @@ import { useCarousel } from "@/components/ui/carousel"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useParams, useSearchParams } from "next/navigation"
 
 export default function suppliersPage() {
   const [filteredOrganizations, setFilteredOrganizations] = useState<any>([])
@@ -91,6 +92,8 @@ function SupplierCarousel(props: {
   reload: () => void
 }) {
   const context = useCarousel()
+  const searchParams = useSearchParams()
+  const messageId = searchParams.get("messageId")
 
   return (
     props.filteredOrganizations.length > 0 ?  
@@ -128,7 +131,8 @@ function SupplierCarousel(props: {
           </div>
         </div>
         <CarouselContent>
-          {props.filteredOrganizations?.map((orga:any, index:number) => (
+          {props.filteredOrganizations?.map((orga:any, index:number) => {
+            return (
             <CarouselItem key={index}  className="basis-1/1 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
               <SupplierCard
                 organization={orga} 
@@ -138,9 +142,10 @@ function SupplierCarousel(props: {
                   props.reload()
                   props.getProducts()
                 }}
+                openDialog={messageId === orga.id}
               />
             </CarouselItem>
-          ))}
+          )})}
         </CarouselContent>
         <CarouselPrevious />
         <CarouselNext />

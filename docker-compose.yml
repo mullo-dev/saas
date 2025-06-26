@@ -6,6 +6,7 @@ services:
       - "6555:3000"
     environment:
       DATABASE_URL: postgresql://remybeauperin:mullopassword@db:8233/saas-v2
+      APP_URL: http://94.130.134.220:6555
     depends_on:
       - db
   db:

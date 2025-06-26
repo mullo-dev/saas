@@ -6,12 +6,12 @@ import { handleFormErrors } from "@/lib/sanitized/sanitizedErrors";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { LoaderCircle, Send } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { getConversationById } from "@/actions/messages/actions/get";
 import SimpleTooltip from "@/components/global/tootip/tooltip";
 
-export function ConversationDrawer({ receipt }: { receipt: any }) {
+export function ConversationDrawer({ receipt, open }: { receipt: any, open?: boolean }) {
   const {
     register,
     setValue,
@@ -22,10 +22,19 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
   const [conversation, setConversation] = useState<any>()
   const [isPending, startTransition] = useTransition();
 
+  const [internalOpen, setInternalOpen] = useState(open)
+
   const getConv = async () => {
     const result = await getConversationById({receiptId: receipt.id })
     setConversation(result?.data?.conversation)
   }
+
+  // Si open est contrôlé, on suit sa valeur
+  useEffect(() => {
+    if (open) {
+      getConv()
+    }
+  }, [])
 
   const onSubmit: SubmitHandler<{message: string}> = async (data) => {
     startTransition(async () => {
@@ -49,7 +58,10 @@ export function ConversationDrawer({ receipt }: { receipt: any }) {
   }
 
   return (
-    <Sheet>
+    <Sheet 
+      open={open ? internalOpen : undefined}
+      onOpenChange={open ? setInternalOpen : undefined}
+    >
       <SheetTrigger>
         <SimpleTooltip content="Conversation">
           <Button 
