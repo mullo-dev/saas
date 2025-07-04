@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { toast } from "sonner";
 
 export default function TotalCard(props:{ suppliers: any }) {
@@ -28,13 +28,18 @@ export default function TotalCard(props:{ suppliers: any }) {
   const submitOrder = () => {
     const messages = Array.from(props.suppliers.values()).map((supplier:any) => ({
       supplierId: supplier.supplierId,
-      message: supplier.message
+      message: supplier.message,
+      deliveryType: supplier.deliveryType,
+      addressChoose: supplier.addressChoose
     }))
     startTransition(async () => {
       const response = await createOrder({messages})
       if (response?.data?.success) {
         toast.success("Commande validée")
         router.push(`/orders/${response.data.order?.id}`)
+      } else {
+        console.log(response)
+        toast.error("Une erreur est survenue.")
       }
     })
   }

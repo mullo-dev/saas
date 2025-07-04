@@ -17,6 +17,7 @@ export default function orderIdPage() {
 
   const getOrder = async () => {
     const result = await getOrderById({orderId: orderId as string})
+    console.log(result)
     if (result?.data?.success) {
       setOrder(result.data.order as unknown as OrderWithRelations)
     }
@@ -56,6 +57,16 @@ export default function orderIdPage() {
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="mb-8">
+                  <p className="text-sm mb-1">
+                    Méthode de livraison : 
+                    <span className="font-bold"> {sup.deliveryType === "DELIVERY" ? "livraison" : "click&collect"}</span>
+                  </p>
+                  <p className="text-sm">
+                    Adresse : 
+                    <span className="font-bold"> {sup.address}</span>
+                  </p>
+                </div>
                 <ProductsTable propsData={sup.products} viewOnly />
               </CardContent>
             </Card>

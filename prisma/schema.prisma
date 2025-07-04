@@ -93,6 +93,7 @@ model Organization {
   metadata    String?
   invitations Invitation[]
   orders      SupplierOnOrder[]
+  addresses   Address[]
 
   @@map("Organization")
   @@unique([slug])
@@ -130,6 +131,22 @@ model Invitation {
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // END OF USER AND ORGANIZATION PART
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+model Address {
+  id              String @id @default(uuid())
+  address         String
+  city            String
+  zipCode         String
+  country         String
+  latitude        Float?
+  longitude       Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  organizationId  String
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("Address")
+}
 
 model Catalogue {
   id              String         @id @default(uuid())
@@ -207,9 +224,11 @@ model SupplierOnOrder {
   orderId         String
   order           Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   products        SupplierProductOnOrder[]
+  deliveryType    DeliveryType @default(DELIVERY)
   deliveryNote    String?
   totalHt         Float
   totalTtc        Float
+  address         String?
 }
 
 model SupplierProductOnOrder {
@@ -253,4 +272,9 @@ enum ChannelType {
   SMS
   WHATSAPP
   APP // message interne
+}
+
+enum DeliveryType {
+  DELIVERY
+  PICKUP
 }

@@ -29,18 +29,24 @@ export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, ord
       <Text style={{fontSize: "8px", marginBottom: 5}}>
         Contact : {order.customer.email}
       </Text>
-      <Text style={{fontSize: "8px"}}>
-        Adresse : 10 rue Cabronne 75015 Paris
-      </Text>
     </View>
     {all ? order.suppliers.map((sup:any, index:number) => (
       <View
         key={index}
-        style={{paddingTop: 20}}
+        style={{paddingTop: 15, paddingBottom: 10, borderBottom: "0.02rem solid gray"}}
       >
         <Text style={{fontSize: "10px", marginBottom: 8}}>Fournisseur : {sup.supplier.name}</Text>
+        <View>
+          <Text style={{fontSize: "8px"}}>
+            Adresse : {sup.address}
+          </Text>
+          <Text style={{fontSize: "8px", marginTop: 3}}>
+            Méthode de livraison : {sup.deliveryType}
+          </Text>
+        </View>
         <View
           style={{
+            marginTop: 8,
             border: "0.03rem solid gray",
             borderRadius: 5,
             overflow: "hidden",
@@ -103,7 +109,23 @@ export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, ord
             }}
           >
             <Text style={{fontSize: 8, textAlign: "right"}}>Total : {sup?.products.reduce((acc: number, p: any) => acc + p.price, 0).toFixed(2)} € HT</Text>
+          </View>
         </View>
+        <View
+          style={{
+            width: "50%",
+            padding: 4,
+            borderRadius: 5,
+            border: "1px solid gray",
+            marginTop: 10
+          }}
+        >
+          <Text style={{ fontSize: 8, fontStyle: "italic" }}>
+            Instruction
+          </Text>
+          <Text style={{ marginTop: 3, fontSize: 9 }}>
+            {sup.deliveryNote}
+          </Text>
         </View>
       </View>
     )) :
@@ -111,11 +133,20 @@ export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, ord
         style={{paddingTop: 20}}
       >
         <Text style={{fontSize: "10px", marginBottom: 8}}>Fournisseur : {supplier.supplier.name}</Text>
+        <View>
+          <Text style={{fontSize: "8px"}}>
+            Adresse : {supplier.address}
+          </Text>
+          <Text style={{fontSize: "8px", marginTop: 3}}>
+            Méthode de livraison : {supplier.deliveryType === "DELIVERY" ? "livraison" : "click & collect"}
+          </Text>
+        </View>
         <View
           style={{
             border: "0.03rem solid gray",
             borderRadius: 5,
             overflow: "hidden",
+            marginTop: 8
           }}
         >
           <View
@@ -176,6 +207,22 @@ export const DeliveryNotePDF = ({ supplier, order, all } : { supplier?: any, ord
             >
               <Text style={{fontSize: 8, textAlign: "right"}}>Total : {supplier?.products.reduce((acc: number, p: any) => acc + p.price, 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € HT</Text>
           </View>
+        </View>
+        <View
+          style={{
+            width: "50%",
+            padding: 4,
+            borderRadius: 5,
+            border: "1px solid gray",
+            marginTop: 10
+          }}
+        >
+          <Text style={{ fontSize: 8, fontStyle: "italic" }}>
+            Instruction
+          </Text>
+          <Text style={{ marginTop: 3, fontSize: 9 }}>
+            {supplier.deliveryNote}
+          </Text>
         </View>
       </View>
     }

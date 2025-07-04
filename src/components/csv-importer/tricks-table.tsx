@@ -7,7 +7,6 @@ import { createProducts } from "@/actions/products/actions/create"
 import { toast } from "sonner"
 import { DataTableProducts } from "../global/tables/products/table"
 import { columnsProducts } from "../global/tables/products/columns"
-import { Button } from "../ui/button"
 import ProductForm from "../global/forms/productForm"
 import { DrawerDialog } from "../global/modal"
 

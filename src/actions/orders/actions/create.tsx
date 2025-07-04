@@ -2,7 +2,6 @@
 
 import { authActionClient } from "@/lib/auth-action";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 import { clearCart } from "@/lib/cart";
 import { resend } from "@/lib/resend";
 import NewOrderEmail from "@/components/emails/newOrder";
@@ -12,14 +11,17 @@ import { sendSms } from "@/lib/send-sms";
 import { z } from "zod";
 
 const URL = process.env.APP_URL
+const DeliveryTypeEnum = ["PICKUP", "DELIVERY"] as const;
 
 export const createOrder = authActionClient
   .metadata({ actionName: "createOrder" }) 
   .schema(
     z.object({messages: z.array(
-      z.object({ 
+      z.object({
         supplierId: z.string(), 
-        message: z.string() 
+        message: z.string(),
+        deliveryType: z.enum(DeliveryTypeEnum),
+        addressChoose: z.string(),
       })
     )})
   )
@@ -74,7 +76,9 @@ export const createOrder = authActionClient
             supplierId: supplier.supplierId,
             totalHt: supplier.totalHt,
             totalTtc: supplier.totalTtc,
-            deliveryNote: "",
+            deliveryNote: messages.find((m:any) => m.supplierId === supplier.supplierId)?.message,
+            deliveryType: messages.find((m:any) => m.supplierId === supplier.supplierId)?.deliveryType,
+            address: messages.find((m:any) => m.supplierId === supplier.supplierId)?.addressChoose,
             products: {
               create: supplier.products
             }
@@ -138,8 +142,7 @@ export const createOrder = authActionClient
         await sendSms("+33770079644",organization.supplier.metadata.phone,smsMessage) // organization?.supplier.metadata.phone
       }
     })
-
-    revalidatePath("/dashboard")
+    
     await clearCart()
     return { success: true, order: order };
   } catch (error) {

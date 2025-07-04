@@ -5,21 +5,36 @@ import TotalCard from "./totalCard";
 import { useEffect, useState } from "react";
 import { GroupedSupplierAndGetPrice } from "@/actions/organization/actions/get";
 import { usePageTitle } from "@/lib/context/pageTitle";
+import { addressType } from "@/actions/addresses/model";
+import { getAddresses } from "@/actions/addresses/actions/get";
 
 export default function tunnelPage() {
   const [groupedSupplier, setGroupedSupplier] = useState<any[]>([])
+  const [addresses, setAddresses] = useState<addressType[]>()
   const { setTitle } = usePageTitle();
   
   const getCartProducts = async () => {
     const response = await GroupedSupplierAndGetPrice()
     if (response?.data?.success) {
-      setGroupedSupplier(response.data.groupedArray)
+      const suppliers = response.data.groupedArray.map((s: any) => ({
+        ...s,
+        deliveryType: "DELIVERY"
+      }));
+      setGroupedSupplier(suppliers)
+    }
+  }
+
+  const getTheAddresses = async () => {
+    const response = await getAddresses()
+    if (response?.data?.success) {
+      setAddresses(response.data.addresses)
     }
   }
 
   useEffect(() => {
     getCartProducts()
     setTitle("Finaliser la commande");
+    getTheAddresses()
   }, [])
 
   return (
@@ -32,6 +47,7 @@ export default function tunnelPage() {
             supplier={supplier}
             getCartProducts={getCartProducts}
             setGroupedSupplier={setGroupedSupplier}
+            addresses={addresses}
           />
         ))}
       </div>
