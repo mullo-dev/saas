@@ -40,7 +40,7 @@ export const createOrganization = authActionClient
     if (org && parsedInput.createByCustomer) {
       await prisma.member.update({
         where: {
-          id: org.members[0].id
+          id: org.members[0]?.id
         },
         data: {
           role: "customerOfInternSupplier"
