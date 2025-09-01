@@ -10,13 +10,14 @@ import { prisma } from '@/lib/prisma';
 export const updateOrganization = authActionClient
   .metadata({ actionName: "updateOrganization" }) 
   .schema(z.object(organizationModel))
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput: { organizationId, ...parsedInput } }) => {
 
   try {
     const cookieStore = await cookies();
 
     const org = await auth.api.updateOrganization({
       body: {
+        organizationId: organizationId || "",
         data: parsedInput
       },
       headers: new Headers({
