@@ -209,7 +209,7 @@ export default function SupplierForm(props: { setOpen: any, reload: () => void }
                           <div key={option.value} className="flex items-center space-x-2">
                             <Checkbox
                               id={option.value}
-                              checked={value.includes(option.value)}
+                              checked={option.disabled ? false :value.includes(option.value)}
                               onCheckedChange={() => toggleValue(option.value)}
                               disabled={option.disabled}
                             />
