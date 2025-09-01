@@ -11,6 +11,10 @@ const URL = process.env.APP_URL
 
 export const auth = betterAuth({
   user: {
+    trustedOrigins: [
+      URL, 
+      ...(process.env.VERCEL_URL ? [`${process.env.VERCEL_URL}`] : [])
+    ],
     additionalFields: {
       type: {
         type: "string",

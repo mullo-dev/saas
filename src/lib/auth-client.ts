@@ -6,7 +6,7 @@ const URL = process.env.APP_URL
 
 export const authClient = createAuthClient({
     /** the base url of the server (optional if you're using the same domain) */
-    baseURL: URL,
+    // baseURL: URL,
     plugins: [ 
       organizationClient({
         ac,
