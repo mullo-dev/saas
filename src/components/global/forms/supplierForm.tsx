@@ -50,8 +50,8 @@ const inputs: { label: string; defaultValue: string; name: InputNames; type: str
 ];
 
 const contactOptions = [
-  { value: "email", label: "Email" },
-  { value: "sms", label: "SMS" },
+  { value: "email", label: "Email", disabled: false },
+  { value: "sms", label: "SMS", disabled: true },
   // { value: "whatsapp", label: "WhatsApp" },
 ];
 
@@ -211,8 +211,12 @@ export default function SupplierForm(props: { setOpen: any, reload: () => void }
                               id={option.value}
                               checked={value.includes(option.value)}
                               onCheckedChange={() => toggleValue(option.value)}
+                              disabled={option.disabled}
                             />
-                            <Label htmlFor={option.value}>{option.label}</Label>
+                            <Label htmlFor={option.value}>
+                            {option.label}
+                            {option.disabled && <span className="text-red-500 text-sm">Pas encore disponible</span>}
+                          </Label>
                           </div>
                         ))}
                       </div>
