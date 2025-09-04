@@ -14,12 +14,14 @@ import {
 } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { clearCart, getCart } from "@/lib/cart"
-import { Eye, Minus, Plus, Trash } from "lucide-react"
+import { Eye, FileEdit, Minus, Plus, Trash } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import { DrawerDialog } from "../modal"
+import ProductForm from "../forms/productForm"
 
 
-export function ProductsTable(props: { propsData: any, supplierId?: string[], viewOnly?: boolean }) {
+export function ProductsTable(props: { propsData: any, supplierId?: string[], viewOnly?: boolean, reload: () => void }) {
   const [cart, setCart] = useState<Cart>()
   
   const getProductsInCart = async () => {
@@ -118,11 +120,22 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
                   <TableCell className="text-sm max-w-20 truncate hidden lg:table-cell">
                     {item.product.ref}
                   </TableCell>
-                  <TableCell className="max-w-80 cursor-pointer hover:text-primary text-sm flex items-center gap-2 group">
-                    <div className="">
+                  <TableCell className="cursor-pointer hover:text-primary text-sm flex items-center gap-2 group">
+                    <div className="flex-1">
                       <p className="text-wrap font-bold">{item.product.name}</p>
                       <p className="text-xs hidden md:block">{item.product.description}</p>
                     </div>
+                    {item.internOrganization && <div>
+                      <DrawerDialog
+                        title="Modifier le produit" 
+                        buttonTitle={<FileEdit />}
+                        buttonSize="icon"
+                        description=""
+                        toastTitle="Modifier le produit"
+                      >
+                        {(p) => <ProductForm setOpen={p.setOpen} productId={item.product.id} catalogueId={item.catalogueId as string} reload={props.reload} />}
+                      </DrawerDialog>
+                    </div>}
                     <Eye size={18} className="onHover text-white group-has-hover:text-white-400" />
                   </TableCell>
                   {props.viewOnly &&

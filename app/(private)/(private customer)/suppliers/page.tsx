@@ -75,7 +75,7 @@ export default function suppliersPage() {
       <hr className="my-4"/>
       <h2 className="font-bold text-xl mb-4">Produits</h2>
       <Suspense fallback={<Skeleton className="w-full h-[300px] rounded-xl" />}>
-        <ProductsTable supplierId={selectSupplier} propsData={allProducts} />
+        <ProductsTable supplierId={selectSupplier} propsData={allProducts} reload={getProducts} />
       </Suspense>
     </div>
   )

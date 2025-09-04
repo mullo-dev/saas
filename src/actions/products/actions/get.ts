@@ -21,9 +21,15 @@ export const getAllProducts = authActionClient
             organization: {
               select: {
                 id: true,
-                name: true
+                name: true,
+                members: {
+                  select: {
+                    role: true
+                  }
+                }
               }
-            }
+            },
+            id: true,
           }
         },
         products: {
@@ -51,7 +57,9 @@ export const getAllProducts = authActionClient
       sub.products.map((product:any) => ({
         ...product,
         supplierName: sub.catalogue.organization.name,
-        organizationId: sub.catalogue.organization.id
+        organizationId: sub.catalogue.organization.id,
+        catalogueId: sub.catalogue.id,
+        internOrganization: sub.catalogue.organization.members.find((m:any) => m.role === "customerOfInternSupplier") ? true : false
       }))
     );
 
@@ -122,6 +130,33 @@ export const getInCartProducts = authActionClient
     );
 
     return { success: true, products: allProducts, totalPriceHt: totalPriceHt, totalTva: totalTva };
+  } catch (error) {
+    return { success: false, error };
+  }
+});
+
+
+export const getProductById = authActionClient
+.metadata({ actionName: "getProductById" })
+.schema(z.object({productId: z.string()}))
+.action(async ({ parsedInput: { productId } }) => {
+  
+  try {
+    // Find one product
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: {
+        productOnSubCatalogues: {
+          select: { price: true }
+        }
+      }
+    });
+
+    if (!product) {
+      return { success: false, error: "NOT_FOUND" };
+    }
+
+    return { success: true, product };
   } catch (error) {
     return { success: false, error };
   }

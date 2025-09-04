@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,9 @@ import { getColSpanClass } from "@/lib/sanitized/class-css";
 import { Euro, Percent } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import MultipleSelector from "@/components/ui/multiselect";
+import { Product } from "@prisma/client";
+import { getProductById } from "@/actions/products/actions/get";
+import { updateProduct } from "@/actions/products/actions/update";
 
 type InputNames = "name" | "ref" | "price" | "sellQuantity" | "unit" | "tvaValue" | "categories" ;
 const inputs: { label: string; defaultValue: string | number; name: InputNames; type: string; col: number, adorment?: any }[] = [
@@ -72,16 +75,61 @@ const inputs: { label: string; defaultValue: string | number; name: InputNames; 
   }
 ];
 
-export default function ProductForm(props: {catalogueId: string, setOpen: any, reload: () => void, createByCustomer?: boolean}) {
+export default function ProductForm(props: {productId?: string, catalogueId: string, setOpen: any, reload: () => void, createByCustomer?: boolean}) {
   const {
     register,
     setError,
     clearErrors,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
     control,
-  } = useForm<productType>();
+  } = useForm<productType>({
+    defaultValues: {
+      ref: "",
+      name: "",
+      description: "",
+      price: 0,
+      unit: "kg",
+      tvaValue: 5.5,
+      categories: [],
+      sellQuantity: 1,
+    },
+  });
+
+  useEffect(() => {
+    const loadAndFill = async () => {
+      if (!props.productId) return;
+      const result = await getProductById({ productId: props.productId as string });
+      const product: any = result?.data?.product;
+      if (!product) return;
+
+      const fields: (keyof productType)[] = [
+        "ref",
+        "name",
+        "description",
+        "price",
+        "unit",
+        "tvaValue",
+        "sellQuantity",
+        "categories",
+      ];
+
+      fields.forEach((field) => {
+        let value: any = product[field as string];
+        if (field === "price" || field === "tvaValue" || field === "sellQuantity") {
+          value = typeof value === "number" ? value : Number(String(value ?? 0).replace(",", "."));
+        }
+        if (field === "categories") {
+          value = Array.isArray(value) ? value : [];
+        }
+        (setValue as any)(field, value, { shouldDirty: false, shouldTouch: false });
+      });
+    };
+
+    loadAndFill();
+  }, [props.productId, setValue])
 
   const onSubmit: SubmitHandler<productType> = async (data) => {
     const formattedData = {
@@ -106,12 +154,22 @@ export default function ProductForm(props: {catalogueId: string, setOpen: any, r
         : Number(String(data.sellQuantity).replace(',', '.')),
     }
 
-    const result = await createSingleProduct({createByCustomer: props.createByCustomer, ...formattedData});
-    if (result?.data?.success) {
-      props.setOpen(false)
-      props.reload()
+    if (props.productId) {
+      const result = await updateProduct({productId: props.productId, ...formattedData})
+      if (result?.data?.success) {
+        props.setOpen(false)
+        props.reload()
+      } else {
+        handleFormErrors(result, setError);
+      }
     } else {
-      handleFormErrors(result, setError);
+      const result = await createSingleProduct({createByCustomer: props.createByCustomer, ...formattedData});
+      if (result?.data?.success) {
+        props.setOpen(false)
+        props.reload()
+      } else {
+        handleFormErrors(result, setError);
+      }
     }
   };
 
@@ -175,7 +233,7 @@ export default function ProductForm(props: {catalogueId: string, setOpen: any, r
           </div>
           <div className="cols-span-2">
             <Button type="submit" onClick={() => clearErrors()}>
-              Créer
+              {props.productId ? "Modifier" : "Créer"}
             </Button>
           </div>
         </div>
