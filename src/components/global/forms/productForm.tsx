@@ -75,7 +75,7 @@ const inputs: { label: string; defaultValue: string | number; name: InputNames; 
   }
 ];
 
-export default function ProductForm(props: {productId?: string, catalogueId: string, setOpen: any, reload: () => void, createByCustomer?: boolean}) {
+export default function ProductForm(props: {productId?: string, catalogueId: string, setOpen: any, reload?: () => void, createByCustomer?: boolean}) {
   const {
     register,
     setError,
@@ -158,7 +158,7 @@ export default function ProductForm(props: {productId?: string, catalogueId: str
       const result = await updateProduct({productId: props.productId, ...formattedData})
       if (result?.data?.success) {
         props.setOpen(false)
-        props.reload()
+        props.reload && props.reload()
       } else {
         handleFormErrors(result, setError);
       }
@@ -166,7 +166,7 @@ export default function ProductForm(props: {productId?: string, catalogueId: str
       const result = await createSingleProduct({createByCustomer: props.createByCustomer, ...formattedData});
       if (result?.data?.success) {
         props.setOpen(false)
-        props.reload()
+        props.reload && props.reload()
       } else {
         handleFormErrors(result, setError);
       }

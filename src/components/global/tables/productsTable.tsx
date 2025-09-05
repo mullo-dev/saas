@@ -21,7 +21,7 @@ import { DrawerDialog } from "../modal"
 import ProductForm from "../forms/productForm"
 
 
-export function ProductsTable(props: { propsData: any, supplierId?: string[], viewOnly?: boolean, reload: () => void }) {
+export function ProductsTable(props: { propsData: any, supplierId?: string[], viewOnly?: boolean, reload?: () => void }) {
   const [cart, setCart] = useState<Cart>()
   
   const getProductsInCart = async () => {
