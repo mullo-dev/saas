@@ -53,7 +53,7 @@ export default function SummaryCard(props:{
 
   useEffect(() => {
     changeDeliveryMode("DELIVERY")
-    selectAddress(props.addresses ? `${props.addresses[0].address} ${props.addresses[0].zipCode} ${props.addresses[0].city}` : "Pas d'adresse selectionné")
+    selectAddress(props.addresses && props.addresses[0] ? `${props.addresses[0].address} ${props.addresses[0].zipCode} ${props.addresses[0].city}` : "Pas d'adresse selectionné")
     handleChange(message)
   }, [props.addresses])
   
