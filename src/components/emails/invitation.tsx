@@ -104,7 +104,7 @@ const listContent = {
 }
 
 const button = {
-  backgroundColor: '#ff5a5f',
+  backgroundColor: '#466e4e',
   borderRadius: '3px',
   color: '#fff',
   fontSize: '18px',

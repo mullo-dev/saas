@@ -9,12 +9,13 @@ import { categoriesOption, productType } from "@/actions/products/model";
 import { Textarea } from "@/components/ui/textarea";
 import { createSingleProduct } from "@/actions/products/actions/create";
 import { getColSpanClass } from "@/lib/sanitized/class-css";
-import { Euro, Percent } from "lucide-react";
+import { Euro, Percent, Trash2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import MultipleSelector from "@/components/ui/multiselect";
 import { Product } from "@prisma/client";
 import { getProductById } from "@/actions/products/actions/get";
 import { updateProduct } from "@/actions/products/actions/update";
+import { deleteProduct } from "@/actions/products/actions/delete";
 
 type InputNames = "name" | "ref" | "price" | "sellQuantity" | "unit" | "tvaValue" | "categories" ;
 const inputs: { label: string; defaultValue: string | number; name: InputNames; type: string; col: number, adorment?: any }[] = [
@@ -131,6 +132,18 @@ export default function ProductForm(props: {productId?: string, catalogueId: str
     loadAndFill();
   }, [props.productId, setValue])
 
+  const onDelete = async () => {
+    if (props.productId) {
+      const result = await deleteProduct({productId: props.productId})
+      if (result?.data?.success) {
+        props.setOpen(false)
+        props.reload && props.reload()
+      } else {
+        handleFormErrors(result, setError);
+      }
+    }
+  }
+
   const onSubmit: SubmitHandler<productType> = async (data) => {
     const formattedData = {
       ref: String(data.ref),
@@ -231,10 +244,17 @@ export default function ProductForm(props: {productId?: string, catalogueId: str
             />
             {errors.description && <p className="text-red-500 mt-1 text-sm">{errors.description?.message}</p>}
           </div>
-          <div className="cols-span-2">
-            <Button type="submit" onClick={() => clearErrors()}>
-              {props.productId ? "Modifier" : "Créer"}
-            </Button>
+          <div className="col-span-4">
+            <div className="flex justify-between">
+              {props.productId && 
+                <Button size="icon" variant="destructive" onClick={() => onDelete()}>
+                  <Trash2 />
+                </Button>
+              }
+              <Button type="submit" onClick={() => clearErrors()}>
+                {props.productId ? "Modifier" : "Créer"}
+              </Button>
+            </div>
           </div>
         </div>
       </form>

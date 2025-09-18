@@ -133,7 +133,9 @@ export const createOrder = authActionClient
           products: organization?.fullProducts,
           client: user?.user?.name,
           href: `${URL}/dashboard/orders/${order.id}`,
-          message: message
+          message: message,
+          deliveryMethod: supplier.deliveryType === "DELIVERY" ? "A livrer" : user?.user?.name + " vient récupérer la commande",
+          address: supplier.address
         })
       })
 

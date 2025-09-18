@@ -36,7 +36,7 @@ export default function OrderValidate({ href }: NewOrderEmailProps) {
         <Container style={container}>
           <Section>
             <Img
-              src={`https://www.mullo.fr/static/media/logo.e1708034d0419af6d434a5a0838ada0c.svg`}
+              src={`https://www.mullo.fr/logo.svg`}
               width="96"
               height="30"
               alt="Mullo"
@@ -105,7 +105,7 @@ const listContent = {
 }
 
 const button = {
-  backgroundColor: '#ff5a5f',
+  backgroundColor: '#466e4e',
   borderRadius: '3px',
   color: '#fff',
   fontSize: '18px',

@@ -24,10 +24,12 @@ interface NewOrderEmailProps {
     tva: number;
   }[];
   href?: string,
-  message?: string
+  message?: string,
+  deliveryMethod?: string,
+  address?: string,
 }
 
-export default function NewOrderEmail({ client, products, href, message }: NewOrderEmailProps) {
+export default function NewOrderEmail({ client, products, href, message, deliveryMethod, address }: NewOrderEmailProps) {
   return (
     <Html>
       <Head />
@@ -37,7 +39,7 @@ export default function NewOrderEmail({ client, products, href, message }: NewOr
         <Container style={container}>
           <Section>
             <Img
-              src={`https://www.mullo.fr/static/media/logo.e1708034d0419af6d434a5a0838ada0c.svg`}
+              src={`https://www.mullo.fr/logo.svg`}
               width="96"
               height="30"
               alt="Mullo"
@@ -46,6 +48,10 @@ export default function NewOrderEmail({ client, products, href, message }: NewOr
           <Section style={{ paddingBottom: '20px' }}>
             <Row>
               <Text style={heading}>{client} a effectué une nouvelle commande</Text>
+              <Text style={paragraph}>
+                Adresse : {address} <br/>
+                Méthode de livraison : {deliveryMethod}
+              </Text>
               <Text style={paragraph}>
                 {message}
               </Text>
@@ -60,12 +66,15 @@ export default function NewOrderEmail({ client, products, href, message }: NewOr
                 </ul>
               </Text>
               <Text style={paragraph}>
-                Vous pouvez retrouver la commande sur votre profil
+                A préparer
+              </Text>
+              {/* <Text style={paragraph}>
+                Vous pouvez retrouver la commande sur votre profil ou en créé un pour y stocker les prochaines commandes.
               </Text>
 
               <Button style={button} href={href}>
-                Consulter la commande
-              </Button>
+                Consulter la commande ou créer un compte
+              </Button> */}
             </Row>
           </Section>
 

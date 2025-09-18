@@ -14,6 +14,8 @@ import { updateMemberOrganization } from "@/actions/members/actions/update";
 import { useUser } from "@/lib/auth-session-client";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { deleteOrganization } from "@/actions/organization/actions/delete";
+import { Trash2 } from "lucide-react";
 
 type InputNames = "name" | "supplierName" | "email" | "phone" ;
 const inputs: { label: string; defaultValue: string; name: InputNames; type: string; }[] = [
@@ -71,6 +73,18 @@ export default function SupplierFormEdit(props: {
   });
   const { user } = useUser()
   const member = props.organization.members.find((m:any) => m.userId === user?.id)
+
+  const onDelete = async () => {
+    if (props.organization.id) {
+      const result = await deleteOrganization({organizationId: props.organization.id})
+      if (result?.data?.success) {
+        props.setOpen(false)
+        props.reload && props.reload()
+      } else {
+        handleFormErrors(result, setError);
+      }
+    }
+  }
 
   const onSubmit: SubmitHandler<supplierType> = async (data:any) => {
     let result
@@ -180,9 +194,16 @@ export default function SupplierFormEdit(props: {
             />
             {errors["contactMessage"] && <p className="text-red-500 mt-1 text-sm">{errors["contactMessage"]?.message}</p>}
           </div>
-          <Button type="submit" className="w-full" onClick={() => clearErrors()}>
-            Valider
-          </Button>
+          <div className="flex justify-between">
+            {props.organization && 
+              <Button size="icon" variant="destructive" onClick={() => onDelete()}>
+                <Trash2 />
+              </Button>
+            }
+            <Button type="submit" onClick={() => clearErrors()}>
+              Valider
+            </Button>
+          </div>
         </div>
       </form>
     </div>
