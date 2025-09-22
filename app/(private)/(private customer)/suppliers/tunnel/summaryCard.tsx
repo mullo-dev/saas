@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useUser } from "@/lib/auth-session-client"
+import { CopyMinus } from "lucide-react"
 import { useEffect } from "react"
 
 export default function SummaryCard(props:{ 
@@ -16,8 +17,10 @@ export default function SummaryCard(props:{
   setGroupedSupplier: (prev:any) => void,
   addresses?: addressType[]
 }) {
+  const parsedMertadata = JSON.parse(props.supplier.supplier.metadata ?? '{}');
   const user = useUser()
-  const message = props.supplier.supplier.metadata?.contentMessage 
+
+  const message = parsedMertadata.contactMessage 
     || props.supplier?.supplier?.members?.find((e:any) => user?.user?.id === e.userId)?.contentMessage
     || `Bonjour ${props.supplier.supplier.name}, tu trouveras ci-joint ma dernière commande. Belle journée`
 

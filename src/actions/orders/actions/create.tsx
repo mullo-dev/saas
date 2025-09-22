@@ -123,26 +123,38 @@ export const createOrder = authActionClient
       //   }
       // });
 
-      // ADD DELIVERYNOTE IN THE MAIL
-      await resend.emails.send({
-        from: 'noreply@mullo.fr',
-        to: organization?.supplier.metadata.email ? organization?.supplier.metadata.email.trim() : organization?.supplier.members[0].user.email.trim(),
-        subject: "Vous avez une nouvelle commande à traîter",
-        // replyTo: `reply+${conversation.id}@mullo.fr`,
-        react: NewOrderEmail({
-          products: organization?.fullProducts,
-          client: user?.user?.name,
-          href: `${URL}/dashboard/orders/${order.id}`,
-          message: message,
-          deliveryMethod: supplier.deliveryType === "DELIVERY" ? "A livrer" : user?.user?.name + " vient récupérer la commande",
-          address: supplier.address
-        })
-      })
+      let email: string
 
-      if (organization?.supplier.metadata.contactPreference?.includes("sms")) {
-        const smsMessage = `Nouvelle commande de ${user?.user?.name}:\n\n${message}\n\nvoir la commande : ${URL}/dashboard/orders/${order.id}`;
-        await sendSms("+33770079644",organization.supplier.metadata.phone,smsMessage) // organization?.supplier.metadata.phone
+      try {
+        const parsed = JSON.parse(organization?.supplier.metadata ?? '{}');
+        email = parsed.email ?? organization?.supplier.members[0].user.email ?? "contact@mullo.fr";
+
+        console.log(email)
+
+        // ADD DELIVERYNOTE IN THE MAIL
+        await resend.emails.send({
+          from: 'noreply@mullo.fr',
+          to: email.trim(),
+          subject: "Vous avez une nouvelle commande à traîter",
+          // replyTo: `reply+${conversation.id}@mullo.fr`,
+          react: NewOrderEmail({
+            products: organization?.fullProducts,
+            client: user?.user?.name,
+            href: `${URL}/dashboard/orders/${order.id}`,
+            message: message,
+            deliveryMethod: supplier.deliveryType === "DELIVERY" ? "A livrer" : user?.user?.name + " vient récupérer la commande",
+            address: supplier.address
+          })
+        })
+      } catch (e) {
+        console.error('Supplier email invalide', e);
       }
+      
+
+      // if (organization?.supplier.metadata.contactPreference?.includes("sms")) {
+      //   const smsMessage = `Nouvelle commande de ${user?.user?.name}:\n\n${message}\n\nvoir la commande : ${URL}/dashboard/orders/${order.id}`;
+      //   await sendSms("+33770079644",organization.supplier.metadata.phone,smsMessage) // organization?.supplier.metadata.phone
+      // }
     })
     
     await clearCart()
