@@ -137,8 +137,8 @@ export const createOrder = authActionClient
 });
 
 
-export function sendEmailOrderToPreapre(order:any,messages:any,grouped:any,user:any) {
-  order.suppliers.forEach((supplier:any, index:number) => {
+export async function sendEmailOrderToPreapre(order:any,messages:any,grouped:any,user:any) {
+  order.suppliers.forEach((supplier:any) => {
     setTimeout(async () => {
       const organization = grouped?.data?.groupedArray.find((sup:any) => sup.supplierId === supplier.supplierId)
       const message = messages.find((m:any) => m.supplierId === supplier.supplierId)?.message
@@ -166,7 +166,7 @@ export function sendEmailOrderToPreapre(order:any,messages:any,grouped:any,user:
       } catch (e) {
         console.error('Supplier email invalide', e);
       }
-    }, index * 2000); // Send email every
+    }, 2000); // Send email every
   });
 }
 
