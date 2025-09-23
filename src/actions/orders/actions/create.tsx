@@ -103,9 +103,9 @@ export const createOrder = authActionClient
       })
     }
 
-    order.suppliers.map(async (supplier:any) => {
-      const organization = grouped?.data?.groupedArray.find((sup) => sup.supplierId === supplier.supplierId)
-      const message = messages.find((m:any) => m.supplierId === supplier.supplierId)?.message
+    sendEmailOrderToPreapre(order, messages, grouped, user.user)
+
+    // order.suppliers.map(async (supplier:any) => {
       // const filePath = path.join(process.cwd(), 'public', 'pdf', `order-${order.ref}.pdf`);
       // const stream = fs.createWriteStream(filePath);
       // const pdfStream = await renderToBuffer(<DeliveryNotePDF order={order} supplier={supplier} products={supplier.products} />);
@@ -123,14 +123,31 @@ export const createOrder = authActionClient
       //   }
       // });
 
-      let email: string
+      // if (organization?.supplier.metadata.contactPreference?.includes("sms")) {
+      //   const smsMessage = `Nouvelle commande de ${user?.user?.name}:\n\n${message}\n\nvoir la commande : ${URL}/dashboard/orders/${order.id}`;
+      //   await sendSms("+33770079644",organization.supplier.metadata.phone,smsMessage) // organization?.supplier.metadata.phone
+      // }
+    // })
+    
+    await clearCart()
+    return { success: true, order: order };
+  } catch (error) {
+    return { success: false, error };
+  }
+});
 
+
+export function sendEmailOrderToPreapre(order:any,messages:any,grouped:any,user:any) {
+  order.suppliers.forEach((supplier:any, index:number) => {
+    setTimeout(async () => {
+      const organization = grouped?.data?.groupedArray.find((sup:any) => sup.supplierId === supplier.supplierId)
+      const message = messages.find((m:any) => m.supplierId === supplier.supplierId)?.message
+      
+      let email: string
       try {
         const parsed = JSON.parse(organization?.supplier.metadata ?? '{}');
         email = parsed.email ?? organization?.supplier.members[0].user.email ?? "contact@mullo.fr";
-
-        console.log(email)
-
+    
         // ADD DELIVERYNOTE IN THE MAIL
         await resend.emails.send({
           from: 'noreply@mullo.fr',
@@ -139,30 +156,19 @@ export const createOrder = authActionClient
           // replyTo: `reply+${conversation.id}@mullo.fr`,
           react: NewOrderEmail({
             products: organization?.fullProducts,
-            client: user?.user?.name,
+            client: user.name,
             href: `${URL}/dashboard/orders/${order.id}`,
             message: message,
-            deliveryMethod: supplier.deliveryType === "DELIVERY" ? "A livrer" : user?.user?.name + " vient récupérer la commande",
+            deliveryMethod: supplier.deliveryType === "DELIVERY" ? "A livrer" : user.name + " vient récupérer la commande",
             address: supplier.address
           })
         })
       } catch (e) {
         console.error('Supplier email invalide', e);
       }
-      
-
-      // if (organization?.supplier.metadata.contactPreference?.includes("sms")) {
-      //   const smsMessage = `Nouvelle commande de ${user?.user?.name}:\n\n${message}\n\nvoir la commande : ${URL}/dashboard/orders/${order.id}`;
-      //   await sendSms("+33770079644",organization.supplier.metadata.phone,smsMessage) // organization?.supplier.metadata.phone
-      // }
-    })
-    
-    await clearCart()
-    return { success: true, order: order };
-  } catch (error) {
-    return { success: false, error };
-  }
-});
+    }, index * 2000); // Send email every
+  });
+}
 
 
 // REF GENERATION
