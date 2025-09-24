@@ -59,8 +59,7 @@ export default function NewOrderEmail({ client, products, href, message, deliver
                 <ul style={listContent}>
                   {products?.map((p:{name:string | null,quantity:number}, index:number) => (
                     <li key={index} style={list}>
-                      <p>{p.name}</p>
-                      <p>{p.quantity}</p>
+                      <p>{p.quantity} - {p.name}</p>
                     </li>
                   ))}
                 </ul>

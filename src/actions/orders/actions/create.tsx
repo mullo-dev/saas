@@ -103,7 +103,17 @@ export const createOrder = authActionClient
       })
     }
 
-    sendEmailOrderToPreapre(order, messages, grouped, user.user)
+    let userName
+    if (user.activeOrganizationId) {
+      const organization = await prisma.organization.findFirst({
+        where: { id: user.activeOrganizationId }
+      })
+      userName = organization?.name
+    } else {
+      userName = user.user.name
+    }
+
+    sendEmailOrderToPreapre(order, messages, grouped, userName)
 
     // order.suppliers.map(async (supplier:any) => {
       // const filePath = path.join(process.cwd(), 'public', 'pdf', `order-${order.ref}.pdf`);
@@ -137,7 +147,7 @@ export const createOrder = authActionClient
 });
 
 
-export async function sendEmailOrderToPreapre(order:any,messages:any,grouped:any,user:any) {
+export async function sendEmailOrderToPreapre(order:any,messages:any,grouped:any,userName:any) {
   order.suppliers.forEach((supplier:any) => {
     setTimeout(async () => {
       const organization = grouped?.data?.groupedArray.find((sup:any) => sup.supplierId === supplier.supplierId)
@@ -156,10 +166,10 @@ export async function sendEmailOrderToPreapre(order:any,messages:any,grouped:any
           // replyTo: `reply+${conversation.id}@mullo.fr`,
           react: NewOrderEmail({
             products: organization?.fullProducts,
-            client: user.name,
+            client: userName,
             href: `${URL}/dashboard/orders/${order.id}`,
             message: message,
-            deliveryMethod: supplier.deliveryType === "DELIVERY" ? "A livrer" : user.name + " vient récupérer la commande",
+            deliveryMethod: supplier.deliveryType === "DELIVERY" ? "A livrer" : userName + " vient récupérer la commande",
             address: supplier.address
           })
         })
