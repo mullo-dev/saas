@@ -23,7 +23,7 @@ export const getOrganizationById = authActionClient
       }),
       query: {
         organizationId: organizationId
-    }
+      }
     })
     return { success: true, organization: organization };
   } catch (error) {

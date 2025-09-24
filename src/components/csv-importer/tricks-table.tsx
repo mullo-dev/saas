@@ -9,6 +9,7 @@ import { DataTableProducts } from "../global/tables/products/table"
 import { columnsProducts } from "../global/tables/products/columns"
 import ProductForm from "../global/forms/productForm"
 import { DrawerDialog } from "../global/modal"
+import { useUser } from "@/lib/auth-session-client"
 
 
 export function TricksTable(
@@ -23,6 +24,7 @@ export function TricksTable(
     reload: () => void,
   }) {
   const { catalogueId } = useParams()
+  const user = useUser()
   const [returnResult, setReturnResult] = React.useState<any>()
 
   const toUploadData = async (parsedData:any) => {
@@ -42,6 +44,10 @@ export function TricksTable(
     }
   }
 
+  // if (!user.activeOrganizationId) {
+  //   return <p>Aucune organisation trouvée</p>
+  // }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center">
@@ -54,7 +60,7 @@ export function TricksTable(
                 buttonTitle="Nouveau produit"
                 description="Ajouter un produit à votre catalogue"
               >
-                {(p) => <ProductForm setOpen={p.setOpen} catalogueId={catalogueId as string} reload={props.reload} />}
+                {(p) => <ProductForm organizationId={user.activeOrganizationId as string} setOpen={p.setOpen} catalogueId={catalogueId as string} reload={props.reload} />}
               </DrawerDialog>
               <CsvImporter
                 fields={[

@@ -37,16 +37,18 @@ export const createOrganization = authActionClient
       })
     });
 
-    if (org && parsedInput.createByCustomer) {
-      await prisma.member.update({
-        where: {
-          id: org.members[0]?.id
-        },
-        data: {
-          role: "customerOfInternSupplier"
-        }
-      })
-      await createCatalogue({organizationId: org.id, name: org.name + " - catalogue"})
+    if (parsedInput.createByCustomer) {
+      if (org) {
+        await prisma.member.update({
+          where: {
+            id: org.members[0]?.id
+          },
+          data: {
+            role: "customerOfInternSupplier"
+          }
+        })
+        await createCatalogue({organizationId: org.id, name: org.name + " - catalogue"})
+      }
     } else {
       // Set the new organization active to the create user
       if (org?.id) {

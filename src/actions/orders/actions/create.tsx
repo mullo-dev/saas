@@ -27,6 +27,8 @@ export const createOrder = authActionClient
   )
   .action(async ({ parsedInput: { messages }, ctx: { user } }) => {
 
+  console.log(user)
+
   try {
     const grouped = await GroupedSupplierAndGetPrice()
 
@@ -109,9 +111,12 @@ export const createOrder = authActionClient
         where: { id: user.activeOrganizationId }
       })
       userName = organization?.name
+      console.log(organization)
     } else {
       userName = user.user.name
     }
+
+    console.log(userName)
 
     sendEmailOrderToPreapre(order, messages, grouped, userName)
 

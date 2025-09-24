@@ -48,6 +48,7 @@ export default function tunnelPage() {
             getCartProducts={getCartProducts}
             setGroupedSupplier={setGroupedSupplier}
             addresses={addresses}
+            reload={getTheAddresses}
           />
         ))}
       </div>

@@ -1,6 +1,9 @@
 "use client"
 
 import { addressType } from "@/actions/addresses/model"
+import { getOrganizationById } from "@/actions/organization/actions/get"
+import AddressForm from "@/components/global/forms/addressForm"
+import { DrawerDialog } from "@/components/global/modal"
 import { MinProductsTable } from "@/components/global/tables/minProductsTable"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -15,7 +18,8 @@ export default function SummaryCard(props:{
   supplier: any, 
   getCartProducts: () => void, 
   setGroupedSupplier: (prev:any) => void,
-  addresses?: addressType[]
+  addresses?: addressType[],
+  reload: () => void
 }) {
   const parsedMertadata = JSON.parse(props.supplier.supplier.metadata ?? '{}');
   const user = useUser()
@@ -53,11 +57,19 @@ export default function SummaryCard(props:{
       )
     );
   };
-
+  
   useEffect(() => {
     changeDeliveryMode("DELIVERY")
     selectAddress(props.addresses && props.addresses[0] ? `${props.addresses[0].address} ${props.addresses[0].zipCode} ${props.addresses[0].city}` : "Pas d'adresse selectionné")
     handleChange(message)
+
+    const test = async () => {
+      if (user.activeOrganizationId) {
+        const orga = await getOrganizationById({organizationId: user.activeOrganizationId})
+        console.log(orga)
+      }
+    }
+    test()
   }, [props.addresses])
   
   
@@ -83,7 +95,7 @@ export default function SummaryCard(props:{
             </RadioGroup>
 
             <Label className="mb-2 mt-5">Mon adresse</Label>
-            {props.addresses &&
+            {props.addresses && props.addresses[0] ?
               <Select onValueChange={selectAddress} defaultValue={props.addresses[0].address + " " + props.addresses[0].zipCode + " " + props.addresses[0].city}>
                 <SelectTrigger className="w-full bg-white">
                   <SelectValue placeholder="Votre adresse" />
@@ -94,6 +106,18 @@ export default function SummaryCard(props:{
                   ))}
                 </SelectContent>
               </Select>
+            : 
+            <>
+              <h5 className="italic text-gray-500 mb-1 text-sm">Vous n'avez pas encore d'adresse</h5>
+              <DrawerDialog
+                title="Nouvelle adresse" 
+                buttonTitle="Ajouter une adresse"
+                buttonSize="lg"
+                description="Ajoutez votre adresse"
+              >
+                {(p) => <AddressForm setOpen={p.setOpen} reload={props.reload} />}
+              </DrawerDialog>
+            </>
             }
           </div>
           <div>
