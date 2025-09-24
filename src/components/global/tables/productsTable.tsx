@@ -133,7 +133,7 @@ export function ProductsTable(props: { propsData: any, supplierId?: string[], vi
                         description=""
                         toastTitle="Modifier le produit"
                       >
-                        {(p) => <ProductForm setOpen={p.setOpen} productId={item.product.id} catalogueId={item.catalogueId as string} reload={props.reload} />}
+                        {(p) => <ProductForm organizationId={item.organizationId} setOpen={p.setOpen} productId={item.product.id} catalogueId={item.catalogueId as string} reload={props.reload} />}
                       </DrawerDialog>
                     </div>}
                     <Eye size={18} className="onHover text-white group-has-hover:text-white-400" />
