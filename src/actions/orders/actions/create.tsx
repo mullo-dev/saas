@@ -179,7 +179,7 @@ export async function sendEmailOrderToPreapre(order:any,messages:any,grouped:any
       } catch (e) {
         console.error('Supplier email invalide', e);
       }
-    }, 2000); // Send email every
+    }, 3000); // Send email every
   });
 }
 
