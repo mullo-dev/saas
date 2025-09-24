@@ -27,8 +27,6 @@ export const createOrder = authActionClient
   )
   .action(async ({ parsedInput: { messages }, ctx: { user } }) => {
 
-  console.log(user)
-
   try {
     const grouped = await GroupedSupplierAndGetPrice()
 
@@ -105,16 +103,16 @@ export const createOrder = authActionClient
       })
     }
 
-    let userName
-    if (user.activeOrganizationId) {
-      const organization = await prisma.organization.findFirst({
-        where: { id: user.activeOrganizationId }
-      })
-      userName = organization?.name
-      console.log(organization)
-    } else {
-      userName = user.user.name
-    }
+    let userName = user.user.name
+    // if (user.activeOrganizationId) {
+    //   const organization = await prisma.organization.findFirst({
+    //     where: { id: user.activeOrganizationId }
+    //   })
+    //   userName = organization?.name
+    //   console.log(organization)
+    // } else {
+    //   userName = user.user.name
+    // }
 
     console.log(userName)
 
