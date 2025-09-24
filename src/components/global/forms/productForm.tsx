@@ -16,6 +16,7 @@ import { Product } from "@prisma/client";
 import { getProductById } from "@/actions/products/actions/get";
 import { updateProduct } from "@/actions/products/actions/update";
 import { deleteProduct } from "@/actions/products/actions/delete";
+import { createCatalogue } from "@/actions/catalogue/actions/create";
 
 type InputNames = "name" | "ref" | "price" | "sellQuantity" | "unit" | "tvaValue" | "categories" ;
 const inputs: { label: string; defaultValue: string | number; name: InputNames; type: string; col: number, adorment?: any }[] = [
@@ -76,7 +77,13 @@ const inputs: { label: string; defaultValue: string | number; name: InputNames; 
   }
 ];
 
-export default function ProductForm(props: {productId?: string, catalogueId: string, setOpen: any, reload?: () => void, createByCustomer?: boolean}) {
+export default function ProductForm(props: {
+  productId?: string, 
+  catalogueId?: string, 
+  organizationId: string, 
+  setOpen: any, reload?: () => void, 
+  createByCustomer?: boolean
+}) {
   const {
     register,
     setError,
@@ -145,6 +152,23 @@ export default function ProductForm(props: {productId?: string, catalogueId: str
   }
 
   const onSubmit: SubmitHandler<productType> = async (data) => {
+    // If the organization don't have a catalogue yet
+    let theCatalogue
+    if (props.catalogueId) {
+      theCatalogue = props.catalogueId
+    } else {
+      const result = await createCatalogue({
+        name: "Catalogue",
+        organizationId: props.organizationId
+      })
+      console.log(result)
+      if (result?.data?.catalogue) {
+        theCatalogue = result?.data?.catalogue.id
+      } else {
+        throw new Error("Catalogue not found")
+      }
+    }
+
     const formattedData = {
       ref: String(data.ref),
       name: String(data.name),
@@ -153,7 +177,7 @@ export default function ProductForm(props: {productId?: string, catalogueId: str
         : Number.isNaN(Number(String(data.price).replace(',', '.'))) ? 
           0
         : Number(String(data.price).replace(',', '.')),
-      catalogueId: props.catalogueId,
+      catalogueId: theCatalogue,
       unit: String(data.unit),
       tvaValue: typeof data.tvaValue === "number" ? data.tvaValue 
         : Number.isNaN(Number(String(data.tvaValue).replace(',', '.'))) ? 

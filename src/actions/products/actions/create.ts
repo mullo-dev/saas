@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { authActionClient } from '@/lib/auth-action';
 import { productModel } from "../model"
+import { checkCatalogueOrCreate } from '@/actions/catalogue/actions/get';
 
 export const createProducts = authActionClient
 .metadata({ actionName: "createProduct" }) 
@@ -74,31 +75,55 @@ export const createProducts = authActionClient
     }
 
     // TO DO : ADD HERE UPDATE AND ADD PRODUCTS (add also the produt is already in)
-    if (createByCustomer) {
+    if (createByCustomer && user?.user) {
+      const subCatalogue = await checkCatalogueOrCreate({
+        userId: user.user.id,
+        catalogueId: catalogueId
+      })
+
       const allProducts = await prisma.product.findMany({
         where: {
           catalogueId: catalogueId
-        }
-      })
-      // Create the subCatalogue
-      await prisma.subCatalogue.create({
-        data: {
-          customerId: user?.user?.id,
-          status: "memberInvited",
-          catalogueId: catalogueId,
-          products: {
-            create: allProducts.map((prod:any) => ({
-              assignedBy: user.user ? user.user.name : "Inconnu",
-              price: prod.price ? prod.price : 0,
-              product: {
-                connect: {
-                  id: prod.id
-                }
-              }
-            }))
+        },
+        include: {
+          productOnSubCatalogues: {
+            select: {
+              subCatalogueId: true
+            }
           }
         }
       })
+
+      if (subCatalogue?.data?.subCatalogue?.id) {
+        const targetSubCatalogueId = subCatalogue.data.subCatalogue.id
+        for (const product of allProducts) {
+          const alreadyLinked = product.productOnSubCatalogues.some(
+            (link) => link.subCatalogueId === targetSubCatalogueId
+          )
+
+          if (alreadyLinked) {
+            await prisma.productOnSubCatalogue.updateMany({
+              where: {
+                productId: product.id,
+                subCatalogueId: targetSubCatalogueId,
+              },
+              data: {
+                assignedBy: user?.user?.name ? user.user.name : "Pas spécifié",
+                price: product.price ? product.price : 0,
+              },
+            })
+          } else {
+            await prisma.productOnSubCatalogue.create({
+              data: {
+                productId: product.id,
+                subCatalogueId: targetSubCatalogueId,
+                assignedBy: user?.user?.name ? user.user.name : "Pas spécifié",
+                price: product.price ? product.price : 0,
+              },
+            })
+          }
+        }
+      }
     }
 
     return {
@@ -129,18 +154,16 @@ export const createSingleProduct = authActionClient
     });
 
     if (createByCustomer && user.user?.id) {
-      const subCatalogue = await prisma.subCatalogue.findFirst({
-        where: {
-          customerId: user.user.id,
-          catalogueId: product.catalogueId,
-        },
-      });
-    
-      if (subCatalogue) {
+      const subCatalogue = await checkCatalogueOrCreate({
+        userId: user.user.id,
+        catalogueId: product.catalogueId,
+      })
+
+      if (subCatalogue?.data?.subCatalogue) {
         await prisma.productOnSubCatalogue.create({
           data: {
             productId: product.id,
-            subCatalogueId: subCatalogue.id,
+            subCatalogueId: subCatalogue.data.subCatalogue.id,
             assignedBy: user.user.name,
             price: product.price ? product.price : 0
           },

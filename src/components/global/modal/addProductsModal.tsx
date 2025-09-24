@@ -6,9 +6,10 @@ import ProductForm from "../forms/productForm";
 import { CsvImporter } from "@/components/csv-importer/csv-importer";
 
 export function AddProductModal(props: {
-  catalogueId: string,
-  toUploadData: (parsedData:any) => Promise<{ success: boolean, error: any }>
-  reload: () => void
+  catalogueId?: string,
+  organizationId: string,
+  toUploadData: (parsedData:any) => Promise<{ success: boolean, error: any }>,
+  reload: () => void,
   returnResult: any
 }) {
 
@@ -47,7 +48,7 @@ export function AddProductModal(props: {
           </CsvImporter>
           <hr />
           <h3 className="font-bold text-sm">Ajouter un seul produit</h3>
-          <ProductForm setOpen={p.setOpen} catalogueId={props.catalogueId} reload={props.reload} createByCustomer />
+          <ProductForm setOpen={p.setOpen} catalogueId={props.catalogueId} organizationId={props.organizationId} reload={props.reload} createByCustomer />
         </>
       )}
     </DrawerDialog>

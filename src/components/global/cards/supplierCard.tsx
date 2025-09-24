@@ -144,7 +144,7 @@ export default function SupplierCard(props: {
               <ConversationDrawer receipt={props.organization.members.find((u:any) => u.role === "owner").user} open={props.openDialog} />
             </div>
           // the supplier was created by the customer...
-          : props.organization.catalogues[0]?.subCatalogues.reduce((acc:any, subCat:any) => acc + subCat._count.products,0) > 0 ? // ...and have a catalogue
+          : // props.organization.catalogues[0]?.subCatalogues.reduce((acc:any, subCat:any) => acc + subCat._count.products,0) > 0 ? // ...and have a catalogue
             <div className="flex gap-2">
               <DrawerDialog
                 title="Modifier votre fournisseur" 
@@ -156,36 +156,37 @@ export default function SupplierCard(props: {
                 {(p) => <SupplierFormEdit organization={props.organization} setOpen={p.setOpen} reload={props.reload} />}
               </DrawerDialog>
               <AddProductModal 
-                catalogueId={props.organization.catalogues[0].id}
+                catalogueId={props.organization?.catalogues[0]?.id}
+                organizationId={props.organization.id}
                 toUploadData={(parsedData) => toUploadData(parsedData)}
                 reload={props.reload}
                 returnResult={returnResult}
               />
             </div>
-          : // ...don't have catagloue yet
-            <CsvImporter
-              fields={[
-                { label: "Référence", value: "chooseRef", required: true },
-                { label: "Name", value: "chooseName", required: true },
-                { label: "Description", value: "chooseDescription" },
-                { label: "Prix", value: "choosePrice", required: true },
-                { label: "Unité de vente", value: "chooseUnit", required: true },
-                { label: "Quantité par colis", value: "chooseSellQuantity", required: true },
-                { label: "Taux de TVA", value: "chooseTvaValue" },
-                { label: "Catégories", value: "chooseCategories" }
-              ]}
-              onImport={(parsedData) => toUploadData(parsedData)}
-              reload={props.reload}
-              className="self-end"
-            >
-              <ul>
-                <li className="text-sm font-bold">{returnResult?.updated} produits ont été mis à jour.</li>
-                <li className="text-sm font-bold">{returnResult?.created} produits ont été créés.</li>
-                {returnResult?.failed > 0 && <li className="text-sm font-bold text-red-800">
-                  {returnResult?.failed} produits n'ont pas pu être importé.
-                </li>}
-              </ul>
-            </CsvImporter>
+          // : // ...don't have catagloue yet
+          //   <CsvImporter
+          //     fields={[
+          //       { label: "Référence", value: "chooseRef", required: true },
+          //       { label: "Name", value: "chooseName", required: true },
+          //       { label: "Description", value: "chooseDescription" },
+          //       { label: "Prix", value: "choosePrice", required: true },
+          //       { label: "Unité de vente", value: "chooseUnit", required: true },
+          //       { label: "Quantité par colis", value: "chooseSellQuantity", required: true },
+          //       { label: "Taux de TVA", value: "chooseTvaValue" },
+          //       { label: "Catégories", value: "chooseCategories" }
+          //     ]}
+          //     onImport={(parsedData) => toUploadData(parsedData)}
+          //     reload={props.reload}
+          //     className="self-end"
+          //   >
+          //     <ul>
+          //       <li className="text-sm font-bold">{returnResult?.updated} produits ont été mis à jour.</li>
+          //       <li className="text-sm font-bold">{returnResult?.created} produits ont été créés.</li>
+          //       {returnResult?.failed > 0 && <li className="text-sm font-bold text-red-800">
+          //         {returnResult?.failed} produits n'ont pas pu être importé.
+          //       </li>}
+          //     </ul>
+          //   </CsvImporter>
           }
       </CardFooter>
     </Card>
